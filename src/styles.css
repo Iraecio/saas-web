@@ -88,6 +88,12 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-feature-settings: "ss01", "cv11";
+  color: var(--color-neutral-900);
+}
+
+.dark body,
+body.dark {
+  color: var(--color-neutral-100);
 }
 
 @keyframes slideIn {

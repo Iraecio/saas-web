@@ -13,7 +13,7 @@ import { CardComponent } from '../../../shared/components/card/card';
       </header>
 
       <app-card title="Relatórios disponíveis">
-        <ul class="divide-y divide-neutral-200 dark:divide-neutral-700">
+        <ul class="divide-y divide-neutral-200 text-neutral-900 dark:divide-neutral-800 dark:text-neutral-100">
           <li class="flex items-center justify-between py-3">
             <span>Vendas por período</span>
             <button class="btn-secondary">Gerar</button>

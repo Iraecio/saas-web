@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, output, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { AppStateService } from '../../../core/services/app-state';
 import { AuthService } from '../../../core/services/auth';
@@ -30,15 +30,18 @@ import { AuthService } from '../../../core/services/auth';
         @if (appState.user(); as user) {
           <div class="flex items-center gap-3 border-l border-neutral-200 pl-3 dark:border-neutral-700">
             <div class="text-right">
-              <p class="text-sm font-medium text-neutral-900 dark:text-white">{{ user.name }}</p>
+              <p class="text-sm font-medium text-neutral-900 dark:text-white">
+                {{ user.name || user.email }}
+              </p>
               <p class="text-xs text-neutral-500">{{ user.role }}</p>
             </div>
             <button
               type="button"
               class="rounded-lg px-3 py-1.5 text-sm text-neutral-700 hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-700"
+              [disabled]="loggingOut()"
               (click)="handleLogout()"
             >
-              Sair
+              {{ loggingOut() ? 'Saindo...' : 'Sair' }}
             </button>
           </div>
         }
@@ -52,9 +55,20 @@ export class HeaderComponent {
   private readonly router = inject(Router);
 
   readonly toggleSidebar = output<void>();
+  protected readonly loggingOut = signal(false);
 
   handleLogout(): void {
-    this.auth.logout();
-    this.router.navigate(['/auth/login']);
+    if (this.loggingOut()) return;
+    this.loggingOut.set(true);
+    this.auth.logout().subscribe({
+      next: () => {
+        this.loggingOut.set(false);
+        this.router.navigate(['/auth/login']);
+      },
+      error: () => {
+        this.loggingOut.set(false);
+        this.router.navigate(['/auth/login']);
+      },
+    });
   }
 }

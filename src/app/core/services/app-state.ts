@@ -20,7 +20,10 @@ export class AppStateService {
   readonly sidebarOpen = this.sidebarOpenSignal.asReadonly();
 
   readonly isAuthenticated = computed(() => this.userSignal() !== null);
-  readonly isAdmin = computed(() => this.userSignal()?.role === 'admin');
+  readonly isAdmin = computed(() => {
+    const role = this.userSignal()?.role;
+    return role === 'ADMIN' || role === 'SUPER_ADMIN';
+  });
 
   constructor() {
     effect(() => {

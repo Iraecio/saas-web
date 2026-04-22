@@ -6,11 +6,11 @@ import { MagicCubeComponent } from '../../../../shared/components/magic-cube/mag
 import { AuthService } from '../../../../core/services/auth';
 
 @Component({
-  selector: 'app-login',
+  selector: 'app-register',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [ReactiveFormsModule, RouterLink, MagicCubeComponent],
   template: `
-    <div class="min-h-screen w-full flex items-center justify-center bg-black p-6 relative overflow-hidden">
+    <div class="min-h-screen w-full flex items-center justify-center bg-black p-6 overflow-y-auto relative">
       <app-magic-cube />
 
       <div class="absolute inset-0 bg-[radial-gradient(ellipse_50%_70%_at_center,rgba(0,0,0,0.85)_0%,transparent_80%)] pointer-events-none"></div>
@@ -24,12 +24,29 @@ import { AuthService } from '../../../../core/services/auth';
 
           <!-- Cabeçalho -->
           <div class="mb-8">
-            <h2 class="text-3xl font-bold text-white">Entrar</h2>
-            <p class="text-neutral-400 mt-2">Acesse sua conta para continuar</p>
+            <h2 class="text-3xl font-bold text-white">Criar Conta</h2>
+            <p class="text-neutral-400 mt-2">Junte-se a milhares de usuários</p>
           </div>
 
           <!-- Formulário -->
           <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-6">
+            <!-- Nome Input -->
+            <div class="group">
+              <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                Nome <span class="text-neutral-500">(opcional)</span>
+              </label>
+              <div class="relative">
+                <input
+                  type="text"
+                  formControlName="name"
+                  autocomplete="name"
+                  placeholder="Seu nome completo"
+                  maxlength="100"
+                  class="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-600 focus:outline-none focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white focus:border-transparent transition-all"
+                />
+              </div>
+            </div>
+
             <!-- Email Input -->
             <div class="group">
               <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
@@ -55,19 +72,14 @@ import { AuthService } from '../../../../core/services/auth';
 
             <!-- Senha Input -->
             <div class="group">
-              <div class="flex items-center justify-between mb-2">
-                <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
-                  Senha
-                </label>
-                <a href="#" class="text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors">
-                  Esqueceu?
-                </a>
-              </div>
+              <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                Senha
+              </label>
               <div class="relative">
                 <input
                   [type]="showPassword() ? 'text' : 'password'"
                   formControlName="password"
-                  autocomplete="current-password"
+                  autocomplete="new-password"
                   placeholder="••••••••"
                   class="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-600 focus:outline-none focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white focus:border-transparent transition-all"
                   required
@@ -90,9 +102,23 @@ import { AuthService } from '../../../../core/services/auth';
                   }
                 </button>
               </div>
+              <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-2">Mínimo 8 caracteres</p>
               @if (form.get('password')?.invalid && form.get('password')?.touched) {
-                <p class="text-xs text-red-500 mt-1">Mínimo 8 caracteres</p>
+                <p class="text-xs text-red-500 mt-1">Senha deve ter no mínimo 8 caracteres</p>
               }
+            </div>
+
+            <!-- Termos -->
+            <div class="flex items-start">
+              <input
+                type="checkbox"
+                id="terms"
+                class="mt-1 w-4 h-4 rounded border-neutral-300 dark:border-neutral-700 text-neutral-900 dark:text-white focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white"
+              />
+              <label for="terms" class="ml-3 text-sm text-neutral-600 dark:text-neutral-400">
+                Concordo com os <a href="#" class="font-medium text-neutral-900 dark:text-white hover:underline">Termos de Serviço</a> e
+                <a href="#" class="font-medium text-neutral-900 dark:text-white hover:underline">Política de Privacidade</a>
+              </label>
             </div>
 
             <!-- Mensagem de Erro -->
@@ -103,19 +129,7 @@ import { AuthService } from '../../../../core/services/auth';
               </div>
             }
 
-            <!-- Checkbox Lembrar -->
-            <div class="flex items-center">
-              <input
-                type="checkbox"
-                id="remember"
-                class="w-4 h-4 rounded border-neutral-300 dark:border-neutral-700 text-neutral-900 dark:text-white focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white"
-              />
-              <label for="remember" class="ml-2 text-sm text-neutral-600 dark:text-neutral-400">
-                Manter-me conectado
-              </label>
-            </div>
-
-            <!-- Botão Entrar -->
+            <!-- Botão Criar Conta -->
             <button
               type="submit"
               [disabled]="form.invalid || loading()"
@@ -123,9 +137,9 @@ import { AuthService } from '../../../../core/services/auth';
             >
               @if (loading()) {
                 <div class="w-4 h-4 border-2 border-white dark:border-neutral-900 border-t-transparent rounded-full animate-spin"></div>
-                <span>Entrando...</span>
+                <span>Criando conta...</span>
               } @else {
-                <span>Entrar</span>
+                <span>Criar Conta</span>
                 <span>→</span>
               }
             </button>
@@ -141,30 +155,20 @@ import { AuthService } from '../../../../core/services/auth';
             </div>
           </div>
 
-          <!-- Link Registrar -->
+          <!-- Link Login -->
           <div class="text-center">
             <p class="text-neutral-600 dark:text-neutral-400">
-              Não tem uma conta?
-              <a routerLink="/auth/register" class="font-semibold text-neutral-900 dark:text-white hover:underline transition-colors">
-                Criar agora
+              Já tem uma conta?
+              <a routerLink="/auth/login" class="font-semibold text-neutral-900 dark:text-white hover:underline transition-colors">
+                Entrar agora
               </a>
             </p>
-          </div>
-
-          <!-- Footer -->
-          <div class="mt-8 pt-8 border-t border-neutral-200 dark:border-neutral-800 text-center text-xs text-neutral-500 dark:text-neutral-600 space-y-2">
-            <p>Ao entrar, você concorda com nossos Termos de Serviço</p>
-            <div class="flex items-center justify-center gap-4">
-              <a href="#" class="hover:text-neutral-700 dark:hover:text-neutral-400 transition-colors">Privacidade</a>
-              <span>•</span>
-              <a href="#" class="hover:text-neutral-700 dark:hover:text-neutral-400 transition-colors">Termos</a>
-            </div>
           </div>
       </div>
     </div>
   `,
 })
-export class LoginComponent {
+export class RegisterComponent {
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
@@ -174,8 +178,12 @@ export class LoginComponent {
   readonly showPassword = signal(false);
 
   readonly form = this.fb.nonNullable.group({
+    name: [''],
     email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(8)]],
+    password: [
+      '',
+      [Validators.required, Validators.minLength(8), Validators.maxLength(72)],
+    ],
   });
 
   togglePassword(): void {
@@ -187,22 +195,24 @@ export class LoginComponent {
     this.loading.set(true);
     this.error.set(undefined);
 
-    const { email, password } = this.form.getRawValue();
-    this.auth.login({ email, password }).subscribe({
-      next: () => {
-        this.loading.set(false);
-        this.router.navigate(['/admin/dashboard']);
-      },
-      error: (err: HttpErrorResponse | Error) => {
-        this.loading.set(false);
-        this.error.set(this.extractMessage(err));
-      },
-    });
+    const { email, password, name } = this.form.getRawValue();
+    this.auth
+      .register({ email, password, name: name.trim() || undefined })
+      .subscribe({
+        next: () => {
+          this.loading.set(false);
+          this.router.navigate(['/admin/dashboard']);
+        },
+        error: (err: HttpErrorResponse | Error) => {
+          this.loading.set(false);
+          this.error.set(this.extractMessage(err));
+        },
+      });
   }
 
   private extractMessage(err: HttpErrorResponse | Error): string {
     if (err instanceof HttpErrorResponse) {
-      if (err.status === 401) return 'Email ou senha incorretos.';
+      if (err.status === 409) return 'Email já cadastrado.';
       if (err.status === 429) return 'Muitas tentativas. Aguarde um minuto.';
       if (err.status === 0) return 'Sem conexão com o servidor.';
       const body = err.error as { message?: string; errors?: string[] } | null;
@@ -210,6 +220,6 @@ export class LoginComponent {
       if (body?.message) return body.message;
       return `Erro ${err.status}`;
     }
-    return err.message ?? 'Falha no login';
+    return err.message ?? 'Falha no registro';
   }
 }

@@ -191,10 +191,10 @@ export class BootstrapComponent {
       .superAdminBootstrap({ email, password, name: name.trim() || undefined })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: () => {
+        next: (response) => {
           this.loading.set(false);
-          const user = this.appState.user();
-          const dashboardPath = user?.role ? this.roleDashboardMap[user.role] : 'client';
+          const role = response.user.role;
+          const dashboardPath = this.roleDashboardMap[role] || 'client';
           this.router.navigate(['/admin/dashboard', dashboardPath]).catch((err) => {
             console.error('[BootstrapComponent] Erro ao navegar:', err);
             this.error.set('Erro ao redirecionar. Tente novamente.');

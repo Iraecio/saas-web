@@ -20,10 +20,23 @@ export class AppStateService {
   readonly sidebarOpen = this.sidebarOpenSignal.asReadonly();
 
   readonly isAuthenticated = computed(() => this.userSignal() !== null);
+  readonly userRole = computed(() => this.userSignal()?.role ?? null);
+  readonly userName = computed(() => this.userSignal()?.name ?? this.userSignal()?.email ?? 'Usuário');
   readonly isAdmin = computed(() => {
     const role = this.userSignal()?.role;
     return role === 'ADMIN' || role === 'SUPER_ADMIN';
   });
+  readonly isSuperAdmin = computed(() => {
+    const role = this.userSignal()?.role;
+    return role === 'SUPER_ADMIN' || role === 'ADMIN';
+  });
+  readonly isReseller = computed(() => {
+    const role = this.userSignal()?.role;
+    return role === 'RESELLER' || role === 'RESELLER_MANAGER';
+  });
+  readonly isVoiceActor = computed(() => this.userSignal()?.role === 'VOICE_ACTOR');
+  readonly isProducer = computed(() => this.userSignal()?.role === 'PRODUCER');
+  readonly isClient = computed(() => this.userSignal()?.role === 'CLIENT');
 
   constructor() {
     effect(() => {

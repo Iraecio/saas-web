@@ -1,7 +1,8 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MagicCubeComponent } from '../../../../shared/components/magic-cube/magic-cube';
 import { AuthService } from '../../../../core/services/auth';
 
@@ -172,6 +173,7 @@ export class RegisterComponent {
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly loading = signal(false);
   readonly error = signal<string | undefined>(undefined);
@@ -198,10 +200,13 @@ export class RegisterComponent {
     const { email, password, name } = this.form.getRawValue();
     this.auth
       .register({ email, password, name: name.trim() || undefined })
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
           this.loading.set(false);
-          this.router.navigate(['/admin/dashboard']);
+          this.router.navigate(['/admin/dashboard']).catch(() => {
+            // Navegar falhou, estado já foi atualizado
+          });
         },
         error: (err: HttpErrorResponse | Error) => {
           this.loading.set(false);

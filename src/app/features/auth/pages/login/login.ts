@@ -1,7 +1,8 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MagicCubeComponent } from '../../../../shared/components/magic-cube/magic-cube';
 import { AuthService } from '../../../../core/services/auth';
 
@@ -168,6 +169,7 @@ export class LoginComponent {
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly loading = signal(false);
   readonly error = signal<string | undefined>(undefined);
@@ -188,16 +190,21 @@ export class LoginComponent {
     this.error.set(undefined);
 
     const { email, password } = this.form.getRawValue();
-    this.auth.login({ email, password }).subscribe({
-      next: () => {
-        this.loading.set(false);
-        this.router.navigate(['/admin/dashboard']);
-      },
-      error: (err: HttpErrorResponse | Error) => {
-        this.loading.set(false);
-        this.error.set(this.extractMessage(err));
-      },
-    });
+    this.auth
+      .login({ email, password })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.loading.set(false);
+          this.router.navigate(['/admin/dashboard']).catch(() => {
+            // Navegar falhou, estado já foi atualizado
+          });
+        },
+        error: (err: HttpErrorResponse | Error) => {
+          this.loading.set(false);
+          this.error.set(this.extractMessage(err));
+        },
+      });
   }
 
   private extractMessage(err: HttpErrorResponse | Error): string {

@@ -20,6 +20,12 @@ export interface LoginInput {
   password: string;
 }
 
+export interface BootstrapInput {
+  email: string;
+  password: string;
+  name?: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly http = inject(HttpClient);
@@ -47,6 +53,14 @@ export class AuthService {
   login(input: LoginInput): Observable<AuthResponse> {
     this.appState.setLoading(true);
     return this.http.post<AuthResponse>(`${this.baseUrl}/auth/login`, input).pipe(
+      tap((res) => this.applySession(res)),
+      finalize(() => this.appState.setLoading(false)),
+    );
+  }
+
+  superAdminBootstrap(input: BootstrapInput): Observable<AuthResponse> {
+    this.appState.setLoading(true);
+    return this.http.post<AuthResponse>(`${this.baseUrl}/auth/bootstrap`, input).pipe(
       tap((res) => this.applySession(res)),
       finalize(() => this.appState.setLoading(false)),
     );

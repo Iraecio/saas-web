@@ -13,6 +13,7 @@ import { provideClientHydration, withEventReplay } from '@angular/platform-brows
 import { firstValueFrom } from 'rxjs';
 import { routes } from './app.routes';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
+import { responseTransformInterceptor } from './core/interceptors/response-transform.interceptor';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
 import { AuthService } from './core/services/auth';
 
@@ -21,7 +22,7 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
     provideRouter(routes, withComponentInputBinding(), withViewTransitions()),
-    provideHttpClient(withFetch(), withInterceptors([authInterceptor, errorInterceptor])),
+    provideHttpClient(withFetch(), withInterceptors([responseTransformInterceptor, authInterceptor, errorInterceptor])),
     provideClientHydration(withEventReplay()),
     {
       provide: APP_INITIALIZER,

@@ -5,6 +5,8 @@ import { Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MagicCubeComponent } from '../../../../shared/components/magic-cube/magic-cube';
 import { AuthService } from '../../../../core/services/auth';
+import { AppStateService } from '../../../../core/services/app-state';
+import { UserRole } from '../../../../core/models/user.model';
 
 @Component({
   selector: 'app-register',
@@ -173,11 +175,22 @@ export class RegisterComponent {
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly appState = inject(AppStateService);
   private readonly destroyRef = inject(DestroyRef);
 
   readonly loading = signal(false);
   readonly error = signal<string | undefined>(undefined);
   readonly showPassword = signal(false);
+
+  private readonly roleDashboardMap: Record<UserRole, string> = {
+    SUPER_ADMIN: 'admin',
+    ADMIN: 'admin',
+    RESELLER: 'reseller',
+    RESELLER_MANAGER: 'reseller',
+    VOICE_ACTOR: 'voice-actor',
+    PRODUCER: 'producer',
+    CLIENT: 'client',
+  };
 
   readonly form = this.fb.nonNullable.group({
     name: [''],
@@ -204,8 +217,11 @@ export class RegisterComponent {
       .subscribe({
         next: () => {
           this.loading.set(false);
-          this.router.navigate(['/admin/dashboard']).catch(() => {
-            // Navegar falhou, estado já foi atualizado
+          const user = this.appState.user();
+          const dashboardPath = user?.role ? this.roleDashboardMap[user.role] : 'client';
+          this.router.navigate(['/admin/dashboard', dashboardPath]).catch((err) => {
+            console.error('[RegisterComponent] Erro ao navegar:', err);
+            this.error.set('Erro ao redirecionar. Tente novamente.');
           });
         },
         error: (err: HttpErrorResponse | Error) => {

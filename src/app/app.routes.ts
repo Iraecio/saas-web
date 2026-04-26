@@ -40,6 +40,11 @@ export const routes: Routes = [
         loadChildren: () =>
           import('./features/role-requests/role-requests.routes').then((m) => m.ROLE_REQUESTS_ROUTES),
       },
+      {
+        path: 'resellers',
+        loadChildren: () =>
+          import('./features/resellers/resellers.routes').then((m) => m.RESELLERS_ROUTES),
+      },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],
   },

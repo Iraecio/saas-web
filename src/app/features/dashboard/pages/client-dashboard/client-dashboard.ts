@@ -1,6 +1,16 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { AppStateService } from '../../../../core/services/app-state';
+import { RoleRequest } from '../../../../core/models/role-request.model';
+import { RoleRequestService } from '../../../role-requests/services/role-request';
+
+const ROLE_LABEL: Record<string, string> = {
+  RESELLER: 'Revendedor',
+  VOICE_ACTOR: 'Locutor',
+  PRODUCER: 'Produtor',
+  CLIENT: 'Cliente',
+};
 
 @Component({
   selector: 'app-client-dashboard',
@@ -8,183 +18,200 @@ import { AppStateService } from '../../../../core/services/app-state';
   imports: [RouterLink],
   template: `
     <div class="p-6 space-y-6">
-
-      <header class="flex items-center justify-between">
-        <div>
-          <h1 class="text-3xl font-bold text-neutral-900 dark:text-white">
-            Olá, {{ appState.userName() }} 👋
-          </h1>
-          <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">O que você precisa hoje?</p>
-        </div>
-        <!-- Créditos -->
-        <div class="flex items-center gap-2 rounded-xl bg-emerald-50 px-4 py-2 ring-1 ring-emerald-200 dark:bg-emerald-900/20 dark:ring-emerald-700">
-          <span class="text-xl">💳</span>
-          <div>
-            <p class="text-xs text-emerald-600 dark:text-emerald-400">Seus créditos</p>
-            <p class="text-lg font-bold text-emerald-700 dark:text-emerald-300">R$ 240,00</p>
-          </div>
-          <a routerLink="/admin/credits" class="ml-2 rounded-lg bg-emerald-500 px-3 py-1 text-xs font-semibold text-white hover:bg-emerald-600 transition">
-            + Recarregar
-          </a>
-        </div>
+      <header>
+        <h1 class="text-3xl font-bold text-neutral-900 dark:text-white">
+          Olá, {{ appState.userName() }} 👋
+        </h1>
+        <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+          {{ isDirectClient() ? 'Bem-vindo à plataforma. Vamos configurar seu perfil.' : 'O que você precisa hoje?' }}
+        </p>
       </header>
 
-      <!-- CTA principal: Novo Pedido -->
-      <section class="rounded-xl bg-gradient-to-r from-violet-600 to-blue-500 p-6 text-white shadow-lg">
-        <div class="flex items-center justify-between">
-          <div>
-            <h2 class="text-xl font-bold">Precisa de uma locução?</h2>
-            <p class="mt-1 text-sm text-white/80">Faça seu pedido e receba em minutos.</p>
+      @if (isDirectClient()) {
+        <!-- Card de boas-vindas / onboarding -->
+        <section class="rounded-xl bg-gradient-to-r from-violet-600 to-blue-500 p-6 text-white shadow-lg">
+          <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              <h2 class="text-xl font-bold">Quer atuar como Revendedor, Locutor ou Produtor?</h2>
+              <p class="mt-1 text-sm text-white/80">
+                Solicite a mudança de papel e nossa equipe vai analisar seu perfil.
+              </p>
+            </div>
+            @if (!hasPendingRequest()) {
+              <a
+                routerLink="/admin/role-requests/new"
+                class="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-bold text-violet-700 shadow transition hover:scale-105"
+              >
+                🎯 Solicitar Upgrade
+              </a>
+            }
           </div>
-          <a
-            routerLink="/admin/orders/new"
-            class="flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-bold text-violet-700 shadow transition hover:scale-105"
-          >
-            <span>🎙️</span> Novo Pedido
-          </a>
-        </div>
-      </section>
+        </section>
 
-      <!-- Stats -->
-      <section class="grid grid-cols-2 gap-4 sm:grid-cols-4">
-        @for (stat of stats; track stat.label) {
-          <div class="rounded-xl bg-white p-4 shadow-sm ring-1 ring-neutral-200 dark:bg-neutral-800 dark:ring-neutral-700">
-            <p class="text-xs font-medium uppercase tracking-wide text-neutral-500 dark:text-neutral-400">{{ stat.label }}</p>
-            <p class="mt-2 text-2xl font-bold text-neutral-900 dark:text-white">{{ stat.value }}</p>
-            <p class="mt-1 text-xs text-neutral-400">{{ stat.sub }}</p>
-          </div>
+        <!-- Status da última solicitação -->
+        @if (latestRequest(); as req) {
+          <section class="rounded-xl bg-white p-6 shadow-sm ring-1 ring-neutral-200 dark:bg-neutral-800 dark:ring-neutral-700">
+            <div class="flex items-start justify-between gap-4">
+              <div class="flex items-start gap-4">
+                <div class="flex h-12 w-12 items-center justify-center rounded-xl text-2xl"
+                     [class]="statusBgClass(req.status)">
+                  {{ statusIcon(req.status) }}
+                </div>
+                <div>
+                  <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">
+                    Solicitação para {{ roleLabel(req.requestedRole) }}
+                  </h3>
+                  <p class="text-sm text-neutral-500 dark:text-neutral-400">
+                    Enviada em {{ formatDate(req.createdAt) }}
+                  </p>
+                  @if (req.status === 'REJECTED' && req.rejectionReason) {
+                    <p class="mt-2 text-sm text-red-600 dark:text-red-400">
+                      <strong>Motivo:</strong> {{ req.rejectionReason }}
+                    </p>
+                  }
+                </div>
+              </div>
+              <span class="rounded-full px-3 py-1 text-xs font-semibold whitespace-nowrap"
+                    [class]="statusBadgeClass(req.status)">
+                {{ statusLabel(req.status) }}
+              </span>
+            </div>
+            <div class="mt-4 flex gap-2">
+              <a routerLink="/admin/role-requests/my"
+                 class="text-sm text-blue-600 hover:underline dark:text-blue-400">
+                Ver histórico completo →
+              </a>
+            </div>
+          </section>
         }
-      </section>
 
-      <!-- Meus pedidos + Locutores favoritos -->
-      <section class="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <div class="lg:col-span-2 rounded-xl bg-white shadow-sm ring-1 ring-neutral-200 dark:bg-neutral-800 dark:ring-neutral-700 overflow-hidden">
-          <div class="border-b border-neutral-200 px-5 py-4 dark:border-neutral-700 flex justify-between items-center">
-            <h3 class="font-semibold text-neutral-900 dark:text-white">Meus Pedidos</h3>
-            <a routerLink="/admin/my-orders" class="text-xs text-blue-500 hover:underline">Ver todos</a>
+        <!-- Cards informativos -->
+        <section class="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div class="rounded-xl bg-white p-6 shadow-sm ring-1 ring-neutral-200 dark:bg-neutral-800 dark:ring-neutral-700">
+            <div class="text-3xl">🎙️</div>
+            <h3 class="mt-3 font-semibold text-neutral-900 dark:text-white">Locutor</h3>
+            <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+              Trabalhe com locuções comerciais, narrações e vinhetas.
+            </p>
           </div>
-          <ul class="divide-y divide-neutral-100 dark:divide-neutral-700">
-            @for (order of myOrders; track order.id) {
-              <li class="flex items-center justify-between px-5 py-3 text-sm">
-                <div class="flex items-center gap-3">
-                  <span class="text-xl">{{ order.icon }}</span>
-                  <div>
-                    <p class="font-medium text-neutral-800 dark:text-neutral-200">{{ order.title }}</p>
-                    <p class="text-xs text-neutral-400">{{ order.type }} · {{ order.date }}</p>
-                  </div>
-                </div>
-                <div class="flex items-center gap-3">
-                  <span class="rounded-full px-2.5 py-0.5 text-xs font-semibold" [class]="order.statusClass">
-                    {{ order.status }}
-                  </span>
-                  @if (order.canDownload) {
-                    <button class="rounded-lg bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700 hover:bg-blue-200 transition">
-                      ⬇️
-                    </button>
-                  }
-                  @if (order.canReview) {
-                    <button class="rounded-lg bg-yellow-100 px-3 py-1 text-xs font-semibold text-yellow-700 hover:bg-yellow-200 transition">
-                      Revisão
-                    </button>
-                  }
-                </div>
-              </li>
-            }
-          </ul>
-        </div>
-
-        <div class="rounded-xl bg-white shadow-sm ring-1 ring-neutral-200 dark:bg-neutral-800 dark:ring-neutral-700 overflow-hidden">
-          <div class="border-b border-neutral-200 px-5 py-4 dark:border-neutral-700 flex justify-between items-center">
-            <h3 class="font-semibold text-neutral-900 dark:text-white">⭐ Favoritos</h3>
-            <a routerLink="/admin/voice-actors" class="text-xs text-blue-500 hover:underline">Ver todos</a>
+          <div class="rounded-xl bg-white p-6 shadow-sm ring-1 ring-neutral-200 dark:bg-neutral-800 dark:ring-neutral-700">
+            <div class="text-3xl">🏢</div>
+            <h3 class="mt-3 font-semibold text-neutral-900 dark:text-white">Revendedor</h3>
+            <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+              Gerencie seus clientes e revenda nossos serviços.
+            </p>
           </div>
-          <ul class="divide-y divide-neutral-100 dark:divide-neutral-700">
-            @for (actor of favoriteActors; track actor.id) {
-              <li class="flex items-center justify-between px-5 py-3 text-sm">
-                <div class="flex items-center gap-3">
-                  <div class="flex h-9 w-9 items-center justify-center rounded-full bg-violet-100 text-base font-bold text-violet-700 dark:bg-violet-900/30">
-                    {{ actor.name[0] }}
-                  </div>
-                  <div>
-                    <p class="font-medium text-neutral-800 dark:text-neutral-200">{{ actor.name }}</p>
-                    <p class="text-xs" [class]="actor.statusClass">{{ actor.status }}</p>
-                  </div>
-                </div>
-                <button
-                  routerLink="/admin/orders/new"
-                  class="rounded-lg bg-violet-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-600 transition"
-                >
-                  Pedir
-                </button>
-              </li>
-            }
-          </ul>
-        </div>
-      </section>
+          <div class="rounded-xl bg-white p-6 shadow-sm ring-1 ring-neutral-200 dark:bg-neutral-800 dark:ring-neutral-700">
+            <div class="text-3xl">🎬</div>
+            <h3 class="mt-3 font-semibold text-neutral-900 dark:text-white">Produtor</h3>
+            <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+              Produza conteúdo de áudio e vídeo para seus clientes.
+            </p>
+          </div>
+        </section>
+      } @else {
+        <!-- Dashboard normal para clientes vinculados a um reseller -->
+        <section class="rounded-xl bg-gradient-to-r from-violet-600 to-blue-500 p-6 text-white shadow-lg">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-xl font-bold">Precisa de uma locução?</h2>
+              <p class="mt-1 text-sm text-white/80">Faça seu pedido e receba em minutos.</p>
+            </div>
+            <a routerLink="/admin/orders/new"
+               class="flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-bold text-violet-700 shadow transition hover:scale-105">
+              🎙️ Novo Pedido
+            </a>
+          </div>
+        </section>
 
+        <section class="grid grid-cols-2 gap-4 sm:grid-cols-4">
+          @for (stat of stats; track stat.label) {
+            <div class="rounded-xl bg-white p-4 shadow-sm ring-1 ring-neutral-200 dark:bg-neutral-800 dark:ring-neutral-700">
+              <p class="text-xs font-medium uppercase tracking-wide text-neutral-500 dark:text-neutral-400">{{ stat.label }}</p>
+              <p class="mt-2 text-2xl font-bold text-neutral-900 dark:text-white">{{ stat.value }}</p>
+              <p class="mt-1 text-xs text-neutral-400">{{ stat.sub }}</p>
+            </div>
+          }
+        </section>
+      }
     </div>
   `,
 })
-export class ClientDashboardComponent {
+export class ClientDashboardComponent implements OnInit {
   protected readonly appState = inject(AppStateService);
+  private readonly roleRequestService = inject(RoleRequestService);
+  private readonly destroyRef = inject(DestroyRef);
+
+  private readonly requests = signal<RoleRequest[]>([]);
+
+  protected readonly isDirectClient = computed(() => {
+    const user = this.appState.user();
+    return !!user && !user.resellerId;
+  });
+
+  protected readonly latestRequest = computed(() => this.requests()[0] ?? null);
+  protected readonly hasPendingRequest = computed(() =>
+    this.requests().some((r) => r.status === 'PENDING'),
+  );
 
   protected readonly stats = [
-    { label: 'Em andamento', value: '2', sub: 'pedidos ativos' },
-    { label: 'Total de Pedidos', value: '48', sub: 'todos os tempos' },
-    { label: 'Entregues', value: '45', sub: 'finalizados' },
-    { label: 'Revisões', value: '1', sub: 'aguardando' },
+    { label: 'Em andamento', value: '0', sub: 'pedidos ativos' },
+    { label: 'Total de Pedidos', value: '0', sub: 'todos os tempos' },
+    { label: 'Entregues', value: '0', sub: 'finalizados' },
+    { label: 'Revisões', value: '0', sub: 'aguardando' },
   ];
 
-  protected readonly myOrders = [
-    {
-      id: 1,
-      title: 'Spot Promoção Maio',
-      type: 'Spot',
-      date: 'hoje',
-      icon: '🎵',
-      status: 'Com locutor',
-      statusClass: 'bg-blue-100 text-blue-700',
-      canDownload: false,
-      canReview: false,
-    },
-    {
-      id: 2,
-      title: 'Vinheta Abertura',
-      type: 'Locução OFF',
-      date: 'ontem',
-      icon: '🎙️',
-      status: 'Disponível',
-      statusClass: 'bg-emerald-100 text-emerald-700',
-      canDownload: true,
-      canReview: true,
-    },
-    {
-      id: 3,
-      title: 'Narração Vídeo',
-      type: 'Locução OFF',
-      date: '22/04',
-      icon: '🎬',
-      status: 'Finalizado',
-      statusClass: 'bg-neutral-100 text-neutral-600',
-      canDownload: true,
-      canReview: false,
-    },
-    {
-      id: 4,
-      title: 'Comercial Produto X',
-      type: 'Spot',
-      date: '20/04',
-      icon: '📢',
-      status: 'Finalizado',
-      statusClass: 'bg-neutral-100 text-neutral-600',
-      canDownload: true,
-      canReview: false,
-    },
-  ];
+  ngOnInit(): void {
+    if (!this.isDirectClient()) return;
+    this.roleRequestService
+      .listMine()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (requests) => this.requests.set(requests),
+        error: () => this.requests.set([]),
+      });
+  }
 
-  protected readonly favoriteActors = [
-    { id: 1, name: 'Carlos Voz', status: '🚀 Disponível em 10min', statusClass: 'text-emerald-600 font-medium' },
-    { id: 2, name: 'Ana Ribeiro', status: '⚡ Disponível em 30min', statusClass: 'text-yellow-600 font-medium' },
-    { id: 3, name: 'Marcos Lima', status: '⭕ Offline', statusClass: 'text-neutral-400' },
-  ];
+  protected roleLabel(role: string): string {
+    return ROLE_LABEL[role] ?? role;
+  }
+
+  protected statusLabel(status: string): string {
+    if (status === 'PENDING') return 'Em análise';
+    if (status === 'APPROVED') return 'Aprovado';
+    if (status === 'REJECTED') return 'Rejeitado';
+    return status;
+  }
+
+  protected statusIcon(status: string): string {
+    if (status === 'PENDING') return '⏳';
+    if (status === 'APPROVED') return '✅';
+    if (status === 'REJECTED') return '❌';
+    return '📋';
+  }
+
+  protected statusBadgeClass(status: string): string {
+    if (status === 'PENDING')
+      return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
+    if (status === 'APPROVED')
+      return 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400';
+    if (status === 'REJECTED')
+      return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
+    return 'bg-neutral-100 text-neutral-700';
+  }
+
+  protected statusBgClass(status: string): string {
+    if (status === 'PENDING') return 'bg-yellow-100 dark:bg-yellow-900/30';
+    if (status === 'APPROVED') return 'bg-emerald-100 dark:bg-emerald-900/30';
+    if (status === 'REJECTED') return 'bg-red-100 dark:bg-red-900/30';
+    return 'bg-neutral-100 dark:bg-neutral-700';
+  }
+
+  protected formatDate(date: string): string {
+    return new Date(date).toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    });
+  }
 }

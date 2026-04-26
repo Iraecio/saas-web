@@ -14,6 +14,7 @@ const MENU_BY_ROLE: Record<UserRole, MenuItem[]> = {
   SUPER_ADMIN: [
     { icon: '📊', label: 'Dashboard', route: '/admin/dashboard' },
     { icon: '👥', label: 'Usuários', route: '/admin/users' },
+    { icon: '🎯', label: 'Solicitações de Papel', route: '/admin/role-requests' },
     { icon: '📦', label: 'Pedidos', route: '/admin/orders' },
     { icon: '🎙️', label: 'Locutores', route: '/admin/voice-actors' },
     { icon: '🎧', label: 'Produtores', route: '/admin/producers' },
@@ -25,6 +26,7 @@ const MENU_BY_ROLE: Record<UserRole, MenuItem[]> = {
   ADMIN: [
     { icon: '📊', label: 'Dashboard', route: '/admin/dashboard' },
     { icon: '👥', label: 'Usuários', route: '/admin/users' },
+    { icon: '🎯', label: 'Solicitações de Papel', route: '/admin/role-requests' },
     { icon: '📦', label: 'Pedidos', route: '/admin/orders' },
     { icon: '🎙️', label: 'Locutores', route: '/admin/voice-actors' },
     { icon: '🎧', label: 'Produtores', route: '/admin/producers' },
@@ -74,6 +76,13 @@ const MENU_BY_ROLE: Record<UserRole, MenuItem[]> = {
     { icon: '⚙️', label: 'Configurações', route: '/admin/settings' },
   ],
 };
+
+const DIRECT_CLIENT_MENU: MenuItem[] = [
+  { icon: '📊', label: 'Dashboard', route: '/admin/dashboard' },
+  { icon: '🎯', label: 'Solicitar Upgrade', route: '/admin/role-requests/new' },
+  { icon: '📋', label: 'Minhas Solicitações', route: '/admin/role-requests/my' },
+  { icon: '⚙️', label: 'Configurações', route: '/admin/settings' },
+];
 
 @Component({
   selector: 'app-sidebar',
@@ -144,9 +153,10 @@ export class SidebarComponent {
   readonly widthClasses = computed(() => (this.open() ? 'w-64' : 'w-20'));
 
   readonly menuItems = computed((): MenuItem[] => {
-    const role = this.appState.userRole();
-    if (!role) return [];
-    return MENU_BY_ROLE[role] ?? [];
+    const user = this.appState.user();
+    if (!user?.role) return [];
+    if (user.role === 'CLIENT' && !user.resellerId) return DIRECT_CLIENT_MENU;
+    return MENU_BY_ROLE[user.role] ?? [];
   });
 
   readonly roleLabel = computed((): string => {

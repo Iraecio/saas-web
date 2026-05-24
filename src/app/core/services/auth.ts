@@ -15,6 +15,17 @@ export interface RegisterInput {
   name?: string;
 }
 
+export interface RegisterResellerInput {
+  email: string;
+  password: string;
+  name: string;
+  companyName?: string;
+}
+
+export interface RegisterResellerResponse extends AuthResponse {
+  defaultDomain: string;
+}
+
 export interface LoginInput {
   email: string;
   password: string;
@@ -48,6 +59,13 @@ export class AuthService {
       tap((res) => this.applySession(res)),
       finalize(() => this.appState.setLoading(false)),
     );
+  }
+
+  registerReseller(input: RegisterResellerInput): Observable<RegisterResellerResponse> {
+    this.appState.setLoading(true);
+    return this.http
+      .post<RegisterResellerResponse>(`${this.baseUrl}/auth/register-reseller`, input)
+      .pipe(finalize(() => this.appState.setLoading(false)));
   }
 
   login(input: LoginInput): Observable<AuthResponse> {

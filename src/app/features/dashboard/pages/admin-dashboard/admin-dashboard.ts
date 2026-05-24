@@ -119,9 +119,11 @@ export class AdminDashboardComponent {
     { icon: '📦', label: 'Ver Pedidos', route: '/admin/orders' },
     { icon: '💼', label: 'Revendedores', route: '/admin/resellers' },
     { icon: '📈', label: 'Relatórios', route: '/admin/reports' },
-    { icon: '💰', label: 'Financeiro', route: '/admin/financial' },
+    { icon: '💰', label: 'Carteira Admin', route: '/admin/wallet-admin' },
+    { icon: '📊', label: 'Analytics', route: '/admin/wallet-admin/analytics' },
     { icon: '🎙️', label: 'Locutores', route: '/admin/voice-actors' },
     { icon: '🎧', label: 'Produtores', route: '/admin/producers' },
+    { icon: '🌐', label: 'Domínios', route: '/admin/custom-domains' },
     { icon: '⚙️', label: 'Configurações', route: '/admin/settings' },
   ];
 

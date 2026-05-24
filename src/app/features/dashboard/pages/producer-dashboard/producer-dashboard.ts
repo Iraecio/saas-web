@@ -1,10 +1,11 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { AppStateService } from '../../../../core/services/app-state';
 
 @Component({
   selector: 'app-producer-dashboard',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [],
+  imports: [RouterLink],
   template: `
     <div class="p-6 space-y-6">
 
@@ -105,6 +106,29 @@ import { AppStateService } from '../../../../core/services/app-state';
             </div>
             <p class="mt-1 text-xs text-neutral-400">75% da meta mensal</p>
           </div>
+        </div>
+      </section>
+
+      <!-- Cards de navegação rápida -->
+      <section>
+        <h2 class="mb-3 text-sm font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">Acesso Rápido</h2>
+        <div class="grid grid-cols-2 gap-3">
+          <a routerLink="/admin/profile/producer"
+            class="flex items-center gap-3 rounded-xl bg-white p-4 shadow-sm ring-1 ring-neutral-200 hover:ring-orange-400 transition dark:bg-neutral-800 dark:ring-neutral-700">
+            <span class="text-2xl">🎧</span>
+            <div>
+              <p class="text-sm font-semibold text-neutral-900 dark:text-white">Perfil de Produtor</p>
+              <p class="text-xs text-neutral-500">Bio e especialidade</p>
+            </div>
+          </a>
+          <a routerLink="/admin/storage"
+            class="flex items-center gap-3 rounded-xl bg-white p-4 shadow-sm ring-1 ring-neutral-200 hover:ring-emerald-400 transition dark:bg-neutral-800 dark:ring-neutral-700">
+            <span class="text-2xl">🗂️</span>
+            <div>
+              <p class="text-sm font-semibold text-neutral-900 dark:text-white">Armazenamento</p>
+              <p class="text-xs text-neutral-500">Projetos de produção</p>
+            </div>
+          </a>
         </div>
       </section>
 

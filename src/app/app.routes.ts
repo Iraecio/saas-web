@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
+import { roleGuard } from './core/guards/role.guard';
 
 export const routes: Routes = [
   {
@@ -44,6 +45,37 @@ export const routes: Routes = [
         path: 'resellers',
         loadChildren: () =>
           import('./features/resellers/resellers.routes').then((m) => m.RESELLERS_ROUTES),
+      },
+      {
+        path: 'profile',
+        loadChildren: () =>
+          import('./features/profile/profile.routes').then((m) => m.PROFILE_ROUTES),
+      },
+      {
+        path: 'custom-domains',
+        canActivate: [roleGuard(['RESELLER', 'RESELLER_MANAGER', 'ADMIN', 'SUPER_ADMIN'])],
+        loadChildren: () =>
+          import('./features/custom-domains/custom-domains.routes').then(
+            (m) => m.CUSTOM_DOMAINS_ROUTES,
+          ),
+      },
+      {
+        path: 'wallet',
+        loadChildren: () =>
+          import('./features/wallet/wallet.routes').then((m) => m.WALLET_ROUTES),
+      },
+      {
+        path: 'wallet-admin',
+        canActivate: [roleGuard(['ADMIN', 'SUPER_ADMIN'])],
+        loadChildren: () =>
+          import('./features/wallet-admin/wallet-admin.routes').then(
+            (m) => m.WALLET_ADMIN_ROUTES,
+          ),
+      },
+      {
+        path: 'storage',
+        loadChildren: () =>
+          import('./features/storage/storage.routes').then((m) => m.STORAGE_ROUTES),
       },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],

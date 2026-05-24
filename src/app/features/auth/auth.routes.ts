@@ -13,5 +13,12 @@ export const AUTH_ROUTES: Routes = [
     path: 'bootstrap',
     loadComponent: () => import('./pages/bootstrap/bootstrap').then((m) => m.BootstrapComponent),
   },
+  {
+    path: 'register-reseller',
+    loadComponent: () =>
+      import('./pages/register-reseller/register-reseller').then(
+        (m) => m.RegisterResellerComponent,
+      ),
+  },
   { path: '', redirectTo: 'login', pathMatch: 'full' },
 ];

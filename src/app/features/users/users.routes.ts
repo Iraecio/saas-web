@@ -9,4 +9,9 @@ export const USERS_ROUTES: Routes = [
     path: 'new',
     loadComponent: () => import('./pages/form/users-form').then((m) => m.UsersFormComponent),
   },
+  {
+    path: ':id/permissions',
+    loadComponent: () =>
+      import('./pages/permissions/permissions').then((m) => m.PermissionsPageComponent),
+  },
 ];

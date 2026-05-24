@@ -4,6 +4,7 @@ import { CardComponent } from '../../../../shared/components/card/card';
 import { TableColumn, TableComponent } from '../../../../shared/components/table/table';
 import { UserListItem } from '../../models/user.model';
 import { UserService } from '../../services/user';
+import { UserRole } from '../../../../core/models/user.model';
 
 @Component({
   selector: 'app-users-list',
@@ -34,8 +35,13 @@ import { UserService } from '../../services/user';
             (change)="roleFilter.set($any($event.target).value)"
           >
             <option value="">Todas as funções</option>
-            <option value="admin">Admin</option>
-            <option value="user">User</option>
+            <option value="SUPER_ADMIN">Super Admin</option>
+            <option value="ADMIN">Admin</option>
+            <option value="RESELLER">Revendedor</option>
+            <option value="RESELLER_MANAGER">Gerente</option>
+            <option value="VOICE_ACTOR">Locutor</option>
+            <option value="PRODUCER">Produtor</option>
+            <option value="CLIENT">Cliente</option>
           </select>
         </div>
 
@@ -55,7 +61,7 @@ export class UsersListComponent {
   private readonly userService = inject(UserService);
 
   readonly search = signal('');
-  readonly roleFilter = signal<'' | 'admin' | 'user'>('');
+  readonly roleFilter = signal<'' | UserRole>('');
   private readonly usersSignal = signal<UserListItem[]>([]);
 
   readonly columns: TableColumn[] = [

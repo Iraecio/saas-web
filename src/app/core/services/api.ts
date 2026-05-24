@@ -3,11 +3,36 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
+import { User } from '../models/user.model';
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = environment.apiUrl;
+
+  // ── User domain methods ──────────────────────────────────────────────────
+
+  listUsers(params?: { role?: string; page?: number; limit?: number }): Observable<User[]> {
+    return this.get<User[]>('/users', params).pipe(catchError(this.handleError));
+  }
+
+  getUser(id: string): Observable<User> {
+    return this.get<User>(`/users/${id}`).pipe(catchError(this.handleError));
+  }
+
+  updateUser(id: string, data: Partial<User>): Observable<User> {
+    return this.put<User>(`/users/${id}`, data).pipe(catchError(this.handleError));
+  }
+
+  deleteUser(id: string): Observable<void> {
+    return this.delete<void>(`/users/${id}`).pipe(catchError(this.handleError));
+  }
+
+  listResellerAdmin(): Observable<User[]> {
+    return this.get<User[]>('/admin/revendedores').pipe(catchError(this.handleError));
+  }
+
+  // ── Generic HTTP methods ─────────────────────────────────────────────────
 
   get<T>(endpoint: string, params?: Record<string, string | number | boolean>): Observable<T> {
     return this.http

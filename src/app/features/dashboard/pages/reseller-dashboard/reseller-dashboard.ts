@@ -126,7 +126,7 @@ export class ResellerDashboardComponent {
     { icon: '➕', label: 'Novo Cliente', route: '/admin/clients/new' },
     { icon: '📦', label: 'Criar Pedido', route: '/admin/orders/new' },
     { icon: '🧠', label: 'CRM', route: '/admin/clients' },
-    { icon: '🌐', label: 'Meu Site', route: '/admin/my-site' },
+    { icon: '🌐', label: 'Domínios', route: '/admin/custom-domains' },
     { icon: '💵', label: 'Comissões', route: '/admin/commissions' },
     { icon: '📈', label: 'Relatórios', route: '/admin/reports' },
   ];

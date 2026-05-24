@@ -133,6 +133,29 @@ const ROLE_LABEL: Record<string, string> = {
             </div>
           }
         </section>
+
+        <!-- Cards de navegação -->
+        <section>
+          <h2 class="mb-3 text-sm font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">Acesso Rápido</h2>
+          <div class="grid grid-cols-2 gap-3">
+            <a routerLink="/admin/wallet"
+              class="flex items-center gap-3 rounded-xl bg-white p-4 shadow-sm ring-1 ring-neutral-200 hover:ring-blue-400 transition dark:bg-neutral-800 dark:ring-neutral-700">
+              <span class="text-2xl">💳</span>
+              <div>
+                <p class="text-sm font-semibold text-neutral-900 dark:text-white">Minha Carteira</p>
+                <p class="text-xs text-neutral-500">Saldo e créditos</p>
+              </div>
+            </a>
+            <a routerLink="/admin/profile"
+              class="flex items-center gap-3 rounded-xl bg-white p-4 shadow-sm ring-1 ring-neutral-200 hover:ring-violet-400 transition dark:bg-neutral-800 dark:ring-neutral-700">
+              <span class="text-2xl">👤</span>
+              <div>
+                <p class="text-sm font-semibold text-neutral-900 dark:text-white">Meu Perfil</p>
+                <p class="text-xs text-neutral-500">Dados pessoais</p>
+              </div>
+            </a>
+          </div>
+        </section>
       }
     </div>
   `,

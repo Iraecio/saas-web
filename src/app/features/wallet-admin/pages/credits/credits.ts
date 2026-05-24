@@ -6,16 +6,16 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { DatePipe } from '@angular/common';
+import { DatePipe, DecimalPipe, SlicePipe } from '@angular/common';
 import { WalletAdminService } from '../../services/wallet-admin';
 import { Credit, CreditStatus } from '../../../../core/models/wallet.model';
 
 @Component({
   selector: 'app-credits-search',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, DatePipe],
+  imports: [DatePipe, DecimalPipe, SlicePipe],
   template: `
     <div class="p-6 max-w-6xl mx-auto space-y-6">
       <header>

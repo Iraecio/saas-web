@@ -9,13 +9,14 @@ import {
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { DatePipe } from '@angular/common';
 import { UserService } from '../../services/user';
 import { UserPermission } from '../../../../core/models/user.model';
 
 @Component({
   selector: 'app-user-permissions',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, DatePipe],
   template: `
     <div class="p-6 max-w-3xl mx-auto space-y-6">
       <header class="flex items-center gap-4">

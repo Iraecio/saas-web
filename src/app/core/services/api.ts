@@ -28,6 +28,10 @@ export class ApiService {
     return this.delete<void>(`/users/${id}`).pipe(catchError(this.handleError));
   }
 
+  createUser(data: Partial<User>): Observable<User> {
+    return this.post<User>('/users', data).pipe(catchError(this.handleError));
+  }
+
   listResellerAdmin(): Observable<User[]> {
     return this.get<User[]>('/admin/revendedores').pipe(catchError(this.handleError));
   }

@@ -6,16 +6,16 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { DatePipe } from '@angular/common';
+import { DatePipe, SlicePipe } from '@angular/common';
 import { WalletAdminService } from '../../services/wallet-admin';
 import { Dispute, DisputeStatus } from '../../../../core/models/wallet.model';
 
 @Component({
   selector: 'app-disputes-admin',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, DatePipe],
+  imports: [ReactiveFormsModule, DatePipe, SlicePipe],
   template: `
     <div class="p-6 max-w-5xl mx-auto space-y-6">
       <header>

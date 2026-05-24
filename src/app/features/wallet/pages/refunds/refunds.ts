@@ -8,14 +8,14 @@ import {
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { DatePipe } from '@angular/common';
+import { DatePipe, SlicePipe } from '@angular/common';
 import { WalletService } from '../../services/wallet';
 import { RefundRequest, RefundStatus } from '../../../../core/models/wallet.model';
 
 @Component({
   selector: 'app-refunds-list',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, DatePipe],
+  imports: [RouterLink, DatePipe, SlicePipe],
   template: `
     <div class="p-6 max-w-4xl mx-auto space-y-6">
       <header class="flex items-center justify-between">

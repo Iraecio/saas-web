@@ -9,14 +9,14 @@ import {
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { DatePipe } from '@angular/common';
+import { DatePipe, DecimalPipe } from '@angular/common';
 import { WalletService } from '../../services/wallet';
 import { CreditWithContext, CreditEvent, Dispute } from '../../../../core/models/wallet.model';
 
 @Component({
   selector: 'app-credit-detail',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, ReactiveFormsModule, DatePipe],
+  imports: [RouterLink, ReactiveFormsModule, DatePipe, DecimalPipe],
   template: `
     <div class="p-6 max-w-3xl mx-auto space-y-6">
       <header class="flex items-center gap-4">

@@ -11,12 +11,13 @@ import { ActivatedRoute } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CustomDomainService } from '../../services/custom-domain';
 import { AppStateService } from '../../../../core/services/app-state';
+import { DatePipe } from '@angular/common';
 import { CustomDomain } from '../../../../core/models/custom-domain.model';
 
 @Component({
   selector: 'app-custom-domains-list',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, DatePipe],
   template: `
     <div class="p-6 max-w-3xl mx-auto space-y-6">
       <header>

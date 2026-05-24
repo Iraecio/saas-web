@@ -11,12 +11,12 @@ import { RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { WalletService } from '../../services/wallet';
 import { Credit, CreditStatus, CreditType } from '../../../../core/models/wallet.model';
-import { DatePipe } from '@angular/common';
+import { DatePipe, DecimalPipe, TitleCasePipe } from '@angular/common';
 
 @Component({
   selector: 'app-credits-list',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, DatePipe],
+  imports: [RouterLink, DatePipe, DecimalPipe, TitleCasePipe],
   template: `
     <div class="p-6 max-w-4xl mx-auto space-y-6">
       <header class="flex items-center justify-between">

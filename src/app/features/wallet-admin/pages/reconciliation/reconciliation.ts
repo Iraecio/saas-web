@@ -7,7 +7,7 @@ import {
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { DatePipe } from '@angular/common';
+import { DatePipe, DecimalPipe, SlicePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { WalletAdminService } from '../../services/wallet-admin';
 import { AppStateService } from '../../../../core/services/app-state';
@@ -16,7 +16,7 @@ import { ReconciliationResult } from '../../../../core/models/wallet.model';
 @Component({
   selector: 'app-reconciliation',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DatePipe, FormsModule],
+  imports: [DatePipe, DecimalPipe, SlicePipe, FormsModule],
   template: `
     <div class="p-6 max-w-5xl mx-auto space-y-6">
       <header>

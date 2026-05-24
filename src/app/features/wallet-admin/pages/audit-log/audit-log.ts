@@ -7,14 +7,14 @@ import {
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { DatePipe } from '@angular/common';
+import { DatePipe, SlicePipe } from '@angular/common';
 import { WalletAdminService } from '../../services/wallet-admin';
 import { WalletAuditLogEntry } from '../../../../core/models/wallet.model';
 
 @Component({
   selector: 'app-audit-log',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DatePipe],
+  imports: [DatePipe, SlicePipe],
   template: `
     <div class="p-6 max-w-5xl mx-auto space-y-6">
       <header>

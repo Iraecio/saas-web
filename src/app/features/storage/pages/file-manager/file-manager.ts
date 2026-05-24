@@ -5,7 +5,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { SlicePipe, isPlatformBrowser } from '@angular/common';
 import { StorageService, UploadProgress } from '../../services/storage';
 import { StorageBucket, UploadResponse, SignedUrlResponse } from '../../../../core/models/storage.model';
 
@@ -21,7 +21,7 @@ const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB
 @Component({
   selector: 'app-file-manager',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [],
+  imports: [SlicePipe],
   template: `
     <div class="p-6 max-w-4xl mx-auto space-y-6">
       <header>

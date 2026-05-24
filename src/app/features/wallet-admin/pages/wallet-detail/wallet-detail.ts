@@ -8,14 +8,14 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { DatePipe } from '@angular/common';
+import { DatePipe, DecimalPipe } from '@angular/common';
 import { WalletAdminService } from '../../services/wallet-admin';
 import { WalletSummary } from '../../../../core/models/wallet.model';
 
 @Component({
   selector: 'app-wallet-detail-admin',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, DatePipe],
+  imports: [RouterLink, DatePipe, DecimalPipe],
   template: `
     <div class="p-6 max-w-3xl mx-auto space-y-6">
       <header class="flex items-center gap-4">

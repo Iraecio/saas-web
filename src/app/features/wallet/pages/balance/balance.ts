@@ -7,6 +7,7 @@ import {
   signal,
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { DatePipe, DecimalPipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { WalletService } from '../../services/wallet';
 import { WalletBalance, WalletNotification } from '../../../../core/models/wallet.model';
@@ -14,7 +15,7 @@ import { WalletBalance, WalletNotification } from '../../../../core/models/walle
 @Component({
   selector: 'app-wallet-balance',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink],
+  imports: [RouterLink, DatePipe, DecimalPipe],
   template: `
     <div class="p-6 max-w-3xl mx-auto space-y-6">
       <header>

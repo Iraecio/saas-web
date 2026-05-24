@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, OnInit } from '@angular/core';
+import { DecimalPipe } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AppStateService } from '../../../../core/services/app-state';
@@ -8,7 +9,7 @@ import { StorageQuota } from '../../../../core/models/profile.model';
 @Component({
   selector: 'app-profile-overview',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, DecimalPipe],
   template: `
     <div class="p-6 max-w-2xl mx-auto space-y-8">
       <header>

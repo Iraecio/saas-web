@@ -6,6 +6,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
+import { DecimalPipe, SlicePipe } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { WalletAdminService } from '../../services/wallet-admin';
@@ -14,7 +15,7 @@ import { WalletAnalytics } from '../../../../core/models/wallet.model';
 @Component({
   selector: 'app-analytics',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, DecimalPipe, SlicePipe],
   template: `
     <div class="p-6 max-w-4xl mx-auto space-y-6">
       <header>

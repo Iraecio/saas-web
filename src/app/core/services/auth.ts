@@ -112,10 +112,14 @@ export class AuthService {
   }
 
   forgotPassword(email: string): Observable<void> {
-    const redirectTo = this.isBrowser
-      ? `${window.location.origin}/auth/reset-password`
-      : undefined;
-    return this.http.post<void>(`${this.baseUrl}/auth/forgot-password`, { email, redirectTo });
+    const origin = this.isBrowser ? window.location.origin : '';
+    // @IsUrl() da API rejeita localhost — só envia redirectTo em produção
+    const isLocalhost = origin.includes('localhost') || origin.includes('127.0.0.1');
+    const body: Record<string, string> = { email };
+    if (!isLocalhost && origin) {
+      body['redirectTo'] = `${origin}/auth/reset-password`;
+    }
+    return this.http.post<void>(`${this.baseUrl}/auth/forgot-password`, body);
   }
 
   resetPassword(token: string, newPassword: string, confirmNewPassword: string): Observable<void> {

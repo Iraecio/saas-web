@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CardComponent } from '../../../../shared/components/card/card';
 import { TableColumn, TableComponent } from '../../../../shared/components/table/table';
@@ -78,16 +78,19 @@ export class UsersListComponent {
 
   readonly filtered = computed(() => {
     const term = this.search().toLowerCase().trim();
-    const role = this.roleFilter();
-    return this.usersSignal().filter((u) => {
-      if (role && u.role !== role) return false;
-      if (!term) return true;
-      return u.name.toLowerCase().includes(term) || u.email.toLowerCase().includes(term);
-    });
+    if (!term) return this.usersSignal();
+    return this.usersSignal().filter(
+      (u) => u.name.toLowerCase().includes(term) || u.email.toLowerCase().includes(term),
+    );
   });
 
   constructor() {
-    this.userService.list().subscribe((users) => this.usersSignal.set(users));
+    effect(() => {
+      const role = this.roleFilter();
+      this.userService
+        .list(role ? { role } : undefined)
+        .subscribe((users) => this.usersSignal.set(users));
+    });
   }
 
   onEdit(user: UserListItem): void {

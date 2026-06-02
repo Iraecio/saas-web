@@ -8,8 +8,8 @@ import { UserListItem } from '../models/user.model';
 export class UserService {
   private readonly api = inject(ApiService);
 
-  list(): Observable<UserListItem[]> {
-    return this.api.listUsers().pipe(map((users) => this.mapToListItems(users)));
+  list(params?: { role?: string }): Observable<UserListItem[]> {
+    return this.api.listUsers(params).pipe(map((users) => this.mapToListItems(users)));
   }
 
   get(id: string): Observable<UserListItem | undefined> {

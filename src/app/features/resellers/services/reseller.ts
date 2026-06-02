@@ -8,9 +8,8 @@ import { Reseller } from '../models/reseller.model';
 export class ResellerService {
   private readonly api = inject(ApiService);
 
-  /** Lista todos os revendedores via GET /admin/revendedores (sem filtro de tenant). */
   list(): Observable<Reseller[]> {
-    return this.api.listResellerAdmin().pipe(
+    return this.api.listUsers({ role: 'RESELLER' }).pipe(
       map((users) => users.map((u) => this.mapUserToReseller(u))),
     );
   }

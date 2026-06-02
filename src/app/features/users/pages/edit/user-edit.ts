@@ -92,7 +92,7 @@ const PERMISSION_CATALOG: Record<UserRole, string[]> = {
 
       @if (user()) {
 
-        <!-- Abas -->
+        <!-- Abas (permissões ocultas até API suportar GET de permissões por usuário) -->
         <nav class="mb-6 flex gap-1 border-b border-neutral-200 dark:border-neutral-700">
           <button type="button" (click)="activeTab.set('dados')"
             class="px-4 pb-3 text-sm transition-colors"
@@ -100,18 +100,6 @@ const PERMISSION_CATALOG: Record<UserRole, string[]> = {
               ? 'border-b-2 border-neutral-900 dark:border-white text-neutral-900 dark:text-white font-semibold'
               : 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'">
             Dados do usuário
-          </button>
-          <button type="button" (click)="activeTab.set('permissoes')"
-            class="px-4 pb-3 text-sm transition-colors"
-            [class]="activeTab() === 'permissoes'
-              ? 'border-b-2 border-neutral-900 dark:border-white text-neutral-900 dark:text-white font-semibold'
-              : 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'">
-            Permissões
-            @if (grantedPerms().length) {
-              <span class="ml-1.5 rounded-full bg-violet-100 px-1.5 py-0.5 text-xs font-bold text-violet-700 dark:bg-violet-900/30 dark:text-violet-300">
-                {{ grantedPerms().length }}
-              </span>
-            }
           </button>
         </nav>
 

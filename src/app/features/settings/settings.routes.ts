@@ -5,5 +5,22 @@ export const SETTINGS_ROUTES: Routes = [
     path: '',
     loadComponent: () =>
       import('./pages/general/general').then((m) => m.SettingsGeneralComponent),
+    children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        redirectTo: 'geral',
+      },
+      {
+        path: 'geral',
+        loadComponent: () =>
+          import('./pages/appearance/appearance').then((m) => m.SettingsAppearanceComponent),
+      },
+      {
+        path: 'perfil',
+        loadComponent: () =>
+          import('../profile/pages/overview/overview').then((m) => m.ProfileOverviewComponent),
+      },
+    ],
   },
 ];

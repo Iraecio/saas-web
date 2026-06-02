@@ -1,36 +1,36 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { AppStateService } from '../../../../core/services/app-state';
-import { CardComponent } from '../../../../shared/components/card/card';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-settings-general',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CardComponent],
+  imports: [RouterLink, RouterLinkActive, RouterOutlet],
   template: `
-    <div class="p-6">
-      <header class="mb-6">
+    <div class="flex flex-col">
+      <div class="px-6 pt-6 pb-0">
         <h1 class="text-3xl font-bold text-neutral-900 dark:text-white">Configurações</h1>
-        <p class="mt-1 text-sm text-neutral-500">Preferências da aplicação.</p>
-      </header>
+        <p class="mt-1 text-sm text-neutral-500">Preferências e informações da sua conta.</p>
 
-      <app-card title="Aparência">
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="font-medium text-neutral-900 dark:text-white">Tema escuro</p>
-            <p class="text-sm text-neutral-500">Alterar entre tema claro e escuro.</p>
-          </div>
-          <button
-            type="button"
-            class="btn-secondary"
-            (click)="appState.toggleTheme()"
+        <nav class="mt-6 flex gap-1 border-b border-neutral-200 dark:border-neutral-700">
+          <a
+            routerLink="geral"
+            routerLinkActive="border-b-2 border-neutral-900 dark:border-white text-neutral-900 dark:text-white font-semibold"
+            class="px-4 pb-3 text-sm text-neutral-500 transition-colors hover:text-neutral-700 dark:hover:text-neutral-300"
           >
-            {{ appState.theme() === 'dark' ? 'Desligar' : 'Ligar' }}
-          </button>
-        </div>
-      </app-card>
+            Geral
+          </a>
+          <a
+            routerLink="perfil"
+            routerLinkActive="border-b-2 border-neutral-900 dark:border-white text-neutral-900 dark:text-white font-semibold"
+            class="px-4 pb-3 text-sm text-neutral-500 transition-colors hover:text-neutral-700 dark:hover:text-neutral-300"
+          >
+            Meu Perfil
+          </a>
+        </nav>
+      </div>
+
+      <router-outlet />
     </div>
   `,
 })
-export class SettingsGeneralComponent {
-  protected readonly appState = inject(AppStateService);
-}
+export class SettingsGeneralComponent {}

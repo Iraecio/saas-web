@@ -10,6 +10,10 @@ export const USERS_ROUTES: Routes = [
     loadComponent: () => import('./pages/form/users-form').then((m) => m.UsersFormComponent),
   },
   {
+    path: ':id/edit',
+    loadComponent: () => import('./pages/edit/user-edit').then((m) => m.UserEditComponent),
+  },
+  {
     path: ':id/permissions',
     loadComponent: () =>
       import('./pages/permissions/permissions').then((m) => m.PermissionsPageComponent),

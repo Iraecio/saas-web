@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { CardComponent } from '../../../../shared/components/card/card';
 import { TableColumn, TableComponent } from '../../../../shared/components/table/table';
 import { UserListItem } from '../../models/user.model';
@@ -59,6 +59,7 @@ import { UserRole } from '../../../../core/models/user.model';
 })
 export class UsersListComponent {
   private readonly userService = inject(UserService);
+  private readonly router = inject(Router);
 
   readonly search = signal('');
   readonly roleFilter = signal<'' | UserRole>('');
@@ -94,7 +95,7 @@ export class UsersListComponent {
   }
 
   onEdit(user: UserListItem): void {
-    console.log('edit', user);
+    this.router.navigate(['/admin/users', user.id, 'edit']);
   }
 
   onDelete(user: UserListItem): void {

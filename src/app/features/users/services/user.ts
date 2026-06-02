@@ -28,6 +28,10 @@ export class UserService {
     return this.api.updateUser(id, data as Partial<User>).pipe(map((user) => this.mapToListItem(user)));
   }
 
+  updateRaw(id: string, data: Record<string, unknown>): Observable<User> {
+    return this.api.updateUser(id, data as Partial<User>);
+  }
+
   remove(id: string): Observable<void> {
     return this.api.deleteUser(id);
   }

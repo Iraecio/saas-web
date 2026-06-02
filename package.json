@@ -4,6 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
+    "start:local": "ng serve --proxy-config proxy.conf.json --configuration development",
     "build": "ng build --configuration production",
     "watch": "ng build --watch --configuration development",
     "serve:ssr": "node dist/saas-web/server/server.mjs",

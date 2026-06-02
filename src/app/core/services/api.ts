@@ -1,9 +1,14 @@
 import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { User } from '../models/user.model';
+
+interface PaginatedResponse<T> {
+  data: T[];
+  meta: { total: number; page: number; limit: number; totalPages: number };
+}
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
@@ -13,7 +18,10 @@ export class ApiService {
   // ── User domain methods ──────────────────────────────────────────────────
 
   listUsers(params?: { role?: string; page?: number; limit?: number }): Observable<User[]> {
-    return this.get<User[]>('/users', params).pipe(catchError(this.handleError));
+    return this.get<PaginatedResponse<User>>('/users', params).pipe(
+      map((res) => res.data),
+      catchError(this.handleError),
+    );
   }
 
   getUser(id: string): Observable<User> {

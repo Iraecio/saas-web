@@ -144,8 +144,28 @@ import { UserRole } from '../../../../core/models/user.model';
             </div>
           </div>
 
+          <!-- Acesso Rápido (DEV) -->
+          <div class="rounded-xl border border-dashed border-neutral-700 bg-neutral-900/50 p-4">
+            <p class="mb-3 text-center text-xs font-semibold uppercase tracking-widest text-neutral-500">
+              Acesso rápido · dev
+            </p>
+            <div class="grid grid-cols-2 gap-2">
+              @for (u of devUsers; track u.email) {
+                <button
+                  type="button"
+                  (click)="quickLogin(u.email)"
+                  [disabled]="loading()"
+                  class="flex flex-col items-start rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-left transition-colors hover:border-neutral-600 hover:bg-neutral-800 disabled:opacity-40"
+                >
+                  <span class="text-[10px] font-semibold uppercase tracking-wide" [class]="u.color">{{ u.role }}</span>
+                  <span class="mt-0.5 truncate text-xs text-neutral-300">{{ u.name }}</span>
+                </button>
+              }
+            </div>
+          </div>
+
           <!-- Link Registrar -->
-          <div class="text-center">
+          <div class="mt-6 text-center">
             <p class="text-neutral-600 dark:text-neutral-400">
               Não tem uma conta?
               <a routerLink="/auth/register" class="font-semibold text-neutral-900 dark:text-white hover:underline transition-colors">
@@ -178,6 +198,15 @@ export class LoginComponent {
   readonly error = signal<string | undefined>(undefined);
   readonly showPassword = signal(false);
 
+  readonly devUsers = [
+    { name: 'Administrador Principal', email: 'admin1@gmail.com',    role: 'Super Admin', color: 'text-red-400' },
+    { name: 'Carlos Mendes',           email: 'revenda1@gmail.com',  role: 'Revendedor',  color: 'text-blue-400' },
+    { name: 'Fernanda Lima',           email: 'revenda2@gmail.com',  role: 'Revendedor',  color: 'text-blue-400' },
+    { name: 'Roberto Alves',           email: 'revenda3@gmail.com',  role: 'Revendedor',  color: 'text-blue-400' },
+    { name: 'Ana Silva',               email: 'locutor1@gmail.com',  role: 'Locutor',     color: 'text-purple-400' },
+    { name: 'Lucas Martins',           email: 'cliente1@gmail.com',  role: 'Cliente',     color: 'text-green-400' },
+  ];
+
   private readonly roleDashboardMap: Record<UserRole, string> = {
     SUPER_ADMIN: 'admin',
     ADMIN: 'admin',
@@ -195,6 +224,11 @@ export class LoginComponent {
 
   togglePassword(): void {
     this.showPassword.set(!this.showPassword());
+  }
+
+  quickLogin(email: string): void {
+    this.form.setValue({ email, password: 'Test@1234' });
+    this.submit();
   }
 
   submit(): void {

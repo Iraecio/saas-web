@@ -1,6 +1,7 @@
 import { RenderMode, ServerRoute } from '@angular/ssr';
 
 export const serverRoutes: ServerRoute[] = [
+  { path: 'auth/reset-password',                 renderMode: RenderMode.Server },
   { path: 'admin/users/:id/edit',               renderMode: RenderMode.Server },
   { path: 'admin/users/:id/permissions',        renderMode: RenderMode.Server },
   { path: 'admin/custom-domains/:resellerId',   renderMode: RenderMode.Server },

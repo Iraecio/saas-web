@@ -17,6 +17,8 @@ import { catchError } from 'rxjs/operators';
 import { CardComponent } from '../../../../shared/components/card/card';
 import { UserService } from '../../services/user';
 import { ResellerService } from '../../../resellers/services/reseller';
+import { AuthService } from '../../../../core/services/auth';
+import { AppStateService } from '../../../../core/services/app-state';
 import { User, UserPermission, UserRole } from '../../../../core/models/user.model';
 import { Reseller } from '../../../resellers/models/reseller.model';
 
@@ -159,6 +161,29 @@ const PERMISSION_CATALOG: Record<UserRole, string[]> = {
                     }
                   </select>
                 </div>
+              </app-card>
+            }
+
+            <!-- Redefinição de senha (só SUPER_ADMIN) -->
+            @if (isSuperAdmin()) {
+              <app-card title="Senha do usuário">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-sm text-neutral-600 dark:text-neutral-400">
+                      Envia um link de redefinição de senha para o email do usuário.
+                    </p>
+                  </div>
+                  <button type="button" class="btn-secondary shrink-0"
+                    [disabled]="resetLinkSending()"
+                    (click)="sendResetLink()">
+                    @if (resetLinkSending()) { Enviando... }
+                    @else if (resetLinkSent()) { ✓ Link enviado }
+                    @else { Enviar link de redefinição }
+                  </button>
+                </div>
+                @if (resetLinkError()) {
+                  <p class="mt-2 text-sm text-red-500">{{ resetLinkError() }}</p>
+                }
               </app-card>
             }
 
@@ -327,10 +352,12 @@ const PERMISSION_CATALOG: Record<UserRole, string[]> = {
 export class UserEditComponent implements OnInit {
   readonly id = input.required<string>();
 
-  private readonly fb         = inject(FormBuilder);
-  private readonly userService = inject(UserService);
-  private readonly resellerService = inject(ResellerService);
-  private readonly destroyRef = inject(DestroyRef);
+  private readonly fb               = inject(FormBuilder);
+  private readonly userService      = inject(UserService);
+  private readonly resellerService  = inject(ResellerService);
+  private readonly authService      = inject(AuthService);
+  private readonly appState         = inject(AppStateService);
+  private readonly destroyRef       = inject(DestroyRef);
 
   // ── State ──────────────────────────────────────────────────────────────────
 
@@ -344,6 +371,13 @@ export class UserEditComponent implements OnInit {
   readonly saving      = signal(false);
   readonly saveError   = signal<string | null>(null);
   readonly saveSuccess = signal(false);
+
+  // Reset link (admin)
+  readonly resetLinkSending = signal(false);
+  readonly resetLinkSent    = signal(false);
+  readonly resetLinkError   = signal<string | null>(null);
+
+  readonly isSuperAdmin = computed(() => this.appState.userRole() === 'SUPER_ADMIN');
 
   // Permissões tab
   readonly grantedPerms    = signal<UserPermission[]>([]);
@@ -436,6 +470,30 @@ export class UserEditComponent implements OnInit {
         error: (err: Error) => {
           this.saving.set(false);
           this.saveError.set(err.message ?? 'Erro ao salvar');
+        },
+      });
+  }
+
+  // ── Reset de senha (admin) ────────────────────────────────────────────────
+
+  sendResetLink(): void {
+    const email = this.user()?.email;
+    if (!email) return;
+    this.resetLinkSending.set(true);
+    this.resetLinkError.set(null);
+
+    this.authService
+      .forgotPassword(email)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.resetLinkSending.set(false);
+          this.resetLinkSent.set(true);
+          setTimeout(() => this.resetLinkSent.set(false), 5000);
+        },
+        error: (err: Error) => {
+          this.resetLinkSending.set(false);
+          this.resetLinkError.set(err.message ?? 'Erro ao enviar link.');
         },
       });
   }

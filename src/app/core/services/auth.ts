@@ -111,6 +111,29 @@ export class AuthService {
       );
   }
 
+  forgotPassword(email: string): Observable<void> {
+    const redirectTo = this.isBrowser
+      ? `${window.location.origin}/auth/reset-password`
+      : undefined;
+    return this.http.post<void>(`${this.baseUrl}/auth/forgot-password`, { email, redirectTo });
+  }
+
+  resetPassword(token: string, newPassword: string, confirmNewPassword: string): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/auth/reset-password`, {
+      token,
+      newPassword,
+      confirmNewPassword,
+    });
+  }
+
+  changePassword(currentPassword: string, newPassword: string, confirmNewPassword: string): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/auth/change-password`, {
+      currentPassword,
+      newPassword,
+      confirmNewPassword,
+    });
+  }
+
   fetchProfile(): Observable<User> {
     return this.http.get<User>(`${this.baseUrl}/users/me`).pipe(
       tap((user) => this.appState.setUser(user)),

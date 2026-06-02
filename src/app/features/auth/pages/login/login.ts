@@ -62,7 +62,7 @@ import { UserRole } from '../../../../core/models/user.model';
                 <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
                   Senha
                 </label>
-                <a href="#" class="text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors">
+                <a routerLink="/auth/forgot-password" class="text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors">
                   Esqueceu?
                 </a>
               </div>

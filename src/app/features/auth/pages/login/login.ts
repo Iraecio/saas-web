@@ -1,5 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, PLATFORM_ID, signal } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -187,12 +188,13 @@ import { UserRole } from '../../../../core/models/user.model';
     </div>
   `,
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
   private readonly appState = inject(AppStateService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly platformId = inject(PLATFORM_ID);
 
   readonly loading = signal(false);
   readonly error = signal<string | undefined>(undefined);
@@ -221,6 +223,22 @@ export class LoginComponent {
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(8)]],
   });
+
+  ngOnInit(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+    // Supabase redireciona para a URL base com o token no hash fragment
+    // ex: /auth/login#access_token=...&type=recovery
+    const hash = window.location.hash.slice(1);
+    if (!hash) return;
+    const params = new URLSearchParams(hash);
+    if (params.get('type') === 'recovery') {
+      const token = params.get('access_token') ?? '';
+      this.router.navigate(['/auth/reset-password'], {
+        queryParams: { token },
+        replaceUrl: true,
+      });
+    }
+  }
 
   togglePassword(): void {
     this.showPassword.set(!this.showPassword());

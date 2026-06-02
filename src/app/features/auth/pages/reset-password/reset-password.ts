@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, PLATFORM_ID, signal } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -109,6 +110,7 @@ export class ResetPasswordComponent implements OnInit {
   private readonly route       = inject(ActivatedRoute);
   private readonly router      = inject(Router);
   private readonly destroyRef  = inject(DestroyRef);
+  private readonly platformId  = inject(PLATFORM_ID);
 
   readonly token   = signal('');
   readonly loading = signal(false);
@@ -125,11 +127,21 @@ export class ResetPasswordComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    // Supabase envia o token como access_token ou token nos query params
-    const token =
+    // Tenta query params primeiro (rota normal após redirect do LoginComponent)
+    let token =
       this.route.snapshot.queryParamMap.get('access_token') ||
       this.route.snapshot.queryParamMap.get('token') ||
       '';
+
+    // Fallback: lê do hash fragment caso o Supabase redirecione direto aqui
+    if (!token && isPlatformBrowser(this.platformId)) {
+      const hash = window.location.hash.slice(1);
+      if (hash) {
+        const params = new URLSearchParams(hash);
+        token = params.get('access_token') ?? '';
+      }
+    }
+
     this.token.set(token);
   }
 

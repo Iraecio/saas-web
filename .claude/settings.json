@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -la /home/iraecio/apps/saas-api/dist 2>/dev/null)",
+      "Read(//home/iraecio/apps/saas-api/dist/**)"
+    ]
+  }
+}

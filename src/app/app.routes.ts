@@ -77,6 +77,38 @@ export const routes: Routes = [
         loadChildren: () =>
           import('./features/storage/storage.routes').then((m) => m.STORAGE_ROUTES),
       },
+      {
+        path: 'services',
+        canActivate: [roleGuard(['ADMIN', 'SUPER_ADMIN', 'RESELLER', 'RESELLER_MANAGER'])],
+        loadChildren: () =>
+          import('./features/services/services.routes').then((m) => m.SERVICES_ROUTES),
+      },
+      {
+        path: 'orders',
+        loadChildren: () =>
+          import('./features/orders/orders.routes').then((m) => m.ORDERS_ROUTES),
+      },
+      {
+        path: 'professionals',
+        loadChildren: () =>
+          import('./features/professionals/professionals.routes').then(
+            (m) => m.PROFESSIONALS_ROUTES,
+          ),
+      },
+      {
+        path: 'withdrawals',
+        canActivate: [roleGuard(['VOICE_ACTOR', 'PRODUCER', 'ADMIN', 'SUPER_ADMIN'])],
+        loadChildren: () =>
+          import('./features/withdrawals/withdrawals.routes').then((m) => m.WITHDRAWALS_ROUTES),
+      },
+      {
+        path: 'reseller-credits',
+        canActivate: [roleGuard(['RESELLER', 'RESELLER_MANAGER', 'ADMIN', 'SUPER_ADMIN'])],
+        loadChildren: () =>
+          import('./features/reseller-credits/reseller-credits.routes').then(
+            (m) => m.RESELLER_CREDITS_ROUTES,
+          ),
+      },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],
   },

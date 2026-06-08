@@ -10,7 +10,7 @@ import { RouterLink } from '@angular/router';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { WalletService } from '../../services/wallet';
-import { WalletBalance, WalletNotification } from '../../../../core/models/wallet.model';
+import { Wallet, WalletNotification } from '../../../../core/models/wallet.model';
 
 @Component({
   selector: 'app-wallet-balance',
@@ -23,22 +23,35 @@ import { WalletBalance, WalletNotification } from '../../../../core/models/walle
         <p class="mt-1 text-sm text-neutral-500">Saldo e notificações da sua conta</p>
       </header>
 
-      <!-- Saldo -->
-      <section class="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 p-6">
-        @if (loadingBalance()) {
-          <div class="flex justify-center py-8">
-            <div class="w-6 h-6 border-2 border-neutral-400 border-t-transparent rounded-full animate-spin"></div>
-          </div>
-        } @else if (balance()) {
-          <div class="text-center">
-            <p class="text-sm text-neutral-500 mb-1">Saldo disponível</p>
-            <p class="text-5xl font-bold text-neutral-900 dark:text-white">
-              {{ balance()!.balance | number:'1.2-2' }}
-              <span class="text-2xl font-normal text-neutral-500">{{ balance()!.currency }}</span>
-            </p>
-          </div>
-        }
-      </section>
+      <!-- Carteiras (dupla carteira: PLATFORM + RESELLER) -->
+      @if (loadingWallets()) {
+        <div class="flex justify-center py-8">
+          <div class="w-6 h-6 border-2 border-neutral-400 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      } @else {
+        <div class="grid gap-3" [class.sm:grid-cols-2]="resellerWallet() !== null">
+          @if (platformWallet(); as w) {
+            <section class="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 p-6">
+              <p class="text-sm text-neutral-500 mb-1">Carteira PLATFORM</p>
+              <p class="text-4xl font-bold text-neutral-900 dark:text-white">
+                {{ w.availableCredits | number }}
+                <span class="text-xl font-normal text-neutral-500">créditos</span>
+              </p>
+              <p class="mt-1 text-xs text-neutral-500">Reservados: {{ w.frozenCredits | number }} · {{ w.currency }}</p>
+            </section>
+          }
+          @if (resellerWallet(); as w) {
+            <section class="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 p-6">
+              <p class="text-sm text-neutral-500 mb-1">Carteira RESELLER</p>
+              <p class="text-4xl font-bold text-neutral-900 dark:text-white">
+                {{ w.availableCredits | number }}
+                <span class="text-xl font-normal text-neutral-500">créditos</span>
+              </p>
+              <p class="mt-1 text-xs text-neutral-500">Reservados: {{ w.frozenCredits | number }} · {{ w.currency }}</p>
+            </section>
+          }
+        </div>
+      }
 
       <!-- Ações rápidas -->
       <div class="grid grid-cols-2 gap-3">
@@ -103,18 +116,28 @@ export class WalletBalancePage implements OnInit {
   private readonly walletService = inject(WalletService);
   private readonly destroyRef = inject(DestroyRef);
 
-  readonly balance = signal<WalletBalance | null>(null);
+  readonly platformWallet = signal<Wallet | null>(null);
+  readonly resellerWallet = signal<Wallet | null>(null);
   readonly notifications = signal<WalletNotification[]>([]);
-  readonly loadingBalance = signal(true);
+  readonly loadingWallets = signal(true);
   readonly loadingNotifications = signal(true);
 
   ngOnInit(): void {
     this.walletService
-      .getBalance()
+      .getPlatformWallet()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (b) => { this.balance.set(b); this.loadingBalance.set(false); },
-        error: () => this.loadingBalance.set(false),
+        next: (w) => { this.platformWallet.set(w); this.loadingWallets.set(false); },
+        error: () => this.loadingWallets.set(false),
+      });
+
+    // Carteira RESELLER pode retornar 403 (cliente sem revenda) — ignorar silenciosamente.
+    this.walletService
+      .getResellerWallet()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (w) => this.resellerWallet.set(w),
+        error: () => this.resellerWallet.set(null),
       });
 
     this.walletService

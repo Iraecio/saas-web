@@ -1,0 +1,285 @@
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { DatePipe, DecimalPipe } from '@angular/common';
+import { HttpEvent, HttpEventType } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { AppStateService } from '../../../../core/services/app-state';
+import { NotificationService } from '../../../../core/services/notification';
+import { OrderService } from '../../services/order';
+import { ORDER_STATUS_LABELS } from '../../order-status.util';
+import { OrderActionsComponent, OrderActionEvent } from '../../components/order-actions/order-actions';
+import { AudioDeliveryComponent } from '../../components/audio-delivery/audio-delivery';
+import { OrderTimelineComponent } from '../../components/order-timeline/order-timeline';
+import { buildActionContext } from '../../components/order-actions/order-actions.logic';
+import { DeliverDto, Order, OrderStatusHistoryEntry } from '../../../../core/models/order.model';
+
+@Component({
+  selector: 'app-order-detail',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    RouterLink,
+    DatePipe,
+    DecimalPipe,
+    OrderActionsComponent,
+    AudioDeliveryComponent,
+    OrderTimelineComponent,
+  ],
+  template: `
+    <div class="p-6 max-w-3xl mx-auto space-y-6">
+      <header class="flex items-center justify-between">
+        <a routerLink="/admin/orders" class="text-sm text-blue-600 hover:underline dark:text-blue-400">← Pedidos</a>
+      </header>
+
+      @if (loading()) {
+        <div class="flex justify-center py-12">
+          <div class="w-6 h-6 border-2 border-neutral-400 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      } @else if (order(); as o) {
+        <section class="rounded-xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-950">
+          <div class="flex items-center justify-between">
+            <h1 class="text-2xl font-bold text-neutral-900 dark:text-white">
+              {{ o.orderType === 'VOICE' ? 'Locução' : 'Produção' }}
+            </h1>
+            <span class="inline-flex rounded-full bg-neutral-100 px-3 py-1 text-sm text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300">
+              {{ statusLabel(o.status) }}
+            </span>
+          </div>
+          <dl class="mt-4 grid grid-cols-2 gap-3 text-sm">
+            <div><dt class="text-neutral-500">Créditos</dt><dd>{{ o.creditCost | number }} ({{ o.creditType }})</dd></div>
+            <div><dt class="text-neutral-500">Revisões</dt><dd>{{ o.revisionCount }} / {{ o.maxRevisions }}</dd></div>
+            <div><dt class="text-neutral-500">Prazo</dt><dd>{{ o.deadlineAt ? (o.deadlineAt | date: 'short') : '—' }}</dd></div>
+            <div><dt class="text-neutral-500">Criado em</dt><dd>{{ o.createdAt | date: 'short' }}</dd></div>
+          </dl>
+        </section>
+
+        <!-- Briefing atual -->
+        @if (o.currentBrief; as b) {
+          <section class="rounded-xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-950">
+            <h2 class="mb-2 text-lg font-semibold">Briefing (v{{ b.versionNumber }})</h2>
+            <p class="whitespace-pre-wrap text-sm text-neutral-700 dark:text-neutral-300">{{ b.briefingText }}</p>
+            @if (b.briefingFileUrl) {
+              <a [href]="b.briefingFileUrl" download class="mt-2 inline-block text-xs text-blue-600 hover:underline dark:text-blue-400">Baixar arquivo do briefing</a>
+            }
+            @if (b.revisionReason) {
+              <p class="mt-2 text-xs text-amber-600">Motivo da revisão: {{ b.revisionReason }}</p>
+            }
+          </section>
+        }
+
+        <!-- Entrega / re-entrega -->
+        <section class="rounded-xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-950">
+          <h2 class="mb-2 text-lg font-semibold">Entrega</h2>
+          <app-audio-delivery
+            [current]="o.currentDelivery"
+            [showUpload]="showDeliveryUpload()"
+            [isRedelivery]="o.status === 'REVIEW'"
+            [progress]="uploadProgress()"
+            [submitting]="acting()"
+            (deliver)="onDeliver($event)"
+            (cancel)="showDeliveryUpload.set(false)"
+          />
+        </section>
+
+        <!-- Reenvio de briefing (cliente, AWAITING_BRIEF) -->
+        @if (showBriefUpdate()) {
+          <section class="space-y-2 rounded-xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-950">
+            <h2 class="text-lg font-semibold">Reenviar briefing</h2>
+            <textarea class="form-input" rows="3" placeholder="Briefing atualizado" [value]="briefText()" (input)="briefText.set($any($event.target).value)"></textarea>
+            <input type="file" accept="audio/*,.mp3,.wav,.ogg,.m4a,.flac" class="form-input" (change)="onBriefFile($any($event.target).files)" />
+            @if (uploadProgress() !== null) {
+              <div class="h-2 w-full overflow-hidden rounded-full bg-neutral-200 dark:bg-neutral-800">
+                <div class="h-full bg-blue-600 transition-all" [style.width.%]="uploadProgress()"></div>
+              </div>
+            }
+            <div class="flex gap-2">
+              <button type="button" class="btn-primary" [disabled]="!briefText().trim() || acting()" (click)="submitBriefUpdate()">Enviar</button>
+              <button type="button" class="btn-secondary" (click)="showBriefUpdate.set(false)">Cancelar</button>
+            </div>
+          </section>
+        }
+
+        <!-- Ações -->
+        <section class="rounded-xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-950">
+          <h2 class="mb-3 text-lg font-semibold">Ações</h2>
+          <app-order-actions
+            [context]="actionContext()!"
+            [disabled]="acting()"
+            (run)="onAction($event)"
+            (fileAction)="onFileAction($event)"
+          />
+        </section>
+
+        <!-- Histórico -->
+        <section class="rounded-xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-950">
+          <h2 class="mb-3 text-lg font-semibold">Histórico</h2>
+          <app-order-timeline [entries]="history()" />
+        </section>
+      } @else {
+        <p class="py-12 text-center text-sm text-neutral-500">Pedido não encontrado.</p>
+      }
+    </div>
+  `,
+})
+export class OrderDetailPage {
+  private readonly orders = inject(OrderService);
+  private readonly appState = inject(AppStateService);
+  private readonly notify = inject(NotificationService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly destroyRef = inject(DestroyRef);
+
+  private readonly orderId = this.route.snapshot.paramMap.get('id')!;
+
+  readonly order = signal<Order | null>(null);
+  readonly history = signal<OrderStatusHistoryEntry[]>([]);
+  readonly loading = signal(true);
+  readonly acting = signal(false);
+  readonly uploadProgress = signal<number | null>(null);
+
+  readonly showDeliveryUpload = signal(false);
+  readonly showBriefUpdate = signal(false);
+  readonly briefText = signal('');
+  private briefFile: File | null = null;
+
+  readonly actionContext = computed(() => {
+    const o = this.order();
+    const user = this.appState.user();
+    if (!o || !user) return null;
+    const canResolve =
+      this.appState.isAdmin() || (this.appState.isReseller() && o.creditType === 'RESELLER');
+    return buildActionContext(o, user.id, user.role, canResolve);
+  });
+
+  constructor() {
+    this.reload();
+  }
+
+  statusLabel(status: Order['status']): string {
+    return ORDER_STATUS_LABELS[status] ?? status;
+  }
+
+  private reload(): void {
+    this.loading.set(true);
+    this.orders
+      .getById(this.orderId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (o) => {
+          this.order.set(o);
+          this.loading.set(false);
+        },
+        error: (err) => {
+          this.notify.error(err.message ?? 'Erro ao carregar pedido');
+          this.loading.set(false);
+        },
+      });
+    this.orders
+      .getHistory(this.orderId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({ next: (h) => this.history.set(h), error: () => {} });
+  }
+
+  onFileAction(action: 'deliver' | 'update-brief'): void {
+    if (action === 'deliver') this.showDeliveryUpload.set(true);
+    else this.showBriefUpdate.set(true);
+  }
+
+  onAction(ev: OrderActionEvent): void {
+    const id = this.orderId;
+    let req: Observable<Order>;
+    switch (ev.action) {
+      case 'accept':
+        req = this.orders.accept(id);
+        break;
+      case 'approve':
+        req = this.orders.approve(id);
+        break;
+      case 'cancel':
+        req = this.orders.cancel(id);
+        break;
+      case 'refuse':
+        req = this.orders.refuse(id, { reason: ev.text ?? '' });
+        break;
+      case 'request-brief-revision':
+        req = this.orders.requestBriefRevision(id, { reason: ev.text ?? '' });
+        break;
+      case 'request-revision':
+        req = this.orders.requestRevision(id, { instructions: ev.text ?? '' });
+        break;
+      case 'dispute':
+        req = this.orders.dispute(id, { justification: ev.text ?? '' });
+        break;
+      case 'resolve':
+        req = this.orders.resolve(id, { decision: ev.decision ?? 'FAVOR_CLIENT', notes: ev.text ?? '' });
+        break;
+      default:
+        return;
+    }
+    this.acting.set(true);
+    req.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: () => {
+        this.acting.set(false);
+        this.notify.success('Ação realizada.');
+        this.reload();
+      },
+      error: (err) => {
+        this.acting.set(false);
+        this.notify.error(err.message ?? 'Erro ao executar ação');
+      },
+    });
+  }
+
+  onDeliver(dto: DeliverDto): void {
+    this.runUpload(this.orders.deliver(this.orderId, dto), () => this.showDeliveryUpload.set(false));
+  }
+
+  onBriefFile(files: FileList | null): void {
+    this.briefFile = files?.[0] ?? null;
+  }
+
+  submitBriefUpdate(): void {
+    if (!this.briefText().trim()) return;
+    this.runUpload(
+      this.orders.updateBrief(this.orderId, {
+        briefingText: this.briefText().trim(),
+        file: this.briefFile ?? undefined,
+      }),
+      () => {
+        this.showBriefUpdate.set(false);
+        this.briefText.set('');
+        this.briefFile = null;
+      },
+    );
+  }
+
+  // Trata upload com progresso e refaz o load ao concluir.
+  private runUpload(req: Observable<HttpEvent<Order>>, onDone: () => void): void {
+    this.acting.set(true);
+    this.uploadProgress.set(0);
+    req.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (event) => {
+        if (event.type === HttpEventType.UploadProgress && event.total) {
+          this.uploadProgress.set(Math.round((100 * event.loaded) / event.total));
+        } else if (event.type === HttpEventType.Response) {
+          this.acting.set(false);
+          this.uploadProgress.set(null);
+          this.notify.success('Enviado com sucesso.');
+          onDone();
+          this.reload();
+        }
+      },
+      error: (err) => {
+        this.acting.set(false);
+        this.uploadProgress.set(null);
+        this.notify.error(err.message ?? 'Erro no envio');
+      },
+    });
+  }
+}

@@ -10,6 +10,7 @@ import {
   WalletNotification,
   ReportDisputeDto,
   RequestRefundDto,
+  Wallet,
 } from '../../../core/models/wallet.model';
 
 @Injectable({ providedIn: 'root' })
@@ -18,6 +19,16 @@ export class WalletService {
 
   getBalance(): Observable<WalletBalance> {
     return this.api.get<WalletBalance>('/wallet/balance');
+  }
+
+  // ── Dupla carteira (spec 002 / saas-api 004) ──────────────────────────────
+  getPlatformWallet(): Observable<Wallet> {
+    return this.api.get<Wallet>('/wallet/platform');
+  }
+
+  // Pode retornar 403 para usuários sem resellerId — tratar no chamador.
+  getResellerWallet(): Observable<Wallet> {
+    return this.api.get<Wallet>('/wallet/reseller');
   }
 
   listCredits(params?: {

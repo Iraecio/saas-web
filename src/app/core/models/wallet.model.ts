@@ -21,9 +21,22 @@ export type RefundStatus =
   | 'CANCELLED';
 export type DisputeStatus = 'OPENED' | 'INVESTIGATING' | 'RESOLVED' | 'CHARGEBACK_FILED';
 
+// Tipo da carteira no modelo de dupla carteira (spec 002 / saas-api 004).
+// Fonte única para 'PLATFORM' | 'RESELLER' — reutilizado por service.model e order.model.
+export type WalletType = 'PLATFORM' | 'RESELLER';
+
 // ── Wallet ────────────────────────────────────────────────────────────────────
 export interface WalletBalance {
   balance: number;
+  currency: string;
+}
+
+// Carteira do modelo de dupla carteira: GET /v1/wallet/platform | /v1/wallet/reseller
+export interface Wallet {
+  id: string;
+  walletType: WalletType;
+  availableCredits: number;
+  frozenCredits: number;
   currency: string;
 }
 

@@ -7,5 +7,8 @@ export const serverRoutes: ServerRoute[] = [
   { path: 'admin/custom-domains/:resellerId',   renderMode: RenderMode.Server },
   { path: 'admin/wallet/credits/:id',           renderMode: RenderMode.Server },
   { path: 'admin/wallet-admin/wallets/:userId', renderMode: RenderMode.Server },
+  { path: 'admin/services/:id/edit',            renderMode: RenderMode.Server },
+  { path: 'admin/services/:id/audit',           renderMode: RenderMode.Server },
+  { path: 'admin/orders/:id',                   renderMode: RenderMode.Server },
   { path: '**',                                 renderMode: RenderMode.Prerender },
 ];

@@ -3,14 +3,9 @@ import { Routes } from '@angular/router';
 export const SETTINGS_ROUTES: Routes = [
   {
     path: '',
-    loadComponent: () =>
-      import('./pages/general/general').then((m) => m.SettingsGeneralComponent),
+    loadComponent: () => import('./pages/general/general').then((m) => m.SettingsGeneralComponent),
     children: [
-      {
-        path: '',
-        pathMatch: 'full',
-        redirectTo: 'geral',
-      },
+      { path: '', pathMatch: 'full', redirectTo: 'geral' },
       {
         path: 'geral',
         loadComponent: () =>
@@ -20,6 +15,10 @@ export const SETTINGS_ROUTES: Routes = [
         path: 'perfil',
         loadComponent: () =>
           import('../profile/pages/overview/overview').then((m) => m.ProfileOverviewComponent),
+      },
+      {
+        path: 'ui-kit',
+        loadComponent: () => import('./pages/ui-kit/ui-kit').then((m) => m.UiKitComponent),
       },
     ],
   },

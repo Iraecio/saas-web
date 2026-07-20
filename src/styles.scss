@@ -1,0 +1,139 @@
+@use '@angular/material' as mat;
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$azure-palette,
+        tertiary: mat.$green-palette,
+      ),
+      typography: Inter,
+      density: 0,
+    )
+  );
+  color-scheme: light;
+  --ui-background: #f7f8fa;
+  --ui-foreground: #15171a;
+  --ui-surface: #ffffff;
+  --ui-surface-subtle: #f1f3f5;
+  --ui-muted: #66707a;
+  --ui-border: #dfe3e7;
+  --ui-border-strong: #b8c0c8;
+  --ui-primary: #155eef;
+  --ui-primary-hover: #0f4fd3;
+  --ui-primary-foreground: #ffffff;
+  --ui-accent: #00a67e;
+  --ui-danger: #d92d20;
+  --ui-warning: #b54708;
+  --ui-focus: #84adff;
+  --ui-radius-sm: 0.25rem;
+  --ui-radius-md: 0.375rem;
+  --ui-radius-lg: 0.5rem;
+}
+
+.dark {
+  color-scheme: dark;
+  --ui-background: #111315;
+  --ui-foreground: #f3f5f7;
+  --ui-surface: #191c1f;
+  --ui-surface-subtle: #22262a;
+  --ui-muted: #a7b0b9;
+  --ui-border: #30363c;
+  --ui-border-strong: #4a535c;
+  --ui-primary: #6b9cff;
+  --ui-primary-hover: #8ab0ff;
+  --ui-primary-foreground: #071b45;
+  --ui-accent: #47d7b1;
+  --ui-danger: #ff7a70;
+  --ui-warning: #fdb022;
+}
+
+@theme {
+  --color-canvas: var(--ui-background);
+  --color-foreground: var(--ui-foreground);
+  --color-surface: var(--ui-surface);
+  --color-surface-subtle: var(--ui-surface-subtle);
+  --color-muted: var(--ui-muted);
+  --color-border: var(--ui-border);
+  --color-border-strong: var(--ui-border-strong);
+  --color-brand: var(--ui-primary);
+  --color-brand-hover: var(--ui-primary-hover);
+  --color-brand-foreground: var(--ui-primary-foreground);
+  --color-accent: var(--ui-accent);
+  --color-danger: var(--ui-danger);
+  --color-warning: var(--ui-warning);
+  --radius-sm: var(--ui-radius-sm);
+  --radius-md: var(--ui-radius-md);
+  --radius-lg: var(--ui-radius-lg);
+}
+
+@layer base {
+  * {
+    border-color: var(--ui-border);
+  }
+  body {
+    margin: 0;
+    background: var(--ui-background);
+    color: var(--ui-foreground);
+    font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+    letter-spacing: 0;
+    -webkit-font-smoothing: antialiased;
+  }
+  :focus-visible {
+    outline: 3px solid var(--ui-focus);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-brand text-brand-foreground hover:bg-brand-hover;
+  }
+  .btn-secondary {
+    @apply border border-border-strong bg-surface text-foreground hover:bg-surface-subtle;
+  }
+  .btn-danger {
+    @apply bg-danger text-white hover:brightness-90;
+  }
+  .card {
+    @apply rounded-lg border border-border bg-surface p-6 shadow-sm;
+  }
+  .form-input {
+    @apply w-full rounded-md border border-border-strong bg-surface px-3 py-2 text-foreground focus:border-brand focus:outline-none;
+  }
+  .form-label {
+    @apply mb-1 block text-sm font-medium text-foreground;
+  }
+  .table-cell {
+    @apply px-4 py-3 text-sm text-foreground;
+  }
+  .badge {
+    @apply inline-flex items-center rounded-sm bg-surface-subtle px-2 py-0.5 text-xs font-medium text-muted;
+  }
+  .sidebar-item {
+    @apply flex cursor-pointer items-center gap-3 rounded-md px-3 py-2 text-muted transition-colors hover:bg-surface-subtle hover:text-foreground;
+  }
+  .sidebar-item-active {
+    @apply bg-foreground text-surface hover:bg-foreground hover:text-surface;
+  }
+}
+
+.mat-mdc-dialog-container {
+  --mdc-dialog-container-shape: var(--ui-radius-lg);
+}
+.mat-mdc-form-field {
+  --mdc-outlined-text-field-container-shape: var(--ui-radius-md);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

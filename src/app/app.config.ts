@@ -22,7 +22,10 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
     provideRouter(routes, withComponentInputBinding(), withViewTransitions()),
-    provideHttpClient(withFetch(), withInterceptors([responseTransformInterceptor, authInterceptor, errorInterceptor])),
+    provideHttpClient(
+      withFetch(),
+      withInterceptors([responseTransformInterceptor, authInterceptor, errorInterceptor]),
+    ),
     provideClientHydration(withEventReplay()),
     {
       provide: APP_INITIALIZER,

@@ -21,14 +21,8 @@ export class WalletService {
     return this.api.get<WalletBalance>('/wallet/balance');
   }
 
-  // ── Dupla carteira (spec 002 / saas-api 004) ──────────────────────────────
-  getPlatformWallet(): Observable<Wallet> {
-    return this.api.get<Wallet>('/wallet/platform');
-  }
-
-  // Pode retornar 403 para usuários sem resellerId — tratar no chamador.
-  getResellerWallet(): Observable<Wallet> {
-    return this.api.get<Wallet>('/wallet/reseller');
+  getWallet(): Observable<Wallet> {
+    return this.api.get<Wallet>('/wallet');
   }
 
   listCredits(params?: {
@@ -51,17 +45,17 @@ export class WalletService {
   }
 
   reportDispute(creditId: string, dto: ReportDisputeDto): Observable<void> {
-    return this.api.post<void>(`/wallet/credits/${creditId}/disputes`, dto);
+    return this.api.post<void>(`/wallet/disputes/${creditId}`, dto);
   }
 
   requestRefund(creditId: string, dto: RequestRefundDto): Observable<void> {
-    return this.api.post<void>(`/wallet/credits/${creditId}/refunds`, dto);
+    return this.api.post<void>(`/wallet/refunds/${creditId}`, dto);
   }
 
-  listRefunds(params?: { status?: string; cursor?: string; limit?: number }): Observable<RefundRequest[]> {
+  listRefunds(params?: { status?: string; offset?: number; limit?: number }): Observable<RefundRequest[]> {
     const query = new URLSearchParams();
     if (params?.status) query.set('status', params.status);
-    if (params?.cursor) query.set('cursor', params.cursor);
+    if (params?.offset !== undefined) query.set('offset', String(params.offset));
     if (params?.limit) query.set('limit', String(params.limit));
     const qs = query.toString();
     return this.api.get<RefundRequest[]>(`/wallet/refunds${qs ? '?' + qs : ''}`);

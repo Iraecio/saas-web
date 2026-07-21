@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, map } from 'rxjs';
+import { Observable, map, throwError } from 'rxjs';
 import { ApiService } from '../../../core/services/api';
 import { User, UserPermission, GrantPermissionDto } from '../../../core/models/user.model';
 import { UserListItem } from '../models/user.model';
@@ -21,7 +21,7 @@ export class UserService {
   }
 
   create(data: Partial<UserListItem>): Observable<UserListItem> {
-    return this.api.createUser(data as Partial<User>).pipe(map((user) => this.mapToListItem(user)));
+    return throwError(() => new Error('Criação administrativa de usuários não é suportada pela API.'));
   }
 
   update(id: string, data: Partial<UserListItem>): Observable<UserListItem> {

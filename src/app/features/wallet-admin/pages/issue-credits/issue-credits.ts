@@ -35,8 +35,8 @@ import { CreditType, CreditOriginType } from '../../../../core/models/wallet.mod
                 placeholder="UUID do usuário" />
             </div>
             <div>
-              <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">Valor *</label>
-              <input type="number" formControlName="amount" min="0.01" step="0.01" class="form-input w-full" />
+              <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">Quantidade *</label>
+              <input type="number" formControlName="amount" min="1" step="1" class="form-input w-full" />
             </div>
             <div>
               <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">Tipo *</label>
@@ -58,8 +58,16 @@ import { CreditType, CreditOriginType } from '../../../../core/models/wallet.mod
               </select>
             </div>
             <div>
-              <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">Expira em</label>
-              <input type="date" formControlName="expiresAt" class="form-input w-full" />
+              <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">Valor unitário (centavos) *</label>
+              <input type="number" formControlName="valueCents" min="1" step="1" class="form-input w-full" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">Custo unitário (centavos) *</label>
+              <input type="number" formControlName="costCents" min="0" step="1" class="form-input w-full" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">Validade (dias)</label>
+              <input type="number" formControlName="expiresInDays" min="1" max="365" class="form-input w-full" />
             </div>
             <div class="col-span-2">
               <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">Observação</label>
@@ -133,16 +141,18 @@ export class IssueCreditsPage implements OnInit {
 
   readonly issueForm = this.fb.nonNullable.group({
     userId: ['', Validators.required],
-    amount: [0, [Validators.required, Validators.min(0.01)]],
+    amount: [1, [Validators.required, Validators.min(1)]],
+    valueCents: [1, [Validators.required, Validators.min(1)]],
+    costCents: [0, [Validators.required, Validators.min(0)]],
     type: ['PAID' as CreditType, Validators.required],
     originType: ['PURCHASE' as CreditOriginType, Validators.required],
-    expiresAt: [''],
+    expiresInDays: [0],
     note: [''],
   });
 
   readonly cancelForm = this.fb.nonNullable.group({
     creditId: ['', Validators.required],
-    reason: [''],
+    reason: ['', Validators.required],
   });
 
   ngOnInit(): void {
@@ -158,22 +168,24 @@ export class IssueCreditsPage implements OnInit {
     this.issueSuccess.set(false);
     this.issueError.set(undefined);
 
-    const { userId, amount, type, originType, expiresAt, note } = this.issueForm.getRawValue();
+    const { userId, amount, valueCents, costCents, type, originType, expiresInDays, note } = this.issueForm.getRawValue();
     this.walletAdminService
       .issueCredits({
-        userId,
+        toUserId: userId,
         amount,
+        valueCents,
+        costCents,
         type,
         originType,
-        expiresAt: expiresAt || undefined,
-        note: note || undefined,
+        expiresInDays: expiresInDays || undefined,
+        metadata: note ? { description: note } : undefined,
       })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
           this.issuingCredits.set(false);
           this.issueSuccess.set(true);
-          this.issueForm.reset({ type: 'PAID', originType: 'PURCHASE', amount: 0 });
+          this.issueForm.reset({ type: 'PAID', originType: 'PURCHASE', amount: 1, valueCents: 1, costCents: 0, expiresInDays: 0 });
           setTimeout(() => this.issueSuccess.set(false), 4000);
         },
         error: (err: Error) => {
@@ -191,7 +203,7 @@ export class IssueCreditsPage implements OnInit {
 
     const { creditId, reason } = this.cancelForm.getRawValue();
     this.walletAdminService
-      .cancelCredits({ creditId, reason: reason || undefined })
+      .cancelCredits({ creditIds: [creditId], reason })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {

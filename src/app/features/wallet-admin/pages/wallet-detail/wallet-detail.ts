@@ -36,10 +36,10 @@ import { WalletSummary } from '../../../../core/models/wallet.model';
           <div class="text-center">
             <p class="text-sm text-neutral-500 mb-1">Saldo da carteira</p>
             <p class="text-4xl font-bold text-neutral-900 dark:text-white">
-              {{ wallet()!.balance | number:'1.2-2' }}
+              {{ wallet()!.availableCredits | number }}
               <span class="text-xl font-normal text-neutral-500">{{ wallet()!.currency }}</span>
             </p>
-            <p class="text-xs text-neutral-400 mt-2">{{ wallet()!.creditCount }} créditos · Criado em {{ wallet()!.createdAt | date:'dd/MM/yyyy' }}</p>
+            <p class="text-xs text-neutral-400 mt-2">{{ wallet()!.frozenCredits }} reservados · Criado em {{ wallet()!.createdAt | date:'dd/MM/yyyy' }}</p>
           </div>
         </section>
 

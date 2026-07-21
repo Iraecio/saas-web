@@ -68,9 +68,9 @@ import { Order, OrderStatus, OrderType } from '../../../../core/models/order.mod
               @for (o of orders(); track o.id) {
                 <tr class="bg-white dark:bg-neutral-950">
                   <td class="px-4 py-3 font-mono text-xs text-neutral-600 dark:text-neutral-400">{{ o.id.slice(0, 8) }}</td>
-                  <td class="px-4 py-3">{{ o.orderType === 'VOICE' ? 'Locução' : 'Produção' }}</td>
-                  <td class="px-4 py-3 text-right">{{ o.creditCost }} ({{ o.creditType }})</td>
-                  <td class="px-4 py-3">{{ o.deadlineAt ? (o.deadlineAt | date: 'short') : '—' }}</td>
+                  <td class="px-4 py-3">{{ o.lineItems.length }} item(ns)</td>
+                  <td class="px-4 py-3 text-right">{{ totalCredits(o) }}</td>
+                  <td class="px-4 py-3">{{ o.createdAt | date: 'short' }}</td>
                   <td class="px-4 py-3 text-center">
                     <span class="inline-flex rounded-full bg-neutral-100 px-2 py-0.5 text-xs text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300">
                       {{ label(o.status) }}
@@ -117,6 +117,10 @@ export class OrdersListPage {
 
   label(status: OrderStatus): string {
     return ORDER_STATUS_LABELS[status] ?? status;
+  }
+
+  totalCredits(order: Order): number {
+    return order.lineItems.reduce((total, item) => total + item.creditCost, 0);
   }
 
   onStatus(value: string): void {

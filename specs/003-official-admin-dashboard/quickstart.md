@@ -40,6 +40,13 @@ npm run build
 
 Executar também testes focados dos serviços/components alterados durante cada fase, sem aguardar a conclusão de todas as fases.
 
+## Resultado da implementação
+
+- API: 63 suítes e 718 testes aprovados; build Nest concluído.
+- Frontend: 7 arquivos de teste e 22 testes aprovados; build production SSR e prerender de 55 rotas concluídos.
+- Busca estática: nenhum endpoint legado abrangido pela matriz e nenhum gerador de dados mockados encontrado nas áreas administrativas alteradas.
+- Avisos remanescentes do build são preexistentes e não bloqueantes: depreciação do `@import` Sass e orçamento CSS do componente `magic-cube`.
+
 ## Done checklist
 
 - Nenhum endpoint removido permanece no código frontend.

@@ -80,7 +80,7 @@ import { Credit, CreditStatus } from '../../../../core/models/wallet.model';
               @for (credit of credits(); track credit.id) {
                 <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800/50">
                   <td class="px-4 py-3 font-mono text-xs text-neutral-500">{{ credit.id | slice:0:8 }}…</td>
-                  <td class="px-4 py-3 font-semibold text-neutral-900 dark:text-white">{{ credit.amount | number:'1.2-2' }}</td>
+                  <td class="px-4 py-3 font-semibold text-neutral-900 dark:text-white">{{ credit.valueCents / 100 | number:'1.2-2' }}</td>
                   <td class="px-4 py-3 text-neutral-700 dark:text-neutral-300">{{ credit.type }}</td>
                   <td class="px-4 py-3 text-neutral-700 dark:text-neutral-300">{{ credit.originType }}</td>
                   <td class="px-4 py-3">
@@ -88,7 +88,7 @@ import { Credit, CreditStatus } from '../../../../core/models/wallet.model';
                       {{ credit.status }}
                     </span>
                   </td>
-                  <td class="px-4 py-3 text-neutral-500 text-xs">{{ credit.createdAt | date:'dd/MM/yyyy' }}</td>
+                  <td class="px-4 py-3 text-neutral-500 text-xs">{{ credit.issuedAt | date:'dd/MM/yyyy' }}</td>
                 </tr>
               }
             </tbody>
@@ -166,7 +166,7 @@ export class CreditsSearchPage implements OnInit {
         status: this.filters.status || undefined,
         type: this.filters.type || undefined,
         originType: this.filters.originType || undefined,
-        page: this.currentPage(),
+        offset: (this.currentPage() - 1) * this.pageSize,
         limit: this.pageSize,
       })
       .pipe(takeUntilDestroyed(this.destroyRef))

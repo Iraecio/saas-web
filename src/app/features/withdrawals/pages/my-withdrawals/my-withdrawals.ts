@@ -100,7 +100,7 @@ export class MyWithdrawalsPage {
 
   private loadWallet(): void {
     this.wallet
-      .getPlatformWallet()
+      .getWallet()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (w) => this.accumulated.set(w.availableCredits),

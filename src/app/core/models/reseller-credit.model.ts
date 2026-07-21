@@ -1,36 +1,8 @@
-// Emissão de créditos RESELLER (spec 002 / saas-api 004).
-export interface EmitCreditDto {
-  clientId: string;
-  creditAmount: number; // inteiro > 0
-  unitValueCents: number; // valor cobrado por crédito
-}
-
-export interface CreditEmission {
-  emissionId: string;
-  clientId: string;
-  creditAmount: number;
-  unitValueCents: number;
-  totalValueCents: number;
-  newWalletBalance?: number; // presente na resposta da emissão
-  emittedAt: string;
-}
-
-export interface EmissionsSummary {
-  totalEmissions: number;
-  totalCreditsEmitted: number;
-  totalVolumeUsedCredits: number;
-}
-
-export interface EmissionsReport {
-  emissions: CreditEmission[];
-  summary: EmissionsSummary;
-  pagination: { page: number; limit: number; total: number };
-}
-
-export interface EmissionsFilters {
-  startDate?: string;
-  endDate?: string;
-  clientId?: string;
-  page?: number;
-  limit?: number;
-}
+export interface PlatformCreditPrice { unitPriceCents: number; effectiveFrom: string; note?: string | null; }
+export interface ResellerPricing { id?: string; unitPriceCents: number; allowDirectPurchase: boolean; packages: CreditPackage[]; }
+export interface CreditPackage { id: string; creditAmount: number; priceCents: number; isActive: boolean; }
+export interface CreditPurchase { id: string; resellerId: string; creditAmount: number; unitPriceCents: number; totalCents: number; status: 'PENDING_PAYMENT' | 'CONFIRMED' | 'CANCELLED'; paymentReference?: string | null; createdAt: string; }
+export interface StockLot { id: string; sourceType: string; initialCredits: number; remainingCredits: number; unitCostCents: number; createdAt: string; }
+export interface StockSummary { totalAvailable: number; lots: StockLot[]; }
+export interface CreditSale { id: string; resellerId: string; clientId: string; creditAmount: number; unitSalePriceCents: number; totalSaleCents: number; totalCostCents: number; marginCents: number; createdAt: string; }
+export interface PaginatedResult<T> { data?: T[]; items?: T[]; meta?: { page: number; limit: number; total: number; totalPages: number }; }

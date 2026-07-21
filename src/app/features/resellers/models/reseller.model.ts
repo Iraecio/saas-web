@@ -4,11 +4,11 @@ export interface Reseller {
   email: string;
   phone?: string;
   status: 'active' | 'inactive' | 'suspended';
-  commissionRate: number;
-  totalSales: number;
-  totalCommission: number;
+  ownerId?: string;
+  timezone?: string;
+  maxUsers?: number;
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string;
 }
 
 export interface ResellerListItem extends Reseller {}

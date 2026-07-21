@@ -86,23 +86,23 @@ import { ReconciliationResult } from '../../../../core/models/wallet.model';
             <tbody class="divide-y divide-neutral-200 dark:divide-neutral-800">
               @for (result of results(); track result.id) {
                 <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800/50"
-                  [class.bg-red-50]="result.status === 'MISMATCH'"
-                  [class.dark:bg-red-900/10]="result.status === 'MISMATCH'">
+                  [class.bg-red-50]="!result.isBalanced"
+                  [class.dark:bg-red-900/10]="!result.isBalanced">
                   <td class="px-4 py-3 font-mono text-xs text-neutral-500">{{ result.walletId | slice:0:12 }}…</td>
-                  <td class="px-4 py-3 text-neutral-700 dark:text-neutral-300">{{ result.expectedBalance | number:'1.2-2' }}</td>
-                  <td class="px-4 py-3 text-neutral-700 dark:text-neutral-300">{{ result.actualBalance | number:'1.2-2' }}</td>
-                  <td class="px-4 py-3 font-semibold" [class]="result.difference !== 0 ? 'text-red-600 dark:text-red-400' : 'text-neutral-500'">
-                    {{ result.difference | number:'1.2-2' }}
+                  <td class="px-4 py-3 text-neutral-700 dark:text-neutral-300">—</td>
+                  <td class="px-4 py-3 text-neutral-700 dark:text-neutral-300">—</td>
+                  <td class="px-4 py-3 font-semibold" [class]="result.discrepancy ? 'text-red-600 dark:text-red-400' : 'text-neutral-500'">
+                    {{ (result.discrepancy ?? 0) | number }}
                   </td>
                   <td class="px-4 py-3">
                     <span class="text-xs px-2 py-0.5 rounded-full font-medium"
-                      [class]="result.status === 'OK' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
-                      {{ result.status }}
+                      [class]="result.isBalanced ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
+                      {{ result.isBalanced ? 'OK' : 'DIVERGENTE' }}
                     </span>
                   </td>
-                  <td class="px-4 py-3 text-neutral-500 text-xs">{{ result.checkedAt | date:'dd/MM/yyyy HH:mm' }}</td>
+                  <td class="px-4 py-3 text-neutral-500 text-xs">{{ result.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
                   <td class="px-4 py-3 text-right">
-                    @if (result.status === 'MISMATCH' && isSuperAdmin()) {
+                    @if (!result.isBalanced && isSuperAdmin()) {
                       <button (click)="openCorrection(result)"
                         class="text-xs text-amber-600 hover:text-amber-800 font-medium">
                         Corrigir
@@ -145,7 +145,7 @@ export class ReconciliationPage implements OnInit {
   loadResults(): void {
     this.loading.set(true);
     this.walletAdminService
-      .getReconciliationResults({ status: this.statusFilter() || undefined })
+      .getReconciliationResults()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (r) => { this.results.set(r); this.loading.set(false); },

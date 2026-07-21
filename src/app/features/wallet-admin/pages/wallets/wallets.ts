@@ -57,9 +57,9 @@ import { WalletSummary } from '../../../../core/models/wallet.model';
                 <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors">
                   <td class="px-6 py-4 font-mono text-xs text-neutral-600 dark:text-neutral-400">{{ wallet.userId }}</td>
                   <td class="px-6 py-4 font-semibold text-neutral-900 dark:text-white">
-                    {{ wallet.balance | number:'1.2-2' }} <span class="text-xs font-normal text-neutral-500">{{ wallet.currency }}</span>
+                    {{ wallet.availableCredits | number }} <span class="text-xs font-normal text-neutral-500">créditos</span>
                   </td>
-                  <td class="px-6 py-4 text-neutral-700 dark:text-neutral-300">{{ wallet.creditCount }}</td>
+                  <td class="px-6 py-4 text-neutral-700 dark:text-neutral-300">{{ wallet.frozenCredits }}</td>
                   <td class="px-6 py-4 text-neutral-500 text-xs">{{ wallet.createdAt | date:'dd/MM/yyyy' }}</td>
                   <td class="px-6 py-4 text-right">
                     <a [routerLink]="[wallet.userId]" class="text-xs text-primary-600 hover:underline">Ver detalhes</a>
@@ -108,7 +108,7 @@ export class WalletsListPage implements OnInit {
     this.loading.set(true);
     this.walletAdminService
       .listWallets({
-        page: this.currentPage(),
+        offset: (this.currentPage() - 1) * this.pageSize,
         limit: this.pageSize,
         userId: this.userIdSearch() || undefined,
       })

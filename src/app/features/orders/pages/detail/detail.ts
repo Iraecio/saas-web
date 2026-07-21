@@ -43,25 +43,40 @@ import { DeliverDto, Order, OrderStatusHistoryEntry } from '../../../../core/mod
           <div class="w-6 h-6 border-2 border-neutral-400 border-t-transparent rounded-full animate-spin"></div>
         </div>
       } @else if (order(); as o) {
+        @if (o.lineItems.length > 1) {
+          <nav class="flex flex-wrap gap-2" aria-label="Itens do pedido">
+            @for (item of o.lineItems; track item.id; let index = $index) {
+              <button
+                type="button"
+                class="rounded-lg border px-3 py-2 text-sm"
+                [class.border-blue-600]="selectedItemId() === item.id"
+                [class.bg-blue-50]="selectedItemId() === item.id"
+                (click)="selectItem(item.id)"
+              >
+                Item {{ index + 1 }} · {{ item.itemType === 'VOICE' ? 'Locução' : 'Produção' }} · {{ statusLabel(item.status) }}
+              </button>
+            }
+          </nav>
+        }
         <section class="rounded-xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-950">
           <div class="flex items-center justify-between">
             <h1 class="text-2xl font-bold text-neutral-900 dark:text-white">
-              {{ o.orderType === 'VOICE' ? 'Locução' : 'Produção' }}
+              {{ selectedItem()?.itemType === 'VOICE' ? 'Locução' : 'Produção' }}
             </h1>
             <span class="inline-flex rounded-full bg-neutral-100 px-3 py-1 text-sm text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300">
-              {{ statusLabel(o.status) }}
+              {{ statusLabel(selectedItem()?.status ?? o.status) }}
             </span>
           </div>
           <dl class="mt-4 grid grid-cols-2 gap-3 text-sm">
-            <div><dt class="text-neutral-500">Créditos</dt><dd>{{ o.creditCost | number }} ({{ o.creditType }})</dd></div>
-            <div><dt class="text-neutral-500">Revisões</dt><dd>{{ o.revisionCount }} / {{ o.maxRevisions }}</dd></div>
-            <div><dt class="text-neutral-500">Prazo</dt><dd>{{ o.deadlineAt ? (o.deadlineAt | date: 'short') : '—' }}</dd></div>
+            <div><dt class="text-neutral-500">Créditos</dt><dd>{{ selectedItem()?.creditCost | number }}</dd></div>
+            <div><dt class="text-neutral-500">Revisões</dt><dd>{{ selectedItem()?.revisionCount }} / {{ selectedItem()?.maxRevisions }}</dd></div>
+            <div><dt class="text-neutral-500">Prazo</dt><dd>{{ selectedItem()?.deadlineAt ? (selectedItem()?.deadlineAt | date: 'short') : '—' }}</dd></div>
             <div><dt class="text-neutral-500">Criado em</dt><dd>{{ o.createdAt | date: 'short' }}</dd></div>
           </dl>
         </section>
 
         <!-- Briefing atual -->
-        @if (o.currentBrief; as b) {
+        @if (selectedItem()?.currentBrief; as b) {
           <section class="rounded-xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-950">
             <h2 class="mb-2 text-lg font-semibold">Briefing (v{{ b.versionNumber }})</h2>
             <p class="whitespace-pre-wrap text-sm text-neutral-700 dark:text-neutral-300">{{ b.briefingText }}</p>
@@ -78,9 +93,9 @@ import { DeliverDto, Order, OrderStatusHistoryEntry } from '../../../../core/mod
         <section class="rounded-xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-950">
           <h2 class="mb-2 text-lg font-semibold">Entrega</h2>
           <app-audio-delivery
-            [current]="o.currentDelivery"
+            [current]="selectedItem()?.currentDelivery"
             [showUpload]="showDeliveryUpload()"
-            [isRedelivery]="o.status === 'REVIEW'"
+            [isRedelivery]="selectedItem()?.status === 'REVIEW'"
             [progress]="uploadProgress()"
             [submitting]="acting()"
             (deliver)="onDeliver($event)"
@@ -138,6 +153,8 @@ export class OrderDetailPage {
   private readonly orderId = this.route.snapshot.paramMap.get('id')!;
 
   readonly order = signal<Order | null>(null);
+  readonly selectedItemId = signal<string | null>(null);
+  readonly selectedItem = computed(() => this.order()?.lineItems.find(item => item.id === this.selectedItemId()) ?? this.order()?.lineItems[0] ?? null);
   readonly history = signal<OrderStatusHistoryEntry[]>([]);
   readonly loading = signal(true);
   readonly acting = signal(false);
@@ -151,10 +168,11 @@ export class OrderDetailPage {
   readonly actionContext = computed(() => {
     const o = this.order();
     const user = this.appState.user();
-    if (!o || !user) return null;
+    const item = this.selectedItem();
+    if (!o || !item || !user) return null;
     const canResolve =
-      this.appState.isAdmin() || (this.appState.isReseller() && o.creditType === 'RESELLER');
-    return buildActionContext(o, user.id, user.role, canResolve);
+      this.appState.isAdmin() || (this.appState.isReseller() && Boolean(o.resellerId));
+    return buildActionContext(o, item, user.id, user.role, canResolve);
   });
 
   constructor() {
@@ -165,6 +183,14 @@ export class OrderDetailPage {
     return ORDER_STATUS_LABELS[status] ?? status;
   }
 
+  selectItem(itemId: string): void {
+    this.selectedItemId.set(itemId);
+    this.history.set([]);
+    this.showDeliveryUpload.set(false);
+    this.showBriefUpdate.set(false);
+    this.loadHistory(itemId);
+  }
+
   private reload(): void {
     this.loading.set(true);
     this.orders
@@ -173,6 +199,9 @@ export class OrderDetailPage {
       .subscribe({
         next: (o) => {
           this.order.set(o);
+          const itemId = this.route.snapshot.queryParamMap.get('itemId') ?? o.lineItems[0]?.id ?? null;
+          this.selectedItemId.set(itemId);
+          if (itemId) this.loadHistory(itemId);
           this.loading.set(false);
         },
         error: (err) => {
@@ -180,8 +209,11 @@ export class OrderDetailPage {
           this.loading.set(false);
         },
       });
+  }
+
+  private loadHistory(itemId: string): void {
     this.orders
-      .getHistory(this.orderId)
+      .getHistory(this.orderId, itemId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({ next: (h) => this.history.set(h), error: () => {} });
   }
@@ -193,31 +225,33 @@ export class OrderDetailPage {
 
   onAction(ev: OrderActionEvent): void {
     const id = this.orderId;
+    const itemId = this.selectedItemId();
+    if (!itemId) return;
     let req: Observable<Order>;
     switch (ev.action) {
       case 'accept':
-        req = this.orders.accept(id);
+        req = this.orders.accept(id, itemId);
         break;
       case 'approve':
-        req = this.orders.approve(id);
+        req = this.orders.approve(id, itemId);
         break;
       case 'cancel':
-        req = this.orders.cancel(id);
+        req = this.orders.cancel(id, itemId);
         break;
       case 'refuse':
-        req = this.orders.refuse(id, { reason: ev.text ?? '' });
+        req = this.orders.refuse(id, itemId, { reason: ev.text ?? '' });
         break;
       case 'request-brief-revision':
-        req = this.orders.requestBriefRevision(id, { reason: ev.text ?? '' });
+        req = this.orders.requestBriefRevision(id, itemId, { reason: ev.text ?? '' });
         break;
       case 'request-revision':
-        req = this.orders.requestRevision(id, { instructions: ev.text ?? '' });
+        req = this.orders.requestRevision(id, itemId, { instructions: ev.text ?? '' });
         break;
       case 'dispute':
-        req = this.orders.dispute(id, { justification: ev.text ?? '' });
+        req = this.orders.dispute(id, itemId, { justification: ev.text ?? '' });
         break;
       case 'resolve':
-        req = this.orders.resolve(id, { decision: ev.decision ?? 'FAVOR_CLIENT', notes: ev.text ?? '' });
+        req = this.orders.resolve(id, itemId, { decision: ev.decision ?? 'FAVOR_CLIENT', notes: ev.text ?? '' });
         break;
       default:
         return;
@@ -237,7 +271,8 @@ export class OrderDetailPage {
   }
 
   onDeliver(dto: DeliverDto): void {
-    this.runUpload(this.orders.deliver(this.orderId, dto), () => this.showDeliveryUpload.set(false));
+    const itemId = this.selectedItemId();
+    if (itemId) this.runUpload(this.orders.deliver(this.orderId, itemId, dto), () => this.showDeliveryUpload.set(false));
   }
 
   onBriefFile(files: FileList | null): void {
@@ -247,7 +282,7 @@ export class OrderDetailPage {
   submitBriefUpdate(): void {
     if (!this.briefText().trim()) return;
     this.runUpload(
-      this.orders.updateBrief(this.orderId, {
+      this.orders.updateBrief(this.orderId, this.selectedItemId()!, {
         briefingText: this.briefText().trim(),
         file: this.briefFile ?? undefined,
       }),

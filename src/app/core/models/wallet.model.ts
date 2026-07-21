@@ -21,45 +21,43 @@ export type RefundStatus =
   | 'CANCELLED';
 export type DisputeStatus = 'OPENED' | 'INVESTIGATING' | 'RESOLVED' | 'CHARGEBACK_FILED';
 
-// Tipo da carteira no modelo de dupla carteira (spec 002 / saas-api 004).
-// Fonte única para 'PLATFORM' | 'RESELLER' — reutilizado por service.model e order.model.
+// Mantido para contratos históricos de serviço/pedido; a carteira do usuário é única.
 export type WalletType = 'PLATFORM' | 'RESELLER';
 
 // ── Wallet ────────────────────────────────────────────────────────────────────
 export interface WalletBalance {
-  balance: number;
-  currency: string;
-}
-
-// Carteira do modelo de dupla carteira: GET /v1/wallet/platform | /v1/wallet/reseller
-export interface Wallet {
-  id: string;
-  walletType: WalletType;
   availableCredits: number;
   frozenCredits: number;
-  currency: string;
+  expiredCredits: number;
 }
 
-export interface WalletSummary {
+export interface Wallet {
   id: string;
   userId: string;
-  balance: number;
+  resellerId?: string | null;
+  availableCredits: number;
+  frozenCredits: number;
+  expiredCredits: number;
+  totalReceived: number;
+  totalSpent: number;
+  totalRefunded: number;
   currency: string;
-  creditCount: number;
   createdAt: string;
 }
+
+export type WalletSummary = Wallet;
 
 // ── Credits ───────────────────────────────────────────────────────────────────
 export interface Credit {
   id: string;
   walletId: string;
-  amount: number;
+  valueCents: number;
+  costCents: number;
   status: CreditStatus;
   type: CreditType;
   originType: CreditOriginType;
   expiresAt?: string | null;
-  createdAt: string;
-  updatedAt: string;
+  issuedAt: string;
 }
 
 export interface CreditEvent {
@@ -80,7 +78,6 @@ export interface CreditWithContext extends Credit {
 export interface CreditsListResponse {
   items: Credit[];
   nextCursor?: string | null;
-  hasMore: boolean;
 }
 
 // ── Disputes ──────────────────────────────────────────────────────────────────
@@ -137,36 +134,34 @@ export interface WalletNotification {
 
 // ── Admin ─────────────────────────────────────────────────────────────────────
 export interface IssueCreditDto {
-  userId: string;
+  toUserId: string;
   amount: number;
+  valueCents: number;
+  costCents: number;
   type: CreditType;
   originType: CreditOriginType;
-  expiresAt?: string;
-  note?: string;
+  expiresInDays?: number;
+  metadata?: { description?: string };
 }
 
 export interface CancelCreditDto {
-  creditId: string;
-  reason?: string;
+  creditIds: string[];
+  reason: string;
 }
 
 export interface ReconciliationResult {
   id: string;
   walletId: string;
-  expectedBalance: number;
-  actualBalance: number;
-  difference: number;
-  status: 'OK' | 'MISMATCH';
-  checkedAt: string;
+  isBalanced: boolean;
+  discrepancy?: number | null;
+  createdAt: string;
 }
 
 export interface WalletAnalytics {
-  period: { from: string; to: string };
-  totalCreditsIssued: number;
-  totalCreditsSpent: number;
-  totalRefunds: number;
-  totalDisputes: number;
-  disputeResolutionRate: number;
+  totalIssued: number;
+  totalSpent: number;
+  totalRefunded: number;
+  totalExpired: number;
 }
 
 export interface WalletAuditLogEntry {

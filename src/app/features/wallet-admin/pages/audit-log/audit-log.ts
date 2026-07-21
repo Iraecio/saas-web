@@ -138,7 +138,7 @@ export class AuditLogPage implements OnInit {
         walletId: this.filters.walletId || undefined,
         creditId: this.filters.creditId || undefined,
         action: this.filters.action || undefined,
-        page: this.currentPage(),
+        offset: (this.currentPage() - 1) * this.pageSize,
         limit: this.pageSize,
       })
       .pipe(takeUntilDestroyed(this.destroyRef))

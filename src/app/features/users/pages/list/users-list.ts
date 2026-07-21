@@ -17,7 +17,12 @@ import { UserRole } from '../../../../core/models/user.model';
           <h1 class="text-3xl font-bold text-neutral-900 dark:text-white">Usuários</h1>
           <p class="mt-1 text-sm text-neutral-500">Gerencie membros e permissões.</p>
         </div>
-        <a routerLink="./new" class="btn-primary">+ Novo usuário</a>
+        <a
+          routerLink="./new"
+          class="inline-flex shrink-0 items-center justify-center rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-neutral-800 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
+        >
+          + Novo usuário
+        </a>
       </header>
 
       <app-card>

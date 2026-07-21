@@ -6,7 +6,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { DecimalPipe, SlicePipe } from '@angular/common';
+import { DecimalPipe } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { WalletAdminService } from '../../services/wallet-admin';
@@ -15,7 +15,7 @@ import { WalletAnalytics } from '../../../../core/models/wallet.model';
 @Component({
   selector: 'app-analytics',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, DecimalPipe, SlicePipe],
+  imports: [ReactiveFormsModule, DecimalPipe],
   template: `
     <div class="p-6 max-w-4xl mx-auto space-y-6">
       <header>
@@ -49,47 +49,47 @@ import { WalletAnalytics } from '../../../../core/models/wallet.model';
           <div class="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 p-5">
             <p class="text-xs text-neutral-500 mb-1">Total Emitido</p>
             <p class="text-2xl font-bold text-green-600 dark:text-green-400">
-              {{ analytics()!.totalCreditsIssued | number:'1.2-2' }}
+              {{ analytics()!.totalIssued | number }}
             </p>
           </div>
 
           <div class="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 p-5">
             <p class="text-xs text-neutral-500 mb-1">Total Gasto</p>
             <p class="text-2xl font-bold text-blue-600 dark:text-blue-400">
-              {{ analytics()!.totalCreditsSpent | number:'1.2-2' }}
+              {{ analytics()!.totalSpent | number }}
             </p>
           </div>
 
           <div class="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 p-5">
             <p class="text-xs text-neutral-500 mb-1">Total Reembolsos</p>
             <p class="text-2xl font-bold text-amber-600 dark:text-amber-400">
-              {{ analytics()!.totalRefunds | number:'1.2-2' }}
+              {{ analytics()!.totalRefunded | number }}
             </p>
           </div>
 
           <div class="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 p-5">
-            <p class="text-xs text-neutral-500 mb-1">Total Disputas</p>
+            <p class="text-xs text-neutral-500 mb-1">Total Expirado</p>
             <p class="text-2xl font-bold text-red-600 dark:text-red-400">
-              {{ analytics()!.totalDisputes }}
+              {{ analytics()!.totalExpired | number }}
             </p>
           </div>
 
           <div class="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 p-5 col-span-2 md:col-span-1">
-            <p class="text-xs text-neutral-500 mb-1">Taxa de Resolução de Disputas</p>
+            <p class="text-xs text-neutral-500 mb-1">Percentual consumido</p>
             <p class="text-2xl font-bold text-neutral-900 dark:text-white">
-              {{ analytics()!.disputeResolutionRate | number:'1.1-1' }}%
+              {{ analytics()!.totalIssued ? (analytics()!.totalSpent / analytics()!.totalIssued * 100 | number:'1.1-1') : 0 }}%
             </p>
             <!-- Barra de progresso -->
             <div class="mt-2 bg-neutral-200 dark:bg-neutral-700 rounded-full h-2">
               <div class="bg-green-500 h-2 rounded-full transition-all"
-                [style.width.%]="analytics()!.disputeResolutionRate"></div>
+                [style.width.%]="analytics()!.totalIssued ? analytics()!.totalSpent / analytics()!.totalIssued * 100 : 0"></div>
             </div>
           </div>
         </div>
 
         <!-- Período analisado -->
         <p class="text-xs text-neutral-400 text-center">
-          Período: {{ analytics()!.period.from | slice:0:10 }} até {{ analytics()!.period.to | slice:0:10 }}
+          Período selecionado nos filtros acima.
         </p>
       } @else {
         <p class="text-neutral-500 text-sm text-center py-8">Selecione um período para ver os dados.</p>

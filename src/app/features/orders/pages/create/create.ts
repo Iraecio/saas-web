@@ -18,9 +18,6 @@ import { Professional } from '../../../../core/models/professional.model';
 import { Service } from '../../../../core/models/service.model';
 import { CreateOrderDto, OrderType } from '../../../../core/models/order.model';
 
-const ACCEPTED_AUDIO = ['mp3', 'wav', 'ogg', 'm4a', 'flac'];
-const MAX_FILE_BYTES = 100 * 1024 * 1024; // 100 MB
-
 @Component({
   selector: 'app-order-create',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -109,14 +106,23 @@ const MAX_FILE_BYTES = 100 * 1024 * 1024; // 100 MB
         <textarea class="form-input" rows="4" [value]="briefingText()" (input)="briefingText.set($any($event.target).value)"></textarea>
       </section>
 
-      <!-- 5. Upload (PRODUCTION) -->
-      @if (orderType() === 'PRODUCTION') {
-        <section class="space-y-2">
-          <label class="form-label">Arquivo de áudio bruto (mp3, wav, ogg, m4a, flac — máx. 100 MB)</label>
-          <input type="file" accept="audio/*,.mp3,.wav,.ogg,.m4a,.flac" class="form-input" (change)="onFile($any($event.target).files)" />
-          @if (file()) {
-            <p class="text-xs text-neutral-500">{{ file()!.name }}</p>
+      <button type="button" class="btn-secondary" [disabled]="!canAddItem()" (click)="addItem()">
+        Adicionar item ao pedido
+      </button>
+
+      @if (items().length) {
+        <section class="space-y-2 rounded-xl border border-neutral-200 p-4 dark:border-neutral-800">
+          <h2 class="font-semibold">Itens do pedido ({{ items().length }})</h2>
+          @for (item of items(); track item.ref; let index = $index) {
+            <div class="flex items-center justify-between gap-3 rounded-lg bg-neutral-50 p-3 text-sm dark:bg-neutral-900">
+              <div>
+                <strong>{{ index + 1 }}. {{ item.serviceName }}</strong>
+                <p class="text-neutral-500">{{ item.professionalName }} · {{ item.creditCost }} créditos</p>
+              </div>
+              <button type="button" class="text-red-600 hover:underline" (click)="removeItem(index)">Remover</button>
+            </div>
           }
+          <p class="text-right text-sm font-semibold">Total: {{ totalCredits() | number }} créditos</p>
         </section>
       }
 
@@ -153,9 +159,17 @@ export class OrderCreatePage {
   readonly selectedServiceId = signal('');
 
   readonly briefingText = signal('');
-  readonly file = signal<File | null>(null);
   readonly submitting = signal(false);
   readonly uploadProgress = signal<number | null>(null);
+  readonly items = signal<Array<{
+    ref: string;
+    serviceId: string;
+    professionalId: string;
+    briefingText: string;
+    serviceName: string;
+    professionalName: string;
+    creditCost: number;
+  }>>([]);
 
   readonly selectedProfessional = computed(() =>
     this.professionals().find((p) => p.id === this.selectedProfessionalId()) ?? null,
@@ -164,12 +178,13 @@ export class OrderCreatePage {
     this.compatibleServices().find((s) => s.id === this.selectedServiceId()) ?? null,
   );
 
-  readonly canSubmit = computed(() => {
+  readonly canAddItem = computed(() => {
     if (!this.selectedProfessional() || !this.selectedService()) return false;
     if (!this.briefingText().trim()) return false;
-    if (this.orderType() === 'PRODUCTION' && !this.file()) return false;
     return true;
   });
+  readonly canSubmit = computed(() => this.items().length > 0);
+  readonly totalCredits = computed(() => this.items().reduce((sum, item) => sum + item.creditCost, 0));
 
   constructor() {
     this.loadProfessionals();
@@ -181,7 +196,6 @@ export class OrderCreatePage {
     this.selectedProfessionalId.set('');
     this.selectedServiceId.set('');
     this.compatibleServices.set([]);
-    this.file.set(null);
     this.loadProfessionals();
   }
 
@@ -236,24 +250,28 @@ export class OrderCreatePage {
     this.selectedServiceId.set(id);
   }
 
-  onFile(files: FileList | null): void {
-    const f = files?.[0] ?? null;
-    if (!f) {
-      this.file.set(null);
-      return;
-    }
-    const ext = f.name.split('.').pop()?.toLowerCase() ?? '';
-    if (!ACCEPTED_AUDIO.includes(ext)) {
-      this.notify.error(`Formato inválido. Aceitos: ${ACCEPTED_AUDIO.join(', ')}.`);
-      this.file.set(null);
-      return;
-    }
-    if (f.size > MAX_FILE_BYTES) {
-      this.notify.error('Arquivo excede o limite de 100 MB.');
-      this.file.set(null);
-      return;
-    }
-    this.file.set(f);
+  addItem(): void {
+    const professional = this.selectedProfessional();
+    const service = this.selectedService();
+    if (!professional || !service || !this.briefingText().trim()) return;
+    const position = this.items().length + 1;
+    this.items.update(items => [...items, {
+      ref: `item-${position}`,
+      serviceId: service.id,
+      professionalId: professional.id,
+      briefingText: this.briefingText().trim(),
+      serviceName: service.name,
+      professionalName: professional.name,
+      creditCost: service.creditCost,
+    }]);
+    this.selectedProfessionalId.set('');
+    this.selectedServiceId.set('');
+    this.compatibleServices.set([]);
+    this.briefingText.set('');
+  }
+
+  removeItem(index: number): void {
+    this.items.update(items => items.filter((_, itemIndex) => itemIndex !== index));
   }
 
   submit(): void {
@@ -262,11 +280,12 @@ export class OrderCreatePage {
     this.uploadProgress.set(this.orderType() === 'PRODUCTION' ? 0 : null);
 
     const dto: CreateOrderDto = {
-      professionalId: this.selectedProfessionalId(),
-      serviceId: this.selectedServiceId(),
-      orderType: this.orderType(),
-      briefingText: this.briefingText().trim(),
-      file: this.file() ?? undefined,
+      items: this.items().map(({ ref, professionalId, serviceId, briefingText }) => ({
+        ref,
+        professionalId,
+        serviceId,
+        briefingText,
+      })),
     };
 
     this.orders

@@ -38,79 +38,72 @@ export class OrderService {
     return this.api.get<Order>(`/orders/${id}`);
   }
 
-  getHistory(id: string): Observable<OrderStatusHistoryEntry[]> {
-    return this.api.get<OrderStatusHistoryEntry[]>(`/orders/${id}/history`);
+  getHistory(id: string, itemId: string): Observable<OrderStatusHistoryEntry[]> {
+    return this.api.get<OrderStatusHistoryEntry[]>(`/orders/${id}/line-items/${itemId}/history`);
   }
 
   // ── Criação ──────────────────────────────────────────────────────────────
-  // VOICE → JSON; PRODUCTION (com arquivo) → multipart com progresso.
   create(dto: CreateOrderDto): Observable<HttpEvent<Order>> {
-    const form = new FormData();
-    form.append('professionalId', dto.professionalId);
-    form.append('serviceId', dto.serviceId);
-    form.append('orderType', dto.orderType);
-    form.append('briefingText', dto.briefingText);
-    if (dto.file) form.append('file', dto.file);
-    return this.http.post<Order>(`${this.baseUrl}/orders`, form, {
+    return this.http.post<Order>(`${this.baseUrl}/orders`, dto, {
       reportProgress: true,
       observe: 'events',
     });
   }
 
   // ── Ações do profissional ──────────────────────────────────────────────────
-  requestBriefRevision(id: string, dto: ReasonDto): Observable<Order> {
-    return this.api.post<Order>(`/orders/${id}/request-brief-revision`, dto);
+  requestBriefRevision(id: string, itemId: string, dto: ReasonDto): Observable<Order> {
+    return this.api.post<Order>(`/orders/${id}/line-items/${itemId}/request-brief-revision`, dto);
   }
 
-  accept(id: string): Observable<Order> {
-    return this.api.post<Order>(`/orders/${id}/accept`, {});
+  accept(id: string, itemId: string): Observable<Order> {
+    return this.api.post<Order>(`/orders/${id}/line-items/${itemId}/accept`, {});
   }
 
-  refuse(id: string, dto: ReasonDto): Observable<Order> {
-    return this.api.post<Order>(`/orders/${id}/refuse`, dto);
+  refuse(id: string, itemId: string, dto: ReasonDto): Observable<Order> {
+    return this.api.post<Order>(`/orders/${id}/line-items/${itemId}/refuse`, dto);
   }
 
   // Entrega / re-entrega — sempre multipart (arquivo obrigatório).
-  deliver(id: string, dto: DeliverDto): Observable<HttpEvent<Order>> {
+  deliver(id: string, itemId: string, dto: DeliverDto): Observable<HttpEvent<Order>> {
     const form = new FormData();
     form.append('file', dto.file);
     if (dto.deliveryNotes) form.append('deliveryNotes', dto.deliveryNotes);
     if (dto.redeliveryReason) form.append('redeliveryReason', dto.redeliveryReason);
-    return this.http.post<Order>(`${this.baseUrl}/orders/${id}/deliver`, form, {
+    return this.http.post<Order>(`${this.baseUrl}/orders/${id}/line-items/${itemId}/deliver`, form, {
       reportProgress: true,
       observe: 'events',
     });
   }
 
   // ── Ações do cliente ─────────────────────────────────────────────────────
-  updateBrief(id: string, dto: UpdateBriefDto): Observable<HttpEvent<Order>> {
+  updateBrief(id: string, itemId: string, dto: UpdateBriefDto): Observable<HttpEvent<Order>> {
     const form = new FormData();
     form.append('briefingText', dto.briefingText);
     if (dto.file) form.append('file', dto.file);
-    return this.http.post<Order>(`${this.baseUrl}/orders/${id}/update-brief`, form, {
+    return this.http.post<Order>(`${this.baseUrl}/orders/${id}/line-items/${itemId}/update-brief`, form, {
       reportProgress: true,
       observe: 'events',
     });
   }
 
-  approve(id: string): Observable<Order> {
-    return this.api.post<Order>(`/orders/${id}/approve`, {});
+  approve(id: string, itemId: string): Observable<Order> {
+    return this.api.post<Order>(`/orders/${id}/line-items/${itemId}/approve`, {});
   }
 
-  requestRevision(id: string, dto: InstructionsDto): Observable<Order> {
-    return this.api.post<Order>(`/orders/${id}/request-revision`, dto);
+  requestRevision(id: string, itemId: string, dto: InstructionsDto): Observable<Order> {
+    return this.api.post<Order>(`/orders/${id}/line-items/${itemId}/request-revision`, dto);
   }
 
-  dispute(id: string, dto: JustificationDto): Observable<Order> {
-    return this.api.post<Order>(`/orders/${id}/dispute`, dto);
+  dispute(id: string, itemId: string, dto: JustificationDto): Observable<Order> {
+    return this.api.post<Order>(`/orders/${id}/line-items/${itemId}/dispute`, dto);
   }
 
-  cancel(id: string): Observable<Order> {
-    return this.api.post<Order>(`/orders/${id}/cancel`, {});
+  cancel(id: string, itemId: string): Observable<Order> {
+    return this.api.post<Order>(`/orders/${id}/line-items/${itemId}/cancel`, {});
   }
 
   // ── Resolução de disputa (ADMIN/RESELLER) ────────────────────────────────
-  resolve(id: string, dto: ResolveDisputeDto): Observable<Order> {
-    return this.api.post<Order>(`/orders/${id}/resolve`, dto);
+  resolve(id: string, itemId: string, dto: ResolveDisputeDto): Observable<Order> {
+    return this.api.post<Order>(`/orders/${id}/line-items/${itemId}/resolve`, dto);
   }
 }

@@ -1,144 +1,210 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  OnInit,
+  inject,
+  signal,
+} from '@angular/core';
+import { DatePipe, DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AppStateService } from '../../../../core/services/app-state';
+import {
+  AdminDashboardSummary,
+  DashboardMetric,
+} from '../../../../core/models/admin-dashboard.model';
+import { AdminDashboardService } from '../../services/admin-dashboard';
 
 @Component({
   selector: 'app-admin-dashboard',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink],
+  imports: [RouterLink, DatePipe, DecimalPipe],
   template: `
     <div class="p-6 space-y-6">
-
-      <header class="flex items-center justify-between">
+      <header class="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 class="text-3xl font-bold text-neutral-900 dark:text-white">
             Olá, {{ appState.userName() }} 👋
           </h1>
           <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
-            Painel Administrativo · {{ appState.userRole() === 'SUPER_ADMIN' ? 'Super Admin' : 'Administrador' }}
+            Painel administrativo com dados oficiais
           </p>
         </div>
-        <span class="rounded-full bg-violet-100 px-3 py-1 text-xs font-semibold text-violet-700 dark:bg-violet-900/30 dark:text-violet-300">
-          Controle Total
-        </span>
+        @if (summary()) {
+          <p class="text-xs text-neutral-400 dark:text-neutral-500">
+            Atualizado {{ summary()!.generatedAt | date: 'short' }}
+          </p>
+        }
       </header>
 
-      <!-- Stats -->
-      <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        @for (stat of stats; track stat.label) {
-          <div class="rounded-xl bg-white p-5 shadow-sm ring-1 ring-neutral-200 dark:bg-neutral-800 dark:ring-neutral-700">
-            <div class="flex items-start justify-between">
-              <div>
-                <p class="text-xs font-medium uppercase tracking-wide text-neutral-500 dark:text-neutral-400">{{ stat.label }}</p>
-                <p class="mt-2 text-2xl font-bold text-neutral-900 dark:text-white">{{ stat.value }}</p>
-                <p class="mt-1 flex items-center gap-1 text-xs" [class]="stat.up ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'">
-                  <span>{{ stat.up ? '↑' : '↓' }}</span>
-                  {{ stat.change }} vs mês anterior
-                </p>
-              </div>
-              <span class="text-2xl">{{ stat.icon }}</span>
-            </div>
-          </div>
-        }
-      </section>
-
-      <!-- Ações rápidas -->
-      <section>
-        <h2 class="mb-3 text-sm font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">Acesso Rápido</h2>
-        <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          @for (action of quickActions; track action.label) {
-            <a
-              [routerLink]="action.route"
-              class="flex flex-col items-center gap-2 rounded-xl bg-white p-4 text-center shadow-sm ring-1 ring-neutral-200 transition hover:ring-violet-400 dark:bg-neutral-800 dark:ring-neutral-700"
-            >
-              <span class="text-3xl">{{ action.icon }}</span>
-              <span class="text-xs font-medium text-neutral-700 dark:text-neutral-300">{{ action.label }}</span>
-            </a>
+      @if (loading()) {
+        <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          @for (_ of [1, 2, 3, 4]; track _) {
+            <div class="h-28 animate-pulse rounded-xl bg-neutral-200 dark:bg-neutral-800"></div>
           }
         </div>
-      </section>
+      } @else if (error()) {
+        <section
+          class="rounded-xl border border-red-200 bg-red-50 p-6 text-red-800 dark:border-red-900 dark:bg-red-950/40 dark:text-red-200"
+        >
+          <p>{{ error() }}</p>
+          <button
+            class="mt-3 rounded-lg bg-white px-4 py-2 text-sm font-medium text-neutral-900 ring-1 ring-neutral-300 hover:bg-neutral-100 dark:bg-neutral-100 dark:text-neutral-900 dark:ring-neutral-300 dark:hover:bg-white"
+            (click)="load()"
+          >
+            Tentar novamente
+          </button>
+        </section>
+      } @else if (summary(); as data) {
+        <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          @for (card of cards(data); track card.label) {
+            <div
+              class="rounded-xl bg-white p-5 text-neutral-900 shadow-sm ring-1 ring-neutral-200 dark:bg-neutral-800 dark:text-neutral-100 dark:ring-neutral-700"
+            >
+              <p
+                class="text-xs font-medium uppercase tracking-wide text-neutral-500 dark:text-neutral-400"
+              >
+                {{ card.label }}
+              </p>
+              <p class="mt-2 text-2xl font-bold text-neutral-900 dark:text-white">
+                {{ card.metric.current | number }}
+                <span class="text-xs font-normal text-neutral-400 dark:text-neutral-500">{{
+                  unit(card.metric)
+                }}</span>
+              </p>
+              <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
+                {{ comparison(card.metric) }}
+              </p>
+            </div>
+          }
+        </section>
 
-      <!-- Pedidos recentes + Alertas -->
-      <section class="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <div class="lg:col-span-2 rounded-xl bg-white shadow-sm ring-1 ring-neutral-200 dark:bg-neutral-800 dark:ring-neutral-700 overflow-hidden">
-          <div class="border-b border-neutral-200 px-5 py-4 dark:border-neutral-700">
-            <h3 class="font-semibold text-neutral-900 dark:text-white">Pedidos Recentes</h3>
-          </div>
-          <ul class="divide-y divide-neutral-100 dark:divide-neutral-700">
-            @for (order of recentOrders; track order.id) {
-              <li class="flex items-center justify-between px-5 py-3 text-sm">
-                <div class="flex items-center gap-3">
-                  <span class="w-2 h-2 rounded-full" [class]="order.statusColor"></span>
-                  <div>
-                    <p class="font-medium text-neutral-800 dark:text-neutral-200">{{ order.client }}</p>
-                    <p class="text-xs text-neutral-400">{{ order.type }}</p>
-                  </div>
-                </div>
-                <div class="text-right">
-                  <p class="font-semibold text-neutral-800 dark:text-neutral-200">{{ order.value }}</p>
-                  <p class="text-xs text-neutral-400">{{ order.status }}</p>
-                </div>
-              </li>
+        <section class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <a routerLink="/admin/users" class="quick-link">👥 Usuários</a>
+          <a routerLink="/admin/orders" class="quick-link">📦 Pedidos</a>
+          <a routerLink="/admin/professionals" class="quick-link">🎙️ Profissionais</a>
+          <a routerLink="/admin/wallet-admin" class="quick-link">💰 Carteiras</a>
+        </section>
+
+        <section class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+          <div
+            class="overflow-hidden rounded-xl bg-white text-neutral-900 ring-1 ring-neutral-200 dark:bg-neutral-800 dark:text-neutral-100 dark:ring-neutral-700 lg:col-span-2"
+          >
+            <h2
+              class="border-b border-neutral-200 p-4 font-semibold text-neutral-900 dark:border-neutral-700 dark:text-white"
+            >
+              Pedidos recentes
+            </h2>
+            @if (data.recentOrders.length === 0) {
+              <p class="p-6 text-sm text-neutral-500 dark:text-neutral-400">
+                Nenhum pedido no período.
+              </p>
             }
-          </ul>
-        </div>
-
-        <div class="rounded-xl bg-white shadow-sm ring-1 ring-neutral-200 dark:bg-neutral-800 dark:ring-neutral-700 overflow-hidden">
-          <div class="border-b border-neutral-200 px-5 py-4 dark:border-neutral-700">
-            <h3 class="font-semibold text-neutral-900 dark:text-white">Alertas do Sistema</h3>
-          </div>
-          <ul class="divide-y divide-neutral-100 p-4 space-y-2 dark:divide-neutral-700">
-            @for (alert of alerts; track alert.text) {
-              <li class="flex items-start gap-3 py-2 text-sm">
-                <span class="text-lg">{{ alert.icon }}</span>
-                <div>
-                  <p class="font-medium text-neutral-800 dark:text-neutral-200">{{ alert.text }}</p>
-                  <p class="text-xs text-neutral-400">{{ alert.time }}</p>
-                </div>
-              </li>
+            @for (order of data.recentOrders; track order.id) {
+              <a
+                [routerLink]="['/admin/orders', order.id]"
+                class="flex justify-between border-b border-neutral-200 px-5 py-3 text-sm text-neutral-700 hover:bg-neutral-50 last:border-0 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-700"
+              >
+                <span
+                  >{{ order.client.name || order.client.email }} ·
+                  {{ order.lineItems.length }} item(ns)</span
+                ><span>{{ order.status }}</span>
+              </a>
             }
-          </ul>
-        </div>
-      </section>
-
+          </div>
+          <div
+            class="overflow-hidden rounded-xl bg-white text-neutral-900 ring-1 ring-neutral-200 dark:bg-neutral-800 dark:text-neutral-100 dark:ring-neutral-700"
+          >
+            <h2
+              class="border-b border-neutral-200 p-4 font-semibold text-neutral-900 dark:border-neutral-700 dark:text-white"
+            >
+              Pendências
+            </h2>
+            @if (data.pendingActions.length === 0) {
+              <p class="p-6 text-sm text-neutral-500 dark:text-neutral-400">Nenhuma pendência.</p>
+            }
+            @for (item of data.pendingActions; track item.type + item.id) {
+              <a
+                [routerLink]="item.targetPath"
+                class="block border-b border-neutral-200 px-4 py-3 text-sm text-neutral-700 hover:bg-neutral-50 last:border-0 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-700"
+                ><strong>{{ item.priority }}</strong> · {{ item.title }}</a
+              >
+            }
+          </div>
+        </section>
+      }
     </div>
   `,
+  styles: [
+    `
+      .quick-link {
+        display: flex;
+        min-height: 4rem;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.75rem;
+        background: #fff;
+        color: #171717;
+        padding: 1rem;
+        box-shadow: 0 0 0 1px rgba(115, 115, 115, 0.2);
+      }
+      .quick-link:hover {
+        background: #fafafa;
+      }
+      :host-context(.dark) .quick-link {
+        background: #262626;
+        color: #f5f5f5;
+        box-shadow: 0 0 0 1px #404040;
+      }
+      :host-context(.dark) .quick-link:hover {
+        background: #404040;
+      }
+    `,
+  ],
 })
-export class AdminDashboardComponent {
+export class AdminDashboardComponent implements OnInit {
   protected readonly appState = inject(AppStateService);
+  private readonly service = inject(AdminDashboardService);
+  private readonly destroyRef = inject(DestroyRef);
+  readonly summary = signal<AdminDashboardSummary | null>(null);
+  readonly loading = signal(true);
+  readonly error = signal<string | null>(null);
 
-  protected readonly stats = [
-    { label: 'Pedidos Hoje', value: '47', change: '18%', up: true, icon: '📦' },
-    { label: 'Receita (mês)', value: 'R$ 52.840', change: '8.3%', up: true, icon: '💰' },
-    { label: 'Usuários Ativos', value: '1.421', change: '5.1%', up: true, icon: '👥' },
-    { label: 'Locutores Online', value: '12', change: '2', up: false, icon: '🎙️' },
-  ];
-
-  protected readonly quickActions = [
-    { icon: '👥', label: 'Gerenciar Usuários', route: '/admin/users' },
-    { icon: '📦', label: 'Ver Pedidos', route: '/admin/orders' },
-    { icon: '💼', label: 'Revendedores', route: '/admin/resellers' },
-    { icon: '📈', label: 'Relatórios', route: '/admin/reports' },
-    { icon: '💰', label: 'Carteira Admin', route: '/admin/wallet-admin' },
-    { icon: '📊', label: 'Analytics', route: '/admin/wallet-admin/analytics' },
-    { icon: '🎙️', label: 'Locutores', route: '/admin/voice-actors' },
-    { icon: '🎧', label: 'Produtores', route: '/admin/producers' },
-    { icon: '🌐', label: 'Domínios', route: '/admin/custom-domains' },
-    { icon: '⚙️', label: 'Configurações', route: '/admin/settings' },
-  ];
-
-  protected readonly recentOrders = [
-    { id: 1, client: 'Agência XYZ', type: 'Spot com produção', value: 'R$ 180', status: 'Com locutor', statusColor: 'bg-blue-500' },
-    { id: 2, client: 'João Silva', type: 'Locução OFF', value: 'R$ 90', status: 'Finalizado', statusColor: 'bg-emerald-500' },
-    { id: 3, client: 'Rádio FM Top', type: 'Edição', value: 'R$ 120', status: 'Com produtor', statusColor: 'bg-yellow-500' },
-    { id: 4, client: 'Marcos Lima', type: 'Locução OFF', value: 'R$ 70', status: 'Aguardando pgto', statusColor: 'bg-neutral-400' },
-    { id: 5, client: 'DigitalMark', type: 'Spot com produção', value: 'R$ 220', status: 'Disponível', statusColor: 'bg-violet-500' },
-  ];
-
-  protected readonly alerts = [
-    { icon: '⚠️', text: '3 pedidos aguardando há +2h', time: 'Agora' },
-    { icon: '💳', text: 'Pagamento pendente #4521', time: 'há 15min' },
-    { icon: '🎙️', text: 'Locutor Carlos offline', time: 'há 30min' },
-    { icon: '✅', text: 'Backup diário concluído', time: 'há 1h' },
-  ];
+  ngOnInit(): void {
+    this.load();
+  }
+  load(): void {
+    this.loading.set(true);
+    this.error.set(null);
+    this.service
+      .getSummary({ timezone: Intl.DateTimeFormat().resolvedOptions().timeZone })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data) => {
+          this.summary.set(data);
+          this.loading.set(false);
+        },
+        error: (error: Error) => {
+          this.error.set(error.message || 'Não foi possível carregar o dashboard.');
+          this.loading.set(false);
+        },
+      });
+  }
+  cards(data: AdminDashboardSummary) {
+    return [
+      { label: 'Pedidos no período', metric: data.metrics.ordersCreated },
+      { label: 'Usuários ativos', metric: data.metrics.activeUsers },
+      { label: 'Créditos consumidos', metric: data.metrics.creditsSpent },
+      { label: 'Profissionais disponíveis', metric: data.metrics.availableProfessionals },
+    ];
+  }
+  comparison(metric: DashboardMetric): string {
+    return metric.variationPercent === null
+      ? 'Sem base de comparação'
+      : `${metric.variationPercent >= 0 ? '+' : ''}${metric.variationPercent}% vs. período anterior`;
+  }
+  unit(metric: DashboardMetric): string {
+    return metric.unit === 'CREDITS' ? 'créditos' : '';
+  }
 }

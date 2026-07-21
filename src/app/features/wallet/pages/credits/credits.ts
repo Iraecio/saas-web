@@ -72,14 +72,14 @@ import { DatePipe, DecimalPipe, TitleCasePipe } from '@angular/common';
                       {{ credit.type | titlecase }} · {{ credit.originType | titlecase }}
                     </p>
                     <p class="text-xs text-neutral-500 mt-0.5">
-                      {{ credit.createdAt | date:'dd/MM/yyyy' }}
+                      {{ credit.issuedAt | date:'dd/MM/yyyy' }}
                       @if (credit.expiresAt) { · Expira {{ credit.expiresAt | date:'dd/MM/yyyy' }} }
                     </p>
                   </div>
                 </div>
                 <div class="flex items-center gap-3">
                   <span class="text-sm font-semibold" [class]="amountClass(credit.status)">
-                    {{ credit.amount | number:'1.2-2' }}
+                    {{ credit.valueCents / 100 | number:'1.2-2' }}
                   </span>
                   <span class="text-xs px-2 py-0.5 rounded-full font-medium" [class]="statusBadgeClass(credit.status)">
                     {{ statusLabel(credit.status) }}
@@ -141,7 +141,7 @@ export class CreditsListPage implements OnInit {
       .subscribe({
         next: (res) => {
           this.credits.update((c) => [...c, ...res.items]);
-          this.hasMore.set(res.hasMore);
+          this.hasMore.set(Boolean(res.nextCursor));
           this.nextCursor.set(res.nextCursor ?? undefined);
           this.loadingMore.set(false);
         },
@@ -164,7 +164,7 @@ export class CreditsListPage implements OnInit {
       .subscribe({
         next: (res) => {
           this.credits.set(res.items);
-          this.hasMore.set(res.hasMore);
+          this.hasMore.set(Boolean(res.nextCursor));
           this.nextCursor.set(res.nextCursor ?? undefined);
           this.loading.set(false);
         },

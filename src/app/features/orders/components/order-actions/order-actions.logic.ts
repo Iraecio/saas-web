@@ -1,4 +1,4 @@
-import { Order, OrderStatus } from '../../../../core/models/order.model';
+import { Order, OrderLineItem, OrderStatus } from '../../../../core/models/order.model';
 import { UserRole } from '../../../../core/models/user.model';
 
 // Ações possíveis sobre um pedido (espelham os endpoints de order-flow).
@@ -74,18 +74,19 @@ export function availableOrderActions(ctx: ActionContext): OrderAction[] {
 // Helper para montar o contexto a partir do Order + dados do usuário.
 export function buildActionContext(
   order: Order,
+  item: OrderLineItem,
   userId: string,
   role: UserRole,
   canResolveDispute: boolean,
 ): ActionContext {
   return {
-    status: order.status,
+    status: item.status,
     role,
     isOwnerClient: order.clientId === userId,
-    isAssignedProfessional: order.professionalId === userId,
+    isAssignedProfessional: item.professionalId === userId,
     canResolveDispute,
-    revisionCount: order.revisionCount,
-    maxRevisions: order.maxRevisions,
-    deadlinePassed: order.deadlineAt ? new Date(order.deadlineAt).getTime() < Date.now() : false,
+    revisionCount: item.revisionCount,
+    maxRevisions: item.maxRevisions,
+    deadlinePassed: item.deadlineAt ? new Date(item.deadlineAt).getTime() < Date.now() : false,
   };
 }

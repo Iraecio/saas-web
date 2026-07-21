@@ -33,7 +33,7 @@ import { CreditWithContext, CreditEvent, Dispute } from '../../../../core/models
         <section class="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 p-6 grid grid-cols-2 gap-4">
           <div>
             <p class="text-xs text-neutral-500">Valor</p>
-            <p class="text-2xl font-bold text-neutral-900 dark:text-white">{{ credit()!.amount | number:'1.2-2' }}</p>
+            <p class="text-2xl font-bold text-neutral-900 dark:text-white">{{ credit()!.valueCents / 100 | number:'1.2-2' }}</p>
           </div>
           <div>
             <p class="text-xs text-neutral-500">Status</p>
@@ -51,7 +51,7 @@ import { CreditWithContext, CreditEvent, Dispute } from '../../../../core/models
           </div>
           <div>
             <p class="text-xs text-neutral-500">Criado em</p>
-            <p class="text-sm text-neutral-700 dark:text-neutral-300">{{ credit()!.createdAt | date:'dd/MM/yyyy HH:mm' }}</p>
+            <p class="text-sm text-neutral-700 dark:text-neutral-300">{{ credit()!.issuedAt | date:'dd/MM/yyyy HH:mm' }}</p>
           </div>
           @if (credit()!.expiresAt) {
             <div>

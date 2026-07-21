@@ -9,8 +9,19 @@ export class ResellerService {
   private readonly api = inject(ApiService);
 
   list(): Observable<Reseller[]> {
-    return this.api.listUsers({ role: 'RESELLER' }).pipe(
-      map((users) => users.map((u) => this.mapUserToReseller(u))),
+    return this.api.get<any[]>('/admin/revendedores').pipe(
+      map((items) => items.map((item) => ({
+        id: item.id,
+        ownerId: item.ownerId,
+        name: item.companyName || item.owner?.name || 'Revenda sem nome',
+        email: item.owner?.email || '',
+        phone: item.phone || undefined,
+        status: item.isActive ? 'active' : 'inactive',
+        timezone: item.timezone,
+        maxUsers: item.maxUsers,
+        createdAt: item.createdAt,
+        updatedAt: item.updatedAt,
+      } as Reseller))),
     );
   }
 
@@ -38,9 +49,6 @@ export class ResellerService {
       email: user.email,
       phone: '',
       status: (user.isActive ? 'active' : 'inactive') as 'active' | 'inactive' | 'suspended',
-      commissionRate: 0,
-      totalSales: 0,
-      totalCommission: 0,
       createdAt: user.createdAt ?? new Date().toISOString(),
       updatedAt: user.updatedAt ?? new Date().toISOString(),
     };

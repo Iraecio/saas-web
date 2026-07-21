@@ -20,12 +20,12 @@ export class WalletAdminService {
   private readonly api = inject(ApiService);
 
   listWallets(params?: {
-    page?: number;
+    offset?: number;
     limit?: number;
     userId?: string;
   }): Observable<WalletSummary[]> {
     const query = new URLSearchParams();
-    if (params?.page) query.set('page', String(params.page));
+    if (params?.offset !== undefined) query.set('offset', String(params.offset));
     if (params?.limit) query.set('limit', String(params.limit));
     if (params?.userId) query.set('userId', params.userId);
     const qs = query.toString();
@@ -41,7 +41,7 @@ export class WalletAdminService {
     type?: string;
     originType?: string;
     userId?: string;
-    page?: number;
+    offset?: number;
     limit?: number;
   }): Observable<Credit[]> {
     const query = new URLSearchParams();
@@ -49,7 +49,7 @@ export class WalletAdminService {
     if (params?.type) query.set('type', params.type);
     if (params?.originType) query.set('originType', params.originType);
     if (params?.userId) query.set('userId', params.userId);
-    if (params?.page) query.set('page', String(params.page));
+    if (params?.offset !== undefined) query.set('offset', String(params.offset));
     if (params?.limit) query.set('limit', String(params.limit));
     const qs = query.toString();
     return this.api.get<Credit[]>(`/wallet/admin/credits${qs ? '?' + qs : ''}`);
@@ -57,31 +57,29 @@ export class WalletAdminService {
 
   getReconciliationResults(params?: {
     walletId?: string;
-    status?: string;
-    page?: number;
+    offset?: number;
     limit?: number;
   }): Observable<ReconciliationResult[]> {
     const query = new URLSearchParams();
     if (params?.walletId) query.set('walletId', params.walletId);
-    if (params?.status) query.set('status', params.status);
-    if (params?.page) query.set('page', String(params.page));
+    if (params?.offset !== undefined) query.set('offset', String(params.offset));
     if (params?.limit) query.set('limit', String(params.limit));
     const qs = query.toString();
     return this.api.get<ReconciliationResult[]>(`/wallet/admin/reconciliation${qs ? '?' + qs : ''}`);
   }
 
   correctReconciliation(id: string, reason: string): Observable<void> {
-    return this.api.post<void>(`/wallet/admin/reconciliation/${id}/correct`, { reason });
+    return this.api.patch<void>(`/wallet/admin/reconciliation/${id}/correct`, { reason });
   }
 
   listDisputes(params?: {
     status?: string;
-    page?: number;
+    offset?: number;
     limit?: number;
   }): Observable<Dispute[]> {
     const query = new URLSearchParams();
     if (params?.status) query.set('status', params.status);
-    if (params?.page) query.set('page', String(params.page));
+    if (params?.offset !== undefined) query.set('offset', String(params.offset));
     if (params?.limit) query.set('limit', String(params.limit));
     const qs = query.toString();
     return this.api.get<Dispute[]>(`/wallet/admin/disputes${qs ? '?' + qs : ''}`);
@@ -93,40 +91,40 @@ export class WalletAdminService {
 
   listAllRefunds(params?: {
     status?: string;
-    page?: number;
+    offset?: number;
     limit?: number;
   }): Observable<RefundRequest[]> {
     const query = new URLSearchParams();
     if (params?.status) query.set('status', params.status);
-    if (params?.page) query.set('page', String(params.page));
+    if (params?.offset !== undefined) query.set('offset', String(params.offset));
     if (params?.limit) query.set('limit', String(params.limit));
     const qs = query.toString();
     return this.api.get<RefundRequest[]>(`/wallet/admin/refunds${qs ? '?' + qs : ''}`);
   }
 
   approveRefund(id: string, notes?: string): Observable<void> {
-    return this.api.post<void>(`/wallet/admin/refunds/${id}/approve`, { notes });
+    return this.api.patch<void>(`/wallet/admin/refunds/${id}/approve`, { notes });
   }
 
   rejectRefund(id: string, reason: string): Observable<void> {
-    return this.api.post<void>(`/wallet/admin/refunds/${id}/reject`, { reason });
+    return this.api.patch<void>(`/wallet/admin/refunds/${id}/reject`, { reason });
   }
 
   getAuditLog(params?: {
     walletId?: string;
     creditId?: string;
     action?: string;
-    page?: number;
+    offset?: number;
     limit?: number;
   }): Observable<WalletAuditLogEntry[]> {
     const query = new URLSearchParams();
     if (params?.walletId) query.set('walletId', params.walletId);
     if (params?.creditId) query.set('creditId', params.creditId);
     if (params?.action) query.set('action', params.action);
-    if (params?.page) query.set('page', String(params.page));
+    if (params?.offset !== undefined) query.set('offset', String(params.offset));
     if (params?.limit) query.set('limit', String(params.limit));
     const qs = query.toString();
-    return this.api.get<WalletAuditLogEntry[]>(`/wallet/admin/audit${qs ? '?' + qs : ''}`);
+    return this.api.get<WalletAuditLogEntry[]>(`/wallet/admin/audit-log${qs ? '?' + qs : ''}`);
   }
 
   getAnalytics(params?: { from?: string; to?: string }): Observable<WalletAnalytics> {
@@ -138,10 +136,10 @@ export class WalletAdminService {
   }
 
   issueCredits(dto: IssueCreditDto): Observable<Credit> {
-    return this.api.post<Credit>('/wallet/admin/credits/issue', dto);
+    return this.api.post<Credit>('/wallet/admin/issue', dto);
   }
 
   cancelCredits(dto: CancelCreditDto): Observable<void> {
-    return this.api.post<void>('/wallet/admin/credits/cancel', dto);
+    return this.api.post<void>('/wallet/admin/cancel', dto);
   }
 }

@@ -63,7 +63,7 @@ import { AppStateService } from '../../../../core/services/app-state';
         <div class="lg:col-span-2 rounded-xl bg-white shadow-sm ring-1 ring-neutral-200 dark:bg-neutral-800 dark:ring-neutral-700 overflow-hidden">
           <div class="border-b border-neutral-200 px-5 py-4 dark:border-neutral-700 flex justify-between items-center">
             <h3 class="font-semibold text-neutral-900 dark:text-white">Clientes Recentes</h3>
-            <a routerLink="/admin/clients" class="text-xs text-blue-500 hover:underline">Ver todos</a>
+            <a routerLink="/admin/orders" class="text-xs text-blue-500 hover:underline">Ver pedidos</a>
           </div>
           <ul class="divide-y divide-neutral-100 dark:divide-neutral-700">
             @for (client of recentClients; track client.id) {
@@ -123,11 +123,11 @@ export class ResellerDashboardComponent {
   ];
 
   protected readonly quickActions = [
-    { icon: '➕', label: 'Novo Cliente', route: '/admin/clients/new' },
+    { icon: '🪙', label: 'Comprar créditos', route: '/admin/reseller-credits/purchases' },
     { icon: '📦', label: 'Criar Pedido', route: '/admin/orders/new' },
-    { icon: '🧠', label: 'CRM', route: '/admin/clients' },
+    { icon: '📦', label: 'Estoque', route: '/admin/reseller-credits/stock' },
     { icon: '🌐', label: 'Domínios', route: '/admin/custom-domains' },
-    { icon: '💵', label: 'Comissões', route: '/admin/commissions' },
+    { icon: '💵', label: 'Vendas', route: '/admin/reseller-credits/sales' },
     { icon: '📈', label: 'Relatórios', route: '/admin/reports' },
   ];
 

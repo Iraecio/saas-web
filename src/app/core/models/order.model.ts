@@ -3,6 +3,8 @@ import { CreditType } from './service.model';
 // ── Enums ────────────────────────────────────────────────────────────────────
 export type OrderType = 'VOICE' | 'PRODUCTION';
 export type OrderStatus =
+  | 'BLOCKED'
+  | 'AWAITING_ASSIGNMENT'
   | 'PENDING'
   | 'AWAITING_BRIEF'
   | 'IN_PROGRESS'
@@ -32,20 +34,22 @@ export interface OrderDelivery {
 // ── Order ────────────────────────────────────────────────────────────────────
 export interface Order {
   id: string;
-  orderType: OrderType;
   status: OrderStatus;
   clientId: string;
-  professionalId: string;
-  serviceId: string;
-  creditCost: number;
-  creditType: CreditType;
-  revisionCount: number;
-  maxRevisions: number;
-  deadlineAt?: string | null;
-  currentBrief?: OrderBriefVersion;
-  currentDelivery?: OrderDelivery;
+  resellerId?: string | null;
+  briefing?: string | null;
+  lineItems: OrderLineItem[];
   createdAt: string;
   updatedAt?: string;
+}
+
+export interface OrderLineItem {
+  id: string; orderId: string; position: number; parentLineItemId?: string | null;
+  serviceId?: string | null; professionalId?: string | null; itemType: OrderType;
+  status: OrderStatus; creditCost: number; professionalPayoutCents?: number | null;
+  revisionCount: number; maxRevisions: number; deadlineAt?: string | null;
+  briefing?: string | null; deliveryUrl?: string | null; createdAt: string; updatedAt?: string;
+  currentBrief?: OrderBriefVersion; currentDelivery?: OrderDelivery;
 }
 
 export interface OrderStatusHistoryEntry {
@@ -69,11 +73,8 @@ export interface OrderListFilters {
 // ── DTOs ─────────────────────────────────────────────────────────────────────
 // Criação — VOICE (JSON) ou PRODUCTION (FormData com `file`)
 export interface CreateOrderDto {
-  professionalId: string;
-  serviceId: string;
-  orderType: OrderType;
-  briefingText: string;
-  file?: File; // obrigatório p/ PRODUCTION
+  briefing?: string;
+  items: Array<{ ref?: string; serviceId?: string; professionalId?: string; parentRef?: string; briefingText?: string }>;
 }
 
 export interface ReasonDto {

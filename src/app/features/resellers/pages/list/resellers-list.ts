@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { CardComponent } from '../../../../shared/components/card/card';
 import { TableColumn, TableComponent } from '../../../../shared/components/table/table';
 import { Reseller } from '../../models/reseller.model';
@@ -8,15 +7,14 @@ import { ResellerService } from '../../services/reseller';
 @Component({
   selector: 'app-resellers-list',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, CardComponent, TableComponent],
+  imports: [CardComponent, TableComponent],
   template: `
     <div class="p-6">
       <header class="mb-6 flex items-center justify-between">
         <div>
           <h1 class="text-3xl font-bold text-neutral-900 dark:text-white">Revendedores</h1>
-          <p class="mt-1 text-sm text-neutral-500">Gerencie revendedores e suas comissões.</p>
+          <p class="mt-1 text-sm text-neutral-500">Revendas cadastradas na plataforma.</p>
         </div>
-        <a routerLink="./new" class="btn-primary">+ Novo revendedor</a>
       </header>
 
       <app-card>
@@ -64,9 +62,8 @@ export class ResellersListComponent {
   readonly columns: TableColumn[] = [
     { key: 'name', label: 'Nome', sortable: true },
     { key: 'email', label: 'Email', sortable: true },
-    { key: 'commissionRate', label: 'Taxa de Comissão', sortable: true, format: (v) => `${v}%` },
-    { key: 'totalSales', label: 'Total de Vendas', sortable: true, format: (v) => `R$ ${(v as number).toLocaleString('pt-BR')}` },
-    { key: 'totalCommission', label: 'Total de Comissão', sortable: true, format: (v) => `R$ ${(v as number).toLocaleString('pt-BR')}` },
+    { key: 'maxUsers', label: 'Limite de usuários', sortable: true },
+    { key: 'timezone', label: 'Fuso horário' },
     {
       key: 'status',
       label: 'Status',

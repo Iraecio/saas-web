@@ -10,7 +10,9 @@ describe('OrderService line items', () => {
   let service: OrderService;
   let http: HttpTestingController;
   beforeEach(() => {
-    TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting(), ApiService, OrderService] });
+    TestBed.configureTestingModule({
+      providers: [provideHttpClient(), provideHttpClientTesting(), ApiService, OrderService],
+    });
     service = TestBed.inject(OrderService);
     http = TestBed.inject(HttpTestingController);
   });
@@ -30,5 +32,15 @@ describe('OrderService line items', () => {
   it('loads item history', () => {
     service.getHistory('o', 'i').subscribe();
     http.expectOne(`${environment.apiUrl}/orders/o/line-items/i/history`).flush([]);
+  });
+  it('loads item pronunciations and protected audio access', () => {
+    service.listPronunciations('o', 'i').subscribe();
+    http.expectOne(`${environment.apiUrl}/orders/o/line-items/i/pronunciations`).flush([]);
+    service.pronunciationAudioAccess('o', 'i', 'p', 'v').subscribe();
+    http
+      .expectOne(
+        `${environment.apiUrl}/orders/o/line-items/i/pronunciations/p/versions/v/audio-access`,
+      )
+      .flush({ signedUrl: 'url', expiresAt: 'date' });
   });
 });

@@ -74,6 +74,7 @@ export const routes: Routes = [
       },
       {
         path: 'storage',
+        canActivate: [roleGuard(['SUPER_ADMIN'])],
         loadChildren: () =>
           import('./features/storage/storage.routes').then((m) => m.STORAGE_ROUTES),
       },

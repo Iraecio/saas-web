@@ -13,10 +13,13 @@ Toda página alterada possui exatamente um estado primário: `loading`, `ready`,
 
 ## Navigation matrix
 
-- ADMIN/SUPER_ADMIN: dashboard, usuários, solicitações, pedidos, catálogo, profissionais, saques, revendedores, carteira admin, compras de créditos, relatórios oficiais, armazenamento e configurações conforme RBAC.
-- RESELLER/RESELLER_MANAGER: pedidos, catálogo, profissionais, preço/pacotes, compras, estoque, vendas, carteira, armazenamento e configurações conforme permissão.
-- VOICE_ACTOR/PRODUCER: pedidos por item, saques, carteira, armazenamento e configurações.
+- SUPER_ADMIN: dashboard, usuários, solicitações, pedidos, catálogo, profissionais, saques, revendedores, carteira admin, compras de créditos, relatórios oficiais, armazenamento global e configurações conforme RBAC.
+- ADMIN: dashboard, usuários, solicitações, pedidos, catálogo, profissionais, saques, revendedores, carteira admin, compras de créditos, relatórios oficiais e configurações conforme RBAC; sem armazenamento.
+- RESELLER/RESELLER_MANAGER: pedidos, catálogo, profissionais, preço/pacotes, compras, estoque, vendas, carteira e configurações conforme permissão; sem armazenamento.
+- VOICE_ACTOR/PRODUCER: pedidos por item, saques, carteira e configurações; sem armazenamento.
 - CLIENT: novo pedido, pedidos, profissionais, carteira e configurações; cliente direto mantém solicitações de papel quando aplicável.
+
+A rota e o menu de armazenamento são exclusivos de SUPER_ADMIN. A visão corresponde ao consumo global gerado por pedidos e pelas demais funcionalidades do SaaS, não a cotas ou arquivos pessoais dos usuários.
 
 Nenhum menu pode apontar para rota inexistente. Acesso negado é explícito; o wildcard não serve como tratamento de autorização.
 

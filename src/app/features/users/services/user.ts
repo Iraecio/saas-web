@@ -2,14 +2,18 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, map, throwError } from 'rxjs';
 import { ApiService } from '../../../core/services/api';
 import { User, UserPermission, GrantPermissionDto } from '../../../core/models/user.model';
-import { UserListItem } from '../models/user.model';
+import { UserListItem, UsersPage } from '../models/user.model';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
   private readonly api = inject(ApiService);
 
-  list(params?: { role?: string }): Observable<UserListItem[]> {
-    return this.api.listUsers(params).pipe(map((users) => this.mapToListItems(users)));
+  list(params?: { role?: string; page?: number; limit?: number }): Observable<UsersPage> {
+    return this.api
+      .listUsers(params)
+      .pipe(
+        map((response) => ({ users: this.mapToListItems(response.data), meta: response.meta })),
+      );
   }
 
   get(id: string): Observable<UserListItem | undefined> {
@@ -21,11 +25,15 @@ export class UserService {
   }
 
   create(data: Partial<UserListItem>): Observable<UserListItem> {
-    return throwError(() => new Error('Criação administrativa de usuários não é suportada pela API.'));
+    return throwError(
+      () => new Error('Criação administrativa de usuários não é suportada pela API.'),
+    );
   }
 
   update(id: string, data: Partial<UserListItem>): Observable<UserListItem> {
-    return this.api.updateUser(id, data as Partial<User>).pipe(map((user) => this.mapToListItem(user)));
+    return this.api
+      .updateUser(id, data as Partial<User>)
+      .pipe(map((user) => this.mapToListItem(user)));
   }
 
   updateRaw(id: string, data: Record<string, unknown>): Observable<User> {
@@ -50,8 +58,10 @@ export class UserService {
       name: user.name ?? '',
       email: user.email,
       role: user.role,
-      createdAt: user.createdAt ?? new Date().toISOString(),
-      status: user.isActive ? 'active' : user.isActive === false ? 'disabled' : 'invited',
+      createdAt: user.createdAt ?? '',
+      lastLoginAt: user.lastLoginAt,
+      resellerId: user.resellerId,
+      status: user.isActive === false ? 'disabled' : 'active',
     };
   }
 

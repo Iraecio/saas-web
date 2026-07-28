@@ -12,94 +12,89 @@ interface MenuItem {
 
 const MENU_BY_ROLE: Record<UserRole, MenuItem[]> = {
   SUPER_ADMIN: [
-    { icon: '📊', label: 'Dashboard',              route: '/admin/dashboard' },
-    { icon: '👥', label: 'Usuários',               route: '/admin/users' },
-    { icon: '🎯', label: 'Solicitações de Papel',  route: '/admin/role-requests' },
-    { icon: '📦', label: 'Pedidos',                route: '/admin/orders' },
-    { icon: '🛎️', label: 'Catálogo',               route: '/admin/services' },
-    { icon: '🎙️', label: 'Profissionais',          route: '/admin/professionals' },
-    { icon: '💸', label: 'Saques',                 route: '/admin/withdrawals/admin' },
-    { icon: '🪙', label: 'Compras de Créditos',    route: '/admin/reseller-credits/admin-purchases' },
-    { icon: '💰', label: 'Carteiras',              route: '/admin/wallet-admin' },
-    { icon: '💼', label: 'Revendedores',           route: '/admin/resellers' },
-    { icon: '📈', label: 'Relatórios',             route: '/admin/reports' },
-    { icon: '🗂️', label: 'Armazenamento',          route: '/admin/storage' },
-    { icon: '⚙️', label: 'Configurações',          route: '/admin/settings' },
+    { icon: '📊', label: 'Dashboard', route: '/admin/dashboard' },
+    { icon: '👥', label: 'Usuários', route: '/admin/users' },
+    { icon: '🎯', label: 'Solicitações de Papel', route: '/admin/role-requests' },
+    { icon: '📦', label: 'Pedidos', route: '/admin/orders' },
+    { icon: '🛎️', label: 'Catálogo', route: '/admin/services' },
+    { icon: '🎙️', label: 'Profissionais', route: '/admin/professionals' },
+    { icon: '💸', label: 'Saques', route: '/admin/withdrawals/admin' },
+    { icon: '🪙', label: 'Compras de Créditos', route: '/admin/reseller-credits/admin-purchases' },
+    { icon: '💰', label: 'Carteiras', route: '/admin/wallet-admin' },
+    { icon: '💼', label: 'Revendedores', route: '/admin/resellers' },
+    { icon: '📈', label: 'Relatórios', route: '/admin/reports' },
+    { icon: '🗂️', label: 'Armazenamento', route: '/admin/storage' },
+    { icon: '⚙️', label: 'Configurações', route: '/admin/settings' },
   ],
   ADMIN: [
-    { icon: '📊', label: 'Dashboard',              route: '/admin/dashboard' },
-    { icon: '👥', label: 'Usuários',               route: '/admin/users' },
-    { icon: '🎯', label: 'Solicitações de Papel',  route: '/admin/role-requests' },
-    { icon: '📦', label: 'Pedidos',                route: '/admin/orders' },
-    { icon: '🛎️', label: 'Catálogo',               route: '/admin/services' },
-    { icon: '🎙️', label: 'Profissionais',          route: '/admin/professionals' },
-    { icon: '💸', label: 'Saques',                 route: '/admin/withdrawals/admin' },
-    { icon: '🪙', label: 'Compras de Créditos',    route: '/admin/reseller-credits/admin-purchases' },
-    { icon: '💰', label: 'Carteiras',              route: '/admin/wallet-admin' },
-    { icon: '💼', label: 'Revendedores',           route: '/admin/resellers' },
-    { icon: '📈', label: 'Relatórios',             route: '/admin/reports' },
-    { icon: '🗂️', label: 'Armazenamento',          route: '/admin/storage' },
-    { icon: '⚙️', label: 'Configurações',          route: '/admin/settings' },
+    { icon: '📊', label: 'Dashboard', route: '/admin/dashboard' },
+    { icon: '👥', label: 'Usuários', route: '/admin/users' },
+    { icon: '🎯', label: 'Solicitações de Papel', route: '/admin/role-requests' },
+    { icon: '📦', label: 'Pedidos', route: '/admin/orders' },
+    { icon: '🛎️', label: 'Catálogo', route: '/admin/services' },
+    { icon: '🎙️', label: 'Profissionais', route: '/admin/professionals' },
+    { icon: '💸', label: 'Saques', route: '/admin/withdrawals/admin' },
+    { icon: '🪙', label: 'Compras de Créditos', route: '/admin/reseller-credits/admin-purchases' },
+    { icon: '💰', label: 'Carteiras', route: '/admin/wallet-admin' },
+    { icon: '💼', label: 'Revendedores', route: '/admin/resellers' },
+    { icon: '📈', label: 'Relatórios', route: '/admin/reports' },
+    { icon: '⚙️', label: 'Configurações', route: '/admin/settings' },
   ],
   RESELLER: [
-    { icon: '📊', label: 'Dashboard',       route: '/admin/dashboard' },
-    { icon: '📦', label: 'Pedidos',         route: '/admin/orders' },
-    { icon: '🛎️', label: 'Catálogo',        route: '/admin/services' },
-    { icon: '🎙️', label: 'Profissionais',   route: '/admin/professionals' },
-    { icon: '🪙', label: 'Comprar Créditos',route: '/admin/reseller-credits/purchases' },
-    { icon: '📦', label: 'Estoque',         route: '/admin/reseller-credits/stock' },
-    { icon: '💵', label: 'Vendas',          route: '/admin/reseller-credits/sales' },
-    { icon: '💳', label: 'Minha Carteira',  route: '/admin/wallet' },
-    { icon: '🗂️', label: 'Armazenamento',   route: '/admin/storage' },
-    { icon: '⚙️', label: 'Configurações',   route: '/admin/settings' },
+    { icon: '📊', label: 'Dashboard', route: '/admin/dashboard' },
+    { icon: '📦', label: 'Pedidos', route: '/admin/orders' },
+    { icon: '🛎️', label: 'Catálogo', route: '/admin/services' },
+    { icon: '🎙️', label: 'Profissionais', route: '/admin/professionals' },
+    { icon: '🪙', label: 'Comprar Créditos', route: '/admin/reseller-credits/purchases' },
+    { icon: '📦', label: 'Estoque', route: '/admin/reseller-credits/stock' },
+    { icon: '💵', label: 'Vendas', route: '/admin/reseller-credits/sales' },
+    { icon: '💳', label: 'Minha Carteira', route: '/admin/wallet' },
+    { icon: '⚙️', label: 'Configurações', route: '/admin/settings' },
   ],
   RESELLER_MANAGER: [
-    { icon: '📊', label: 'Dashboard',       route: '/admin/dashboard' },
-    { icon: '📦', label: 'Pedidos',         route: '/admin/orders' },
-    { icon: '🛎️', label: 'Catálogo',        route: '/admin/services' },
-    { icon: '🎙️', label: 'Profissionais',   route: '/admin/professionals' },
-    { icon: '🪙', label: 'Comprar Créditos',route: '/admin/reseller-credits/purchases' },
-    { icon: '📦', label: 'Estoque',         route: '/admin/reseller-credits/stock' },
-    { icon: '💵', label: 'Vendas',          route: '/admin/reseller-credits/sales' },
-    { icon: '💳', label: 'Minha Carteira',  route: '/admin/wallet' },
-    { icon: '📈', label: 'Relatórios',      route: '/admin/reports' },
-    { icon: '🗂️', label: 'Armazenamento',   route: '/admin/storage' },
-    { icon: '⚙️', label: 'Configurações',   route: '/admin/settings' },
+    { icon: '📊', label: 'Dashboard', route: '/admin/dashboard' },
+    { icon: '📦', label: 'Pedidos', route: '/admin/orders' },
+    { icon: '🛎️', label: 'Catálogo', route: '/admin/services' },
+    { icon: '🎙️', label: 'Profissionais', route: '/admin/professionals' },
+    { icon: '🪙', label: 'Comprar Créditos', route: '/admin/reseller-credits/purchases' },
+    { icon: '📦', label: 'Estoque', route: '/admin/reseller-credits/stock' },
+    { icon: '💵', label: 'Vendas', route: '/admin/reseller-credits/sales' },
+    { icon: '💳', label: 'Minha Carteira', route: '/admin/wallet' },
+    { icon: '📈', label: 'Relatórios', route: '/admin/reports' },
+    { icon: '⚙️', label: 'Configurações', route: '/admin/settings' },
   ],
   VOICE_ACTOR: [
-    { icon: '📊', label: 'Dashboard',       route: '/admin/dashboard' },
-    { icon: '📦', label: 'Meus Pedidos',    route: '/admin/orders' },
-    { icon: '💸', label: 'Meus Saques',     route: '/admin/withdrawals' },
-    { icon: '💳', label: 'Minha Carteira',  route: '/admin/wallet' },
-    { icon: '🗂️', label: 'Armazenamento',   route: '/admin/storage' },
-    { icon: '⚙️', label: 'Configurações',   route: '/admin/settings' },
+    { icon: '📊', label: 'Dashboard', route: '/admin/dashboard' },
+    { icon: '📦', label: 'Meus Pedidos', route: '/admin/orders' },
+    { icon: '💸', label: 'Meus Saques', route: '/admin/withdrawals' },
+    { icon: '💳', label: 'Minha Carteira', route: '/admin/wallet' },
+    { icon: '⚙️', label: 'Configurações', route: '/admin/settings' },
   ],
   PRODUCER: [
-    { icon: '📊', label: 'Dashboard',       route: '/admin/dashboard' },
-    { icon: '📦', label: 'Meus Pedidos',    route: '/admin/orders' },
-    { icon: '💸', label: 'Meus Saques',     route: '/admin/withdrawals' },
-    { icon: '💳', label: 'Minha Carteira',  route: '/admin/wallet' },
-    { icon: '🗂️', label: 'Armazenamento',   route: '/admin/storage' },
-    { icon: '⚙️', label: 'Configurações',   route: '/admin/settings' },
+    { icon: '📊', label: 'Dashboard', route: '/admin/dashboard' },
+    { icon: '📦', label: 'Meus Pedidos', route: '/admin/orders' },
+    { icon: '💸', label: 'Meus Saques', route: '/admin/withdrawals' },
+    { icon: '💳', label: 'Minha Carteira', route: '/admin/wallet' },
+    { icon: '⚙️', label: 'Configurações', route: '/admin/settings' },
   ],
   CLIENT: [
-    { icon: '📊', label: 'Dashboard',       route: '/admin/dashboard' },
-    { icon: '➕', label: 'Novo Pedido',     route: '/admin/orders/new' },
-    { icon: '📦', label: 'Meus Pedidos',    route: '/admin/orders' },
-    { icon: '🎙️', label: 'Profissionais',   route: '/admin/professionals' },
-    { icon: '💳', label: 'Minha Carteira',  route: '/admin/wallet' },
-    { icon: '⚙️', label: 'Configurações',   route: '/admin/settings' },
+    { icon: '📊', label: 'Dashboard', route: '/admin/dashboard' },
+    { icon: '➕', label: 'Novo Pedido', route: '/admin/orders/new' },
+    { icon: '📦', label: 'Meus Pedidos', route: '/admin/orders' },
+    { icon: '🎙️', label: 'Profissionais', route: '/admin/professionals' },
+    { icon: '💳', label: 'Minha Carteira', route: '/admin/wallet' },
+    { icon: '⚙️', label: 'Configurações', route: '/admin/settings' },
   ],
 };
 
 const DIRECT_CLIENT_MENU: MenuItem[] = [
-  { icon: '📊', label: 'Dashboard',             route: '/admin/dashboard' },
-  { icon: '➕', label: 'Novo Pedido',            route: '/admin/orders/new' },
-  { icon: '📦', label: 'Meus Pedidos',           route: '/admin/orders' },
-  { icon: '💳', label: 'Minha Carteira',         route: '/admin/wallet' },
-  { icon: '🎯', label: 'Solicitar Upgrade',     route: '/admin/role-requests/new' },
-  { icon: '📋', label: 'Minhas Solicitações',   route: '/admin/role-requests/my' },
-  { icon: '⚙️', label: 'Configurações',         route: '/admin/settings' },
+  { icon: '📊', label: 'Dashboard', route: '/admin/dashboard' },
+  { icon: '➕', label: 'Novo Pedido', route: '/admin/orders/new' },
+  { icon: '📦', label: 'Meus Pedidos', route: '/admin/orders' },
+  { icon: '💳', label: 'Minha Carteira', route: '/admin/wallet' },
+  { icon: '🎯', label: 'Solicitar Upgrade', route: '/admin/role-requests/new' },
+  { icon: '📋', label: 'Minhas Solicitações', route: '/admin/role-requests/my' },
+  { icon: '⚙️', label: 'Configurações', route: '/admin/settings' },
 ];
 
 @Component({
@@ -111,7 +106,9 @@ const DIRECT_CLIENT_MENU: MenuItem[] = [
       class="flex h-full flex-col border-r border-neutral-200 bg-white transition-all duration-300 dark:border-neutral-700 dark:bg-neutral-800"
       [class]="widthClasses()"
     >
-      <div class="flex h-16 items-center justify-center border-b border-neutral-200 px-6 dark:border-neutral-700">
+      <div
+        class="flex h-16 items-center justify-center border-b border-neutral-200 px-6 dark:border-neutral-700"
+      >
         <h2 class="text-xl font-bold text-neutral-900 dark:text-white">
           @if (open()) {
             <span>SaaS Web</span>
@@ -126,13 +123,16 @@ const DIRECT_CLIENT_MENU: MenuItem[] = [
           <a
             [routerLink]="item.route"
             routerLinkActive="sidebar-item-active"
+            [routerLinkActiveOptions]="{ exact: true }"
             class="sidebar-item"
           >
             <span class="text-xl">{{ item.icon }}</span>
             @if (open()) {
               <span class="text-sm font-medium">{{ item.label }}</span>
               @if (item.badge) {
-                <span class="ml-auto rounded-full bg-danger px-2 py-0.5 text-xs font-bold text-white">
+                <span
+                  class="ml-auto rounded-full bg-danger px-2 py-0.5 text-xs font-bold text-white"
+                >
                   {{ item.badge }}
                 </span>
               }
@@ -144,17 +144,25 @@ const DIRECT_CLIENT_MENU: MenuItem[] = [
       <div class="border-t border-neutral-200 p-4 dark:border-neutral-700">
         @if (open()) {
           <div class="flex items-center gap-2">
-            <div class="flex h-7 w-7 items-center justify-center rounded-full bg-violet-100 text-xs font-bold text-violet-700 dark:bg-violet-900/30 dark:text-violet-300">
+            <div
+              class="flex h-7 w-7 items-center justify-center rounded-full bg-violet-100 text-xs font-bold text-violet-700 dark:bg-violet-900/30 dark:text-violet-300"
+            >
               {{ appState.userName()[0]?.toUpperCase() }}
             </div>
             <div class="min-w-0">
-              <p class="truncate text-xs font-medium text-neutral-700 dark:text-neutral-300">{{ appState.userName() }}</p>
-              <p class="text-xs text-neutral-400">{{ roleLabel() }}</p>
+              <p class="truncate text-xs font-medium text-neutral-700 dark:text-neutral-300">
+                {{ appState.userName() }}
+              </p>
+              @if (roleLabel(); as label) {
+                <p class="text-xs text-neutral-400">{{ label }}</p>
+              }
             </div>
           </div>
         } @else {
           <div class="flex justify-center">
-            <div class="flex h-7 w-7 items-center justify-center rounded-full bg-violet-100 text-xs font-bold text-violet-700 dark:bg-violet-900/30">
+            <div
+              class="flex h-7 w-7 items-center justify-center rounded-full bg-violet-100 text-xs font-bold text-violet-700 dark:bg-violet-900/30"
+            >
               {{ appState.userName()[0]?.toUpperCase() }}
             </div>
           </div>
@@ -188,6 +196,6 @@ export class SidebarComponent {
       CLIENT: 'Cliente',
     };
     const role = this.appState.userRole();
-    return role ? labels[role] : '';
+    return role && role !== 'CLIENT' ? labels[role] : '';
   });
 }

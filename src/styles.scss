@@ -86,17 +86,40 @@
     outline: 3px solid var(--ui-focus);
     outline-offset: 2px;
   }
+  button:not(:disabled),
+  [role='button']:not([aria-disabled='true']) {
+    cursor: pointer;
+  }
 }
 
 @layer components {
+  .btn-primary,
+  .btn-secondary,
+  .btn-danger,
+  .btn-ghost {
+    @apply inline-flex min-h-10 items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-semibold leading-5 transition-all duration-200;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2;
+    @apply disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-45;
+    @apply active:translate-y-px;
+  }
   .btn-primary {
-    @apply bg-brand text-brand-foreground hover:bg-brand-hover;
+    @apply bg-brand text-brand-foreground shadow-sm hover:bg-brand-hover hover:shadow-md;
   }
   .btn-secondary {
-    @apply border border-border-strong bg-surface text-foreground hover:bg-surface-subtle;
+    @apply border border-border-strong bg-surface text-foreground shadow-sm hover:border-brand/40 hover:bg-surface-subtle;
   }
   .btn-danger {
-    @apply bg-danger text-white hover:brightness-90;
+    @apply bg-danger text-white shadow-sm hover:brightness-90 hover:shadow-md;
+  }
+  .btn-ghost {
+    @apply text-foreground hover:bg-surface-subtle;
+  }
+  .btn-icon {
+    @apply inline-flex size-10 items-center justify-center rounded-md text-muted transition-colors hover:bg-surface-subtle hover:text-foreground;
+    @apply disabled:pointer-events-none disabled:opacity-45;
+  }
+  .btn-link {
+    @apply inline-flex items-center gap-1 rounded-sm font-semibold text-brand underline-offset-4 transition-colors hover:underline;
   }
   .card {
     @apply rounded-lg border border-border bg-surface p-6 shadow-sm;

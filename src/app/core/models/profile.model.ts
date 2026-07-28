@@ -44,9 +44,3 @@ export interface UpdateClientProfileDto {
   phone?: string;
   address?: string;
 }
-
-export interface StorageQuota {
-  userId: string;
-  usedBytes: number;
-  totalBytes: number;
-}

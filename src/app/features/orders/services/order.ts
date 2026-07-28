@@ -15,6 +15,11 @@ import {
   ResolveDisputeDto,
   UpdateBriefDto,
 } from '../../../core/models/order.model';
+import {
+  OrderPronunciation,
+  OrderPronunciationVersion,
+  PronunciationAudioAccess,
+} from '../../../core/models/pronunciation.model';
 
 @Injectable({ providedIn: 'root' })
 export class OrderService {
@@ -40,6 +45,31 @@ export class OrderService {
 
   getHistory(id: string, itemId: string): Observable<OrderStatusHistoryEntry[]> {
     return this.api.get<OrderStatusHistoryEntry[]>(`/orders/${id}/line-items/${itemId}/history`);
+  }
+
+  listPronunciations(id: string, itemId: string): Observable<OrderPronunciation[]> {
+    return this.api.get<OrderPronunciation[]>(`/orders/${id}/line-items/${itemId}/pronunciations`);
+  }
+
+  pronunciationHistory(
+    id: string,
+    itemId: string,
+    instructionId: string,
+  ): Observable<OrderPronunciationVersion[]> {
+    return this.api.get<OrderPronunciationVersion[]>(
+      `/orders/${id}/line-items/${itemId}/pronunciations/${instructionId}/history`,
+    );
+  }
+
+  pronunciationAudioAccess(
+    id: string,
+    itemId: string,
+    instructionId: string,
+    versionId: string,
+  ): Observable<PronunciationAudioAccess> {
+    return this.api.get<PronunciationAudioAccess>(
+      `/orders/${id}/line-items/${itemId}/pronunciations/${instructionId}/versions/${versionId}/audio-access`,
+    );
   }
 
   // ── Criação ──────────────────────────────────────────────────────────────
@@ -69,10 +99,14 @@ export class OrderService {
     form.append('file', dto.file);
     if (dto.deliveryNotes) form.append('deliveryNotes', dto.deliveryNotes);
     if (dto.redeliveryReason) form.append('redeliveryReason', dto.redeliveryReason);
-    return this.http.post<Order>(`${this.baseUrl}/orders/${id}/line-items/${itemId}/deliver`, form, {
-      reportProgress: true,
-      observe: 'events',
-    });
+    return this.http.post<Order>(
+      `${this.baseUrl}/orders/${id}/line-items/${itemId}/deliver`,
+      form,
+      {
+        reportProgress: true,
+        observe: 'events',
+      },
+    );
   }
 
   // ── Ações do cliente ─────────────────────────────────────────────────────
@@ -80,10 +114,14 @@ export class OrderService {
     const form = new FormData();
     form.append('briefingText', dto.briefingText);
     if (dto.file) form.append('file', dto.file);
-    return this.http.post<Order>(`${this.baseUrl}/orders/${id}/line-items/${itemId}/update-brief`, form, {
-      reportProgress: true,
-      observe: 'events',
-    });
+    return this.http.post<Order>(
+      `${this.baseUrl}/orders/${id}/line-items/${itemId}/update-brief`,
+      form,
+      {
+        reportProgress: true,
+        observe: 'events',
+      },
+    );
   }
 
   approve(id: string, itemId: string): Observable<Order> {

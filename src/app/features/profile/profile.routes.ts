@@ -23,4 +23,8 @@ export const PROFILE_ROUTES: Routes = [
     loadComponent: () =>
       import('./pages/client-profile/client-profile').then((m) => m.ClientProfilePageComponent),
   },
+  {
+    path: 'pronunciations',
+    redirectTo: '/admin/settings/pronuncias',
+  },
 ];

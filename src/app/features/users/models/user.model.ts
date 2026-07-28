@@ -6,5 +6,12 @@ export interface UserListItem {
   email: string;
   role: UserRole;
   createdAt: string;
-  status: 'active' | 'invited' | 'disabled';
+  lastLoginAt?: string | null;
+  resellerId?: string | null;
+  status: 'active' | 'disabled';
+}
+
+export interface UsersPage {
+  users: UserListItem[];
+  meta: { total: number; page: number; limit: number; totalPages: number };
 }

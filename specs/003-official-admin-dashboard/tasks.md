@@ -130,6 +130,7 @@
 - [x] T047 Verificar ausência de endpoints antigos e mocks com busca estática em `src/app/`
 - [x] T048 Executar suítes completas e builds em `/home/iraecio/apps/saas-api` e `/home/iraecio/apps/saas-web`
 - [x] T049 Marcar todas as tarefas concluídas e registrar resultados em `specs/003-official-admin-dashboard/tasks.md`
+- [x] T050 Restringir menu, atalhos e rota de armazenamento a SUPER_ADMIN em `src/app/shared/components/sidebar/sidebar.ts`, dashboards por papel e `src/app/app.routes.ts`
 
 ---
 
@@ -162,5 +163,4 @@ Cada checkpoint exige testes focados e build antes da próxima história. Nenhum
 ## Format Validation
 
 Todas as 49 tarefas usam checkbox, ID sequencial, rótulo de história nas fases de história, marcador `[P]` somente quando paralelizável e caminho de arquivo explícito.
-
 

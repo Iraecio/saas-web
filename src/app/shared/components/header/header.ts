@@ -33,7 +33,9 @@ import { AuthService } from '../../../core/services/auth';
               <p class="text-sm font-medium text-neutral-900 dark:text-white">
                 {{ user.name || user.email }}
               </p>
-              <p class="text-xs text-neutral-500">{{ user.role }}</p>
+              @if (user.role !== 'CLIENT') {
+                <p class="text-xs text-neutral-500">{{ user.role }}</p>
+              }
             </div>
             <button
               type="button"

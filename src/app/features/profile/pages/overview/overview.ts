@@ -1,15 +1,13 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, OnInit } from '@angular/core';
-import { DecimalPipe } from '@angular/common';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AppStateService } from '../../../../core/services/app-state';
 import { ProfileService } from '../../services/my-profile';
-import { StorageQuota } from '../../../../core/models/profile.model';
 
 @Component({
   selector: 'app-profile-overview',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, DecimalPipe],
+  imports: [ReactiveFormsModule],
   template: `
     <div class="p-6 max-w-2xl mx-auto space-y-8">
       <header>
@@ -65,27 +63,10 @@ import { StorageQuota } from '../../../../core/models/profile.model';
         </span>
       </section>
 
-      <!-- Cota de armazenamento -->
-      @if (quota()) {
-        <section class="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 p-6">
-          <h2 class="text-lg font-semibold text-neutral-900 dark:text-white mb-4">Armazenamento</h2>
-          <div class="space-y-2">
-            <div class="flex justify-between text-sm text-neutral-600 dark:text-neutral-400">
-              <span>{{ formatBytes(quota()!.usedBytes) }} usados</span>
-              <span>{{ formatBytes(quota()!.totalBytes) }} total</span>
-            </div>
-            <div class="w-full bg-neutral-200 dark:bg-neutral-700 rounded-full h-2">
-              <div class="bg-neutral-900 dark:bg-white rounded-full h-2 transition-all"
-                   [style.width.%]="usagePercent()"></div>
-            </div>
-            <p class="text-xs text-neutral-500">{{ usagePercent() | number:'1.1-1' }}% utilizado</p>
-          </div>
-        </section>
-      }
     </div>
   `,
 })
-export class ProfileOverviewComponent implements OnInit {
+export class ProfileOverviewComponent {
   private readonly fb = inject(FormBuilder);
   private readonly appState = inject(AppStateService);
   private readonly profileService = inject(ProfileService);
@@ -95,29 +76,12 @@ export class ProfileOverviewComponent implements OnInit {
   readonly saving = signal(false);
   readonly saveSuccess = signal(false);
   readonly saveError = signal<string | undefined>(undefined);
-  readonly quota = signal<import('../../../../core/models/profile.model').StorageQuota | null>(null);
 
   readonly form = this.fb.nonNullable.group({
     name: [this.user()?.name ?? ''],
     department: [this.user()?.department ?? ''],
     jobTitle: [this.user()?.jobTitle ?? ''],
   });
-
-  readonly usagePercent = () => {
-    const q = this.quota();
-    if (!q || q.totalBytes === 0) return 0;
-    return Math.min(100, (q.usedBytes / q.totalBytes) * 100);
-  };
-
-  ngOnInit(): void {
-    const userId = this.user()?.id;
-    if (userId) {
-      this.profileService
-        .getStorageQuota(userId)
-        .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe({ next: (q) => this.quota.set(q), error: () => {} });
-    }
-  }
 
   save(): void {
     const userId = this.user()?.id;

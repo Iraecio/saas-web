@@ -5,7 +5,7 @@ import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { User } from '../models/user.model';
 
-interface PaginatedResponse<T> {
+export interface PaginatedResponse<T> {
   data: T[];
   meta: { total: number; page: number; limit: number; totalPages: number };
 }
@@ -17,11 +17,12 @@ export class ApiService {
 
   // ── User domain methods ──────────────────────────────────────────────────
 
-  listUsers(params?: { role?: string; page?: number; limit?: number }): Observable<User[]> {
-    return this.get<PaginatedResponse<User>>('/users', params).pipe(
-      map((res) => res.data),
-      catchError(this.handleError),
-    );
+  listUsers(params?: {
+    role?: string;
+    page?: number;
+    limit?: number;
+  }): Observable<PaginatedResponse<User>> {
+    return this.get<PaginatedResponse<User>>('/users', params).pipe(catchError(this.handleError));
   }
 
   getUser(id: string): Observable<User> {
@@ -42,22 +43,21 @@ export class ApiService {
 
   // ── Generic HTTP methods ─────────────────────────────────────────────────
 
-  get<T>(endpoint: string, params?: Record<string, string | number | boolean>): Observable<T> {
+  get<T>(
+    endpoint: string,
+    params?: Record<string, string | number | boolean | null | undefined>,
+  ): Observable<T> {
     return this.http
       .get<T>(`${this.baseUrl}${endpoint}`, { params: this.toHttpParams(params) })
       .pipe(catchError(this.handleError));
   }
 
   post<T>(endpoint: string, body: unknown): Observable<T> {
-    return this.http
-      .post<T>(`${this.baseUrl}${endpoint}`, body)
-      .pipe(catchError(this.handleError));
+    return this.http.post<T>(`${this.baseUrl}${endpoint}`, body).pipe(catchError(this.handleError));
   }
 
   put<T>(endpoint: string, body: unknown): Observable<T> {
-    return this.http
-      .put<T>(`${this.baseUrl}${endpoint}`, body)
-      .pipe(catchError(this.handleError));
+    return this.http.put<T>(`${this.baseUrl}${endpoint}`, body).pipe(catchError(this.handleError));
   }
 
   patch<T>(endpoint: string, body: unknown): Observable<T> {
@@ -67,15 +67,16 @@ export class ApiService {
   }
 
   delete<T>(endpoint: string): Observable<T> {
-    return this.http
-      .delete<T>(`${this.baseUrl}${endpoint}`)
-      .pipe(catchError(this.handleError));
+    return this.http.delete<T>(`${this.baseUrl}${endpoint}`).pipe(catchError(this.handleError));
   }
 
-  private toHttpParams(params?: Record<string, string | number | boolean>): HttpParams | undefined {
+  private toHttpParams(
+    params?: Record<string, string | number | boolean | null | undefined>,
+  ): HttpParams | undefined {
     if (!params) return undefined;
     let httpParams = new HttpParams();
     for (const [key, value] of Object.entries(params)) {
+      if (value === undefined || value === null) continue;
       httpParams = httpParams.set(key, String(value));
     }
     return httpParams;

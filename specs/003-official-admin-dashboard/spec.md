@@ -138,6 +138,8 @@ Como usuário autenticado, quero visualizar apenas opções permitidas e funcion
 - **FR-026**: Opções de relatório sem fonte oficial MUST ser removidas da interface até que possam produzir resultados reais.
 - **FR-027**: A solução MUST manter os fluxos oficiais já funcionais de autenticação, usuários, perfis, catálogo, profissionais, armazenamento, domínios, solicitações de papel e saques.
 - **FR-028**: Todos os valores monetários, quantidades de crédito, datas e estados MUST ser exibidos com unidade e significado inequívocos.
+- **FR-029**: Somente o papel SUPER_ADMIN MUST visualizar no menu, acessar ou executar operações na área administrativa de armazenamento; todos os demais papéis MUST ter o destino e os atalhos ocultos e o acesso direto negado.
+- **FR-030**: A área de armazenamento MUST representar o consumo global do SaaS para acompanhamento administrativo, incluindo arquivos e dados gerados por pedidos e pelas demais funcionalidades, sem apresentar cotas ou gerenciadores pessoais aos outros papéis.
 
 ### Key Entities
 
@@ -152,6 +154,7 @@ Como usuário autenticado, quero visualizar apenas opções permitidas e funcion
 - **Lote de Estoque**: Quantidade disponível para venda, ligada à sua origem e custo.
 - **Venda de Créditos**: Transferência comercial de créditos da revenda para um cliente, com custo, receita e margem.
 - **Relatório Oficial**: Consulta filtrável baseada em registros reais e com origem e período identificáveis.
+- **Resumo de Armazenamento**: Visão administrativa do consumo global do SaaS, atribuído aos pedidos e às demais funcionalidades que originam os dados armazenados.
 
 ## Success Criteria *(mandatory)*
 
@@ -168,6 +171,7 @@ Como usuário autenticado, quero visualizar apenas opções permitidas e funcion
 - **SC-009**: 100% dos relatórios visíveis produzem dados oficiais; nenhuma ação sem efeito permanece disponível.
 - **SC-010**: Falhas parciais, estados vazios e acesso negado são distinguíveis pelo usuário em todas as áreas abrangidas, sem substituição por zero fictício.
 - **SC-011**: Todos os cenários críticos de carteira, pedido composto, estoque e venda passam em validação automatizada e em uma jornada ponta a ponta por papel envolvido.
+- **SC-012**: Nos sete papéis existentes, somente SUPER_ADMIN visualiza a opção de armazenamento e consegue abrir sua rota; 100% das tentativas diretas dos demais papéis são negadas.
 
 ## Assumptions
 
@@ -178,6 +182,7 @@ Como usuário autenticado, quero visualizar apenas opções permitidas e funcion
 - Comparações do dashboard usam o mesmo intervalo imediatamente anterior ao período selecionado.
 - Quando o período anterior for zero, a interface mostrará “sem base de comparação” em vez de uma porcentagem infinita ou enganosa.
 - Os sete papéis existentes e suas regras atuais de autorização serão preservados.
+- Armazenamento é uma capacidade administrativa global e não uma área pessoal; seus dados decorrem de pedidos e das demais funcionalidades do SaaS.
 - Exportação de arquivos de relatório não faz parte da primeira entrega; a visualização filtrável oficial é suficiente.
 - Eventos de infraestrutura, como conclusão de backup, ficam fora do dashboard enquanto não houver fonte oficial e acionável.
 - Novas bibliotecas visuais e mudanças amplas de identidade visual estão fora do escopo.

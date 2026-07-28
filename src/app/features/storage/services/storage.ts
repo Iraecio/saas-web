@@ -1,5 +1,6 @@
 import { Injectable, PLATFORM_ID, inject } from '@angular/core';
 import { HttpClient, HttpEventType, HttpErrorResponse } from '@angular/common/http';
+import { HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { isPlatformBrowser } from '@angular/common';
@@ -29,11 +30,12 @@ export class StorageService {
 
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('bucket', bucket);
-    if (folder) formData.append('folder', folder);
+    let params = new HttpParams().set('bucket', bucket);
+    if (folder) params = params.set('folder', folder);
 
     return this.http
       .post<UploadResponse>(`${this.baseUrl}/storage/upload`, formData, {
+        params,
         reportProgress: true,
         observe: 'events',
       })

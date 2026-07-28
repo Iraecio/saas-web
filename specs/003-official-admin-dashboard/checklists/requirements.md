@@ -32,5 +32,6 @@
 ## Notes
 
 - Validation completed on 2026-07-20 after reviewing the specification against all checklist items.
+- Validation updated on 2026-07-21 to make storage visibility and direct access exclusive to SUPER_ADMIN and define its global administrative purpose.
 - No clarification markers remain; assumptions define dashboard financial meaning, period comparison, report export scope and infrastructure exclusions.
 - The five prioritized user stories preserve the requested delivery order and are independently testable.

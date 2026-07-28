@@ -140,7 +140,7 @@ src/app/
 ### Phase E — Navegação e relatórios
 
 1. Auditar matriz de papel × rota × menu.
-2. Remover destinos inexistentes e expor features oficiais autorizadas.
+2. Remover destinos inexistentes e expor features oficiais autorizadas, mantendo armazenamento global visível e acessível somente para SUPER_ADMIN.
 3. Usar wallet analytics e vendas de revenda como relatórios iniciais.
 4. Remover botões de geração sem efeito e números artificiais em revendedores/overview.
 5. Validar os sete papéis, build SSR e jornadas ponta a ponta.

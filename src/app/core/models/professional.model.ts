@@ -7,6 +7,10 @@ export interface Professional {
   scope: ServiceScope; // GLOBAL | PARTICULAR
   resellerId: string | null;
   name: string;
+  avatarUrl?: string | null;
+  demoUrl?: string | null;
+  voiceSamplesUrls?: string[];
+  portfolioUrls?: string[];
   verificationStatus?: string;
   accent?: string; // específico de locutor; campos de produtor a refinar na integração
 }

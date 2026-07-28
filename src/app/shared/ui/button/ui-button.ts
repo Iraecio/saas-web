@@ -34,7 +34,7 @@ export class UiButtonComponent {
     () => `${this.base} ${this.sizes[this.size()]} ${this.variants[this.variant()]}`,
   );
   private readonly base =
-    'inline-flex items-center justify-center gap-2 rounded-md font-semibold transition-colors disabled:pointer-events-none disabled:opacity-45';
+    'inline-flex items-center justify-center gap-2 rounded-md font-semibold shadow-sm transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 active:translate-y-px disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-45';
   private readonly sizes: Record<UiButtonSize, string> = {
     sm: 'h-8 px-3 text-xs',
     md: 'h-10 px-4 text-sm',
@@ -42,9 +42,10 @@ export class UiButtonComponent {
     icon: 'size-10 p-0',
   };
   private readonly variants: Record<UiButtonVariant, string> = {
-    primary: 'bg-brand text-brand-foreground hover:bg-brand-hover',
-    secondary: 'border border-border-strong bg-surface text-foreground hover:bg-surface-subtle',
-    destructive: 'bg-danger text-white hover:brightness-90',
-    ghost: 'text-foreground hover:bg-surface-subtle',
+    primary: 'bg-brand text-brand-foreground hover:bg-brand-hover hover:shadow-md',
+    secondary:
+      'border border-border-strong bg-surface text-foreground hover:border-brand/40 hover:bg-surface-subtle',
+    destructive: 'bg-danger text-white hover:brightness-90 hover:shadow-md',
+    ghost: 'shadow-none text-foreground hover:bg-surface-subtle',
   };
 }

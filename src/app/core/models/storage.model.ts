@@ -5,7 +5,9 @@ export interface UploadResponse {
   fullPath: string;
   bucket: StorageBucket;
   size: number;
-  mimeType: string;
+  mimetype: string;
+  originalName: string;
+  publicUrl?: string;
 }
 
 export interface SignedUrlResponse {

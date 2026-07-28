@@ -33,17 +33,18 @@ export class ButtonComponent {
   readonly classes = computed(() => {
     const variant = this.variant();
     const size = this.size();
-    const base = 'font-semibold transition-all duration-200 rounded-lg inline-flex items-center justify-center gap-2';
+    const base =
+      'inline-flex items-center justify-center gap-2 rounded-md font-semibold shadow-sm transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 active:translate-y-px disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-45';
     const sizes: Record<ButtonSize, string> = {
-      sm: 'px-3 py-1 text-sm',
-      md: 'px-4 py-2 text-base',
-      lg: 'px-6 py-3 text-lg',
+      sm: 'min-h-8 px-3 py-1 text-xs',
+      md: 'min-h-10 px-4 py-2 text-sm',
+      lg: 'min-h-11 px-5 py-2.5 text-sm',
     };
     const variants: Record<ButtonVariant, string> = {
       primary: 'btn-primary',
       secondary: 'btn-secondary',
       danger: 'btn-danger',
-      ghost: 'text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-700',
+      ghost: 'shadow-none text-foreground hover:bg-surface-subtle',
     };
     return `${base} ${sizes[size]} ${variants[variant]}`;
   });

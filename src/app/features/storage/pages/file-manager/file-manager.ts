@@ -239,7 +239,7 @@ export class FileManagerPage {
             {
               path: progress.response!.path,
               size: progress.response!.size,
-              mimeType: progress.response!.mimeType,
+              mimeType: progress.response!.mimetype,
               bucket: progress.response!.bucket,
             },
             ...files,

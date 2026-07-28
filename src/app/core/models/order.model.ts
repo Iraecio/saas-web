@@ -1,4 +1,5 @@
 import { CreditType } from './service.model';
+import { OrderPronunciation, OrderPronunciationInput } from './pronunciation.model';
 
 // ── Enums ────────────────────────────────────────────────────────────────────
 export type OrderType = 'VOICE' | 'PRODUCTION';
@@ -44,12 +45,26 @@ export interface Order {
 }
 
 export interface OrderLineItem {
-  id: string; orderId: string; position: number; parentLineItemId?: string | null;
-  serviceId?: string | null; professionalId?: string | null; itemType: OrderType;
-  status: OrderStatus; creditCost: number; professionalPayoutCents?: number | null;
-  revisionCount: number; maxRevisions: number; deadlineAt?: string | null;
-  briefing?: string | null; deliveryUrl?: string | null; createdAt: string; updatedAt?: string;
-  currentBrief?: OrderBriefVersion; currentDelivery?: OrderDelivery;
+  id: string;
+  orderId: string;
+  position: number;
+  parentLineItemId?: string | null;
+  serviceId?: string | null;
+  professionalId?: string | null;
+  itemType: OrderType;
+  status: OrderStatus;
+  creditCost: number;
+  professionalPayoutCents?: number | null;
+  revisionCount: number;
+  maxRevisions: number;
+  deadlineAt?: string | null;
+  briefing?: string | null;
+  deliveryUrl?: string | null;
+  createdAt: string;
+  updatedAt?: string;
+  currentBrief?: OrderBriefVersion;
+  currentDelivery?: OrderDelivery;
+  pronunciations?: OrderPronunciation[];
 }
 
 export interface OrderStatusHistoryEntry {
@@ -74,7 +89,15 @@ export interface OrderListFilters {
 // Criação — VOICE (JSON) ou PRODUCTION (FormData com `file`)
 export interface CreateOrderDto {
   briefing?: string;
-  items: Array<{ ref?: string; serviceId?: string; professionalId?: string; parentRef?: string; briefingText?: string }>;
+  items: Array<{
+    ref?: string;
+    serviceId?: string;
+    professionalId?: string;
+    parentRef?: string;
+    briefingText?: string;
+    briefingFileUrl?: string;
+    pronunciations?: OrderPronunciationInput[];
+  }>;
 }
 
 export interface ReasonDto {

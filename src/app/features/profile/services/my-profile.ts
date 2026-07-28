@@ -8,7 +8,6 @@ import {
   UpdateProducerProfileDto,
   ClientProfile,
   UpdateClientProfileDto,
-  StorageQuota,
 } from '../../../core/models/profile.model';
 import { User } from '../../../core/models/user.model';
 
@@ -46,9 +45,5 @@ export class ProfileService {
 
   updateClientProfile(userId: string, dto: UpdateClientProfileDto): Observable<ClientProfile> {
     return this.api.patch<ClientProfile>(`/users/${userId}/client-profile`, dto);
-  }
-
-  getStorageQuota(userId: string): Observable<StorageQuota> {
-    return this.api.get<StorageQuota>(`/users/${userId}/storage-quota`);
   }
 }

@@ -36,6 +36,19 @@ import { AppStateService } from '../../../../core/services/app-state';
               Pronúncias
             </a>
           }
+          @if (
+            appState.userRole() === 'SUPER_ADMIN' ||
+            appState.userRole() === 'RESELLER' ||
+            appState.userRole() === 'RESELLER_MANAGER'
+          ) {
+            <a
+              routerLink="pagamento"
+              routerLinkActive="border-b-2 border-neutral-900 dark:border-white text-neutral-900 dark:text-white font-semibold"
+              class="px-4 pb-3 text-sm text-neutral-500 transition-colors hover:text-neutral-700 dark:hover:text-neutral-300"
+            >
+              Pagamento
+            </a>
+          }
         </nav>
       </div>
 

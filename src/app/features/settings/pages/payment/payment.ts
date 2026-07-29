@@ -220,77 +220,261 @@ const STATUS_CLASS: Record<PaymentConfigStatus, string> = {
           <form
             [formGroup]="configurationForm"
             (ngSubmit)="saveConfiguration()"
-            class="mt-5 grid gap-4 md:grid-cols-2"
+            class="mt-6 space-y-6"
           >
-            <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-              Modalidade
-              <select class="form-input mt-1 w-full" formControlName="policyId">
-                <option value="">Selecione</option>
+            <fieldset>
+              <legend class="text-sm font-semibold text-neutral-900 dark:text-white">
+                1. Escolha como receber
+              </legend>
+              <p class="mt-1 text-sm text-neutral-500">
+                Selecione uma modalidade autorizada para este ambiente.
+              </p>
+              <div class="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                 @for (policy of eligiblePolicies(); track policy.id) {
-                  <option [value]="policy.id">
-                    {{ policy.displayName }} · {{ methodLabel(policy.methodType) }}
-                  </option>
+                  <button
+                    type="button"
+                    class="group flex min-h-28 items-start gap-3 rounded-xl border p-4 text-left transition-all"
+                    [class.border-brand]="configurationForm.controls.policyId.value === policy.id"
+                    [class.bg-brand/5]="configurationForm.controls.policyId.value === policy.id"
+                    [class.ring-2]="configurationForm.controls.policyId.value === policy.id"
+                    [class.ring-brand/15]="configurationForm.controls.policyId.value === policy.id"
+                    [class.border-neutral-200]="
+                      configurationForm.controls.policyId.value !== policy.id
+                    "
+                    [disabled]="!!editing()"
+                    (click)="selectPolicy(policy)"
+                  >
+                    <span
+                      class="flex size-10 shrink-0 items-center justify-center rounded-lg text-xl"
+                      [class]="providerIconClass(policy.providerCode)"
+                    >
+                      {{ providerIcon(policy.providerCode) }}
+                    </span>
+                    <span>
+                      <span class="block font-semibold text-neutral-900 dark:text-white">
+                        {{ policy.displayName }}
+                      </span>
+                      <span class="mt-1 block text-xs leading-5 text-neutral-500">
+                        {{ providerDescription(policy.providerCode) }}
+                      </span>
+                    </span>
+                  </button>
                 }
-              </select>
-            </label>
-            <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-              Nome interno
-              <input
-                class="form-input mt-1 w-full"
-                formControlName="name"
-                placeholder="Conta principal"
-              />
-            </label>
-            <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-              Prioridade
-              <input
-                type="number"
-                min="0"
-                class="form-input mt-1 w-full"
-                formControlName="priority"
-              />
-            </label>
-            <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-              Moeda
-              <input
-                maxlength="3"
-                class="form-input mt-1 w-full uppercase"
-                formControlName="currency"
-              />
-            </label>
-            <label class="text-sm font-medium text-neutral-700 md:col-span-2 dark:text-neutral-300">
-              Dados públicos (JSON)
-              <textarea
-                rows="6"
-                class="form-input mt-1 w-full font-mono text-xs"
-                formControlName="publicConfig"
-              ></textarea>
-              <span class="mt-1 block text-xs font-normal text-neutral-500">
-                {{ publicConfigHint() }}
-              </span>
-            </label>
-            <label class="text-sm font-medium text-neutral-700 md:col-span-2 dark:text-neutral-300">
-              Credenciais (JSON, opcional)
-              <textarea
-                rows="4"
-                class="form-input mt-1 w-full font-mono text-xs"
-                formControlName="credentials"
-                placeholder='{"webhookSecret":"..."}'
-                autocomplete="off"
-              ></textarea>
-              <span class="mt-1 block text-xs font-normal text-neutral-500">
-                @if (editing()?.hasCredentials) {
-                  Credencial configurada. Deixe vazio para preservá-la ou informe um objeto para
-                  substituir.
-                } @else {
-                  Segredos são enviados uma vez e não voltam a ser exibidos.
-                }
-              </span>
-            </label>
-            @if (formError()) {
-              <p role="alert" class="text-sm text-red-600 md:col-span-2">{{ formError() }}</p>
+              </div>
+            </fieldset>
+
+            <div
+              class="grid gap-4 rounded-xl border border-neutral-200 bg-neutral-50/70 p-4 md:grid-cols-4 dark:border-neutral-700 dark:bg-neutral-800/40"
+            >
+              <label
+                class="text-sm font-medium text-neutral-700 md:col-span-2 dark:text-neutral-300"
+              >
+                Nome para identificação
+                <input
+                  class="form-input mt-1 w-full"
+                  formControlName="name"
+                  placeholder="Ex.: PIX principal"
+                />
+                <span class="mt-1 block text-xs font-normal text-neutral-500">
+                  Visível apenas para sua equipe.
+                </span>
+              </label>
+              <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                Prioridade
+                <input
+                  type="number"
+                  min="0"
+                  class="form-input mt-1 w-full"
+                  formControlName="priority"
+                />
+              </label>
+              <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                Moeda
+                <input
+                  maxlength="3"
+                  class="form-input mt-1 w-full uppercase"
+                  formControlName="currency"
+                />
+              </label>
+            </div>
+
+            @if (selectedProvider() === 'PIX_MANUAL') {
+              <section
+                class="rounded-xl border border-cyan-200 bg-cyan-50/50 p-5 dark:border-cyan-900 dark:bg-cyan-950/20"
+              >
+                <div class="mb-5">
+                  <h4 class="font-semibold text-neutral-900 dark:text-white">Dados da chave PIX</h4>
+                  <p class="text-sm text-neutral-500">
+                    O pagador verá estes dados e enviará o comprovante para análise.
+                  </p>
+                </div>
+                <div class="grid gap-4 md:grid-cols-2">
+                  <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                    Tipo da chave
+                    <select class="form-input mt-1" formControlName="pixKeyType">
+                      <option value="CPF">CPF</option>
+                      <option value="CNPJ">CNPJ</option>
+                      <option value="EMAIL">E-mail</option>
+                      <option value="PHONE">Telefone</option>
+                      <option value="RANDOM">Chave aleatória</option>
+                    </select>
+                  </label>
+                  <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                    Chave PIX
+                    <input
+                      class="form-input mt-1"
+                      formControlName="pixKey"
+                      placeholder="Digite a chave"
+                    />
+                  </label>
+                  <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                    Nome do favorecido
+                    <input class="form-input mt-1" formControlName="beneficiaryName" />
+                  </label>
+                  <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                    CPF ou CNPJ do favorecido
+                    <input
+                      class="form-input mt-1"
+                      formControlName="beneficiaryDocument"
+                      inputmode="numeric"
+                    />
+                  </label>
+                </div>
+              </section>
             }
-            <div class="flex justify-end gap-2 md:col-span-2">
+
+            @if (selectedProvider() === 'BANK_TRANSFER_MANUAL' || selectedProvider() === 'MANUAL') {
+              <section
+                class="rounded-xl border border-blue-200 bg-blue-50/50 p-5 dark:border-blue-900 dark:bg-blue-950/20"
+              >
+                <div class="mb-5">
+                  <h4 class="font-semibold text-neutral-900 dark:text-white">Dados bancários</h4>
+                  <p class="text-sm text-neutral-500">
+                    Use uma conta apta a receber depósitos e transferências.
+                  </p>
+                </div>
+                <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                  <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                    Banco
+                    <input
+                      class="form-input mt-1"
+                      formControlName="bankName"
+                      placeholder="Nome ou código"
+                    />
+                  </label>
+                  <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                    Agência
+                    <input class="form-input mt-1" formControlName="agency" />
+                  </label>
+                  <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                    Conta com dígito
+                    <input class="form-input mt-1" formControlName="account" />
+                  </label>
+                  <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                    Tipo de conta
+                    <select class="form-input mt-1" formControlName="accountType">
+                      <option value="CHECKING">Conta corrente</option>
+                      <option value="SAVINGS">Conta poupança</option>
+                      <option value="PAYMENT">Conta de pagamento</option>
+                    </select>
+                  </label>
+                  <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                    Nome do titular
+                    <input class="form-input mt-1" formControlName="holderName" />
+                  </label>
+                  <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                    CPF ou CNPJ do titular
+                    <input
+                      class="form-input mt-1"
+                      formControlName="holderDocument"
+                      inputmode="numeric"
+                    />
+                  </label>
+                </div>
+              </section>
+            }
+
+            @if (selectedProvider() === 'MERCADO_PAGO') {
+              <section
+                class="rounded-xl border border-sky-200 bg-sky-50/50 p-5 dark:border-sky-900 dark:bg-sky-950/20"
+              >
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div>
+                    <h4 class="font-semibold text-neutral-900 dark:text-white">
+                      Integração Mercado Pago
+                    </h4>
+                    <p class="max-w-2xl text-sm text-neutral-500">
+                      Informe as credenciais de produção da conta que receberá os pagamentos.
+                    </p>
+                  </div>
+                  @if (editing()?.hasCredentials) {
+                    <span
+                      class="w-fit rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700"
+                    >
+                      Credenciais configuradas
+                    </span>
+                  }
+                </div>
+                <div class="mt-5 grid gap-4 md:grid-cols-2">
+                  <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                    Access token
+                    <input
+                      type="password"
+                      class="form-input mt-1"
+                      formControlName="accessToken"
+                      autocomplete="new-password"
+                      placeholder="{{
+                        editing()?.hasCredentials ? 'Deixe vazio para manter' : 'APP_USR-...'
+                      }}"
+                    />
+                  </label>
+                  <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                    Assinatura secreta do webhook
+                    <input
+                      type="password"
+                      class="form-input mt-1"
+                      formControlName="webhookSecret"
+                      autocomplete="new-password"
+                      placeholder="{{
+                        editing()?.hasCredentials
+                          ? 'Deixe vazio para manter'
+                          : 'Chave gerada no Mercado Pago'
+                      }}"
+                    />
+                  </label>
+                </div>
+                <div
+                  class="mt-4 rounded-lg border border-sky-200 bg-white/70 p-3 text-xs leading-5 text-neutral-600 dark:border-sky-900 dark:bg-neutral-900/40 dark:text-neutral-400"
+                >
+                  As credenciais são criptografadas pela API e nunca voltam a ser exibidas. Após
+                  salvar, use <strong>Validar</strong> para testar a conexão antes de ativar.
+                </div>
+              </section>
+            }
+
+            @if (selectedProvider() && selectedProvider() !== 'MERCADO_PAGO') {
+              <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                Instruções para o pagador
+                <textarea
+                  rows="4"
+                  class="form-input mt-1 resize-y"
+                  formControlName="instructions"
+                  placeholder="Explique como realizar o pagamento e enviar o comprovante."
+                ></textarea>
+              </label>
+            }
+
+            @if (formError()) {
+              <p
+                role="alert"
+                class="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700 dark:bg-red-950/30 dark:text-red-300"
+              >
+                {{ formError() }}
+              </p>
+            }
+            <div
+              class="sticky bottom-0 -mx-5 flex flex-col-reverse gap-2 border-t border-neutral-200 bg-white/95 px-5 py-4 backdrop-blur sm:flex-row sm:justify-end dark:border-neutral-700 dark:bg-neutral-900/95"
+            >
               <button type="button" class="btn-secondary" (click)="closeEditor()">Cancelar</button>
               <button
                 type="submit"
@@ -469,6 +653,7 @@ export class PaymentSettingsPage {
   readonly policyEditorOpen = signal(false);
   readonly suspendingId = signal<string | null>(null);
   readonly suspendReason = signal('');
+  readonly selectedProvider = signal<string | null>(null);
 
   readonly role = computed(() => this.appState.userRole() as PaymentSettingsRole);
   readonly isSuperAdmin = computed(() => this.role() === 'SUPER_ADMIN');
@@ -483,8 +668,19 @@ export class PaymentSettingsPage {
     name: ['', [Validators.required, Validators.minLength(2)]],
     priority: [0, [Validators.required, Validators.min(0)]],
     currency: ['BRL', [Validators.required, Validators.pattern(/^[A-Za-z]{3}$/)]],
-    publicConfig: ['{}', Validators.required],
-    credentials: [''],
+    instructions: [''],
+    pixKey: [''],
+    pixKeyType: ['EMAIL'],
+    beneficiaryName: [''],
+    beneficiaryDocument: [''],
+    bankName: [''],
+    agency: [''],
+    account: [''],
+    accountType: ['CHECKING'],
+    holderName: [''],
+    holderDocument: [''],
+    accessToken: [''],
+    webhookSecret: [''],
   });
 
   readonly policyForm = this.fb.nonNullable.group({
@@ -523,20 +719,34 @@ export class PaymentSettingsPage {
   openCreate(): void {
     this.editing.set(null);
     this.formError.set(null);
+    const firstPolicy = this.eligiblePolicies()[0];
     this.configurationForm.reset({
-      policyId: this.eligiblePolicies()[0]?.id ?? '',
+      policyId: firstPolicy?.id ?? '',
       name: '',
       priority: 0,
       currency: 'BRL',
-      publicConfig: this.defaultPublicConfig(this.eligiblePolicies()[0]),
-      credentials: '',
+      instructions: '',
+      pixKey: '',
+      pixKeyType: 'EMAIL',
+      beneficiaryName: '',
+      beneficiaryDocument: '',
+      bankName: '',
+      agency: '',
+      account: '',
+      accountType: 'CHECKING',
+      holderName: '',
+      holderDocument: '',
+      accessToken: '',
+      webhookSecret: '',
     });
+    this.selectedProvider.set(firstPolicy?.providerCode ?? null);
     this.configurationForm.controls.policyId.enable();
     this.configurationForm.controls.currency.enable();
     this.editorOpen.set(true);
   }
 
   openEdit(configuration: PaymentConfiguration): void {
+    const config = configuration.publicConfig;
     this.editing.set(configuration);
     this.formError.set(null);
     this.configurationForm.reset({
@@ -544,9 +754,21 @@ export class PaymentSettingsPage {
       name: configuration.name,
       priority: configuration.priority,
       currency: configuration.currency,
-      publicConfig: JSON.stringify(configuration.publicConfig, null, 2),
-      credentials: '',
+      instructions: this.configValue(config, 'instructions'),
+      pixKey: this.configValue(config, 'pixKey'),
+      pixKeyType: this.configValue(config, 'pixKeyType') || 'EMAIL',
+      beneficiaryName: this.configValue(config, 'beneficiaryName'),
+      beneficiaryDocument: this.configValue(config, 'beneficiaryDocument'),
+      bankName: this.configValue(config, 'bankName'),
+      agency: this.configValue(config, 'agency'),
+      account: this.configValue(config, 'account'),
+      accountType: this.configValue(config, 'accountType') || 'CHECKING',
+      holderName: this.configValue(config, 'holderName'),
+      holderDocument: this.configValue(config, 'holderDocument'),
+      accessToken: '',
+      webhookSecret: '',
     });
+    this.selectedProvider.set(configuration.policy.providerCode);
     this.configurationForm.controls.policyId.disable();
     this.configurationForm.controls.currency.disable();
     this.editorOpen.set(true);
@@ -556,25 +778,26 @@ export class PaymentSettingsPage {
     this.editorOpen.set(false);
     this.editing.set(null);
     this.formError.set(null);
+    this.selectedProvider.set(null);
   }
 
   saveConfiguration(): void {
     if (this.configurationForm.invalid || this.busy()) return;
-    let publicConfig: Record<string, unknown>;
-    let credentials: Record<string, unknown> | undefined;
-    try {
-      publicConfig = this.parseObject(
-        this.configurationForm.getRawValue().publicConfig,
-        'Dados públicos',
-      );
-      const credentialsText = this.configurationForm.getRawValue().credentials.trim();
-      credentials = credentialsText ? this.parseObject(credentialsText, 'Credenciais') : undefined;
-    } catch (error) {
-      this.formError.set((error as Error).message);
+    const values = this.configurationForm.getRawValue();
+    const provider = this.selectedProvider();
+    const validationError = this.validateProviderFields(provider, values);
+    if (validationError) {
+      this.formError.set(validationError);
       return;
     }
-
-    const values = this.configurationForm.getRawValue();
+    const publicConfig = this.buildPublicConfig(provider, values);
+    const credentials =
+      provider === 'MERCADO_PAGO' && (values.accessToken.trim() || values.webhookSecret.trim())
+        ? {
+            accessToken: values.accessToken.trim(),
+            webhookSecret: values.webhookSecret.trim(),
+          }
+        : undefined;
     const current = this.editing();
     const request = current
       ? this.service.updateConfiguration(this.role(), current.id, {
@@ -679,6 +902,39 @@ export class PaymentSettingsPage {
     return { MANUAL: 'Manual', PIX: 'PIX', PROVIDER: 'Provedor' }[type];
   }
 
+  selectPolicy(policy: PaymentMethodPolicy): void {
+    if (this.editing()) return;
+    this.configurationForm.controls.policyId.setValue(policy.id);
+    this.selectedProvider.set(policy.providerCode);
+    this.formError.set(null);
+  }
+
+  providerIcon(providerCode: string): string {
+    if (providerCode === 'PIX_MANUAL') return '◆';
+    if (providerCode === 'MERCADO_PAGO') return 'MP';
+    if (providerCode === 'BANK_TRANSFER_MANUAL' || providerCode === 'MANUAL') return '▤';
+    return '◉';
+  }
+
+  providerIconClass(providerCode: string): string {
+    if (providerCode === 'PIX_MANUAL') {
+      return 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/40 dark:text-cyan-300';
+    }
+    if (providerCode === 'MERCADO_PAGO') {
+      return 'bg-sky-100 text-xs font-black text-sky-700 dark:bg-sky-900/40 dark:text-sky-300';
+    }
+    return 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300';
+  }
+
+  providerDescription(providerCode: string): string {
+    if (providerCode === 'PIX_MANUAL') return 'Chave PIX com análise manual do comprovante.';
+    if (providerCode === 'MERCADO_PAGO') return 'Checkout automático e atualização de status.';
+    if (providerCode === 'BANK_TRANSFER_MANUAL' || providerCode === 'MANUAL') {
+      return 'Depósito ou transferência com comprovante.';
+    }
+    return 'Integração de pagamento autorizada.';
+  }
+
   flagClass(enabled: boolean): string {
     return enabled
       ? 'rounded-full bg-emerald-100 px-2.5 py-1 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300'
@@ -691,41 +947,79 @@ export class PaymentSettingsPage {
     );
   }
 
-  publicConfigHint(): string {
-    const policy = this.policies().find(
-      (item) => item.id === this.configurationForm.getRawValue().policyId,
-    );
-    if (policy?.providerCode === 'PIX_MANUAL') {
-      return 'Informe instructions, pixKey e beneficiaryName.';
-    }
-    if (policy?.providerCode === 'MANUAL') return 'Informe ao menos instructions.';
-    if (policy?.providerCode === 'GENERIC_WEBHOOK') {
-      return 'As instruções públicas são opcionais; informe webhookSecret nas credenciais.';
-    }
-    return 'Informe um objeto conforme o contrato do provedor.';
+  private configValue(config: Record<string, unknown>, key: string): string {
+    const value = config[key];
+    return typeof value === 'string' ? value : '';
   }
 
-  private defaultPublicConfig(policy?: PaymentMethodPolicy): string {
-    if (policy?.providerCode === 'PIX_MANUAL') {
-      return JSON.stringify({ instructions: '', pixKey: '', beneficiaryName: '' }, null, 2);
+  private validateProviderFields(
+    provider: string | null,
+    values: ReturnType<typeof this.configurationForm.getRawValue>,
+  ): string | null {
+    if (!provider) return 'Selecione uma modalidade de pagamento.';
+    if (provider === 'PIX_MANUAL') {
+      if (
+        !values.pixKey.trim() ||
+        !values.beneficiaryName.trim() ||
+        !values.beneficiaryDocument.trim() ||
+        !values.instructions.trim()
+      ) {
+        return 'Preencha a chave PIX, o favorecido, o documento e as instruções.';
+      }
     }
-    if (policy?.providerCode === 'MANUAL') {
-      return JSON.stringify({ instructions: '' }, null, 2);
+    if (provider === 'BANK_TRANSFER_MANUAL' || provider === 'MANUAL') {
+      if (
+        !values.bankName.trim() ||
+        !values.agency.trim() ||
+        !values.account.trim() ||
+        !values.holderName.trim() ||
+        !values.holderDocument.trim() ||
+        !values.instructions.trim()
+      ) {
+        return 'Preencha todos os dados bancários e as instruções para o pagador.';
+      }
     }
-    return '{}';
+    if (
+      provider === 'MERCADO_PAGO' &&
+      !this.editing()?.hasCredentials &&
+      (!values.accessToken.trim() || !values.webhookSecret.trim())
+    ) {
+      return 'Informe o access token e a assinatura secreta do webhook.';
+    }
+    if (
+      provider === 'MERCADO_PAGO' &&
+      Boolean(values.accessToken.trim()) !== Boolean(values.webhookSecret.trim())
+    ) {
+      return 'Para substituir credenciais, informe o access token e a assinatura secreta.';
+    }
+    return null;
   }
 
-  private parseObject(value: string, label: string): Record<string, unknown> {
-    let parsed: unknown;
-    try {
-      parsed = JSON.parse(value);
-    } catch {
-      throw new Error(`${label}: informe um JSON válido.`);
+  private buildPublicConfig(
+    provider: string | null,
+    values: ReturnType<typeof this.configurationForm.getRawValue>,
+  ): Record<string, unknown> {
+    if (provider === 'PIX_MANUAL') {
+      return {
+        instructions: values.instructions.trim(),
+        pixKey: values.pixKey.trim(),
+        pixKeyType: values.pixKeyType,
+        beneficiaryName: values.beneficiaryName.trim(),
+        beneficiaryDocument: values.beneficiaryDocument.trim(),
+      };
     }
-    if (!parsed || Array.isArray(parsed) || typeof parsed !== 'object') {
-      throw new Error(`${label}: o valor deve ser um objeto JSON.`);
+    if (provider === 'BANK_TRANSFER_MANUAL' || provider === 'MANUAL') {
+      return {
+        instructions: values.instructions.trim(),
+        bankName: values.bankName.trim(),
+        agency: values.agency.trim(),
+        account: values.account.trim(),
+        accountType: values.accountType,
+        holderName: values.holderName.trim(),
+        holderDocument: values.holderDocument.trim(),
+      };
     }
-    return parsed as Record<string, unknown>;
+    return {};
   }
 
   private runMutation(

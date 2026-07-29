@@ -12,7 +12,10 @@ import { AppStateService } from '../../../../core/services/app-state';
         <h1 class="text-3xl font-bold text-neutral-900 dark:text-white">Configurações</h1>
         <p class="mt-1 text-sm text-neutral-500">Preferências e informações da sua conta.</p>
 
-        <nav class="mt-6 flex gap-1 border-b border-neutral-200 dark:border-neutral-700">
+        <nav
+          class="mt-6 flex gap-1 overflow-x-auto border-b border-neutral-200 dark:border-neutral-700"
+          aria-label="Seções das configurações"
+        >
           <a
             routerLink="geral"
             routerLinkActive="border-b-2 border-neutral-900 dark:border-white text-neutral-900 dark:text-white font-semibold"
@@ -31,7 +34,7 @@ import { AppStateService } from '../../../../core/services/app-state';
             <a
               routerLink="pronuncias"
               routerLinkActive="border-b-2 border-neutral-900 dark:border-white text-neutral-900 dark:text-white font-semibold"
-              class="px-4 pb-3 text-sm text-neutral-500 transition-colors hover:text-neutral-700 dark:hover:text-neutral-300"
+              class="shrink-0 px-4 pb-3 text-sm text-neutral-500 transition-colors hover:text-neutral-700 dark:hover:text-neutral-300"
             >
               Pronúncias
             </a>
@@ -46,7 +49,7 @@ import { AppStateService } from '../../../../core/services/app-state';
               routerLinkActive="border-b-2 border-neutral-900 dark:border-white text-neutral-900 dark:text-white font-semibold"
               class="px-4 pb-3 text-sm text-neutral-500 transition-colors hover:text-neutral-700 dark:hover:text-neutral-300"
             >
-              Pagamento
+              Pagamentos
             </a>
           }
         </nav>

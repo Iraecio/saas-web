@@ -24,6 +24,11 @@ export const SETTINGS_ROUTES: Routes = [
           import('../pronunciations/pages/library/library').then((m) => m.PronunciationLibraryPage),
       },
       {
+        path: 'pagamento',
+        canActivate: [roleGuard(['SUPER_ADMIN', 'RESELLER', 'RESELLER_MANAGER'])],
+        loadComponent: () => import('./pages/payment/payment').then((m) => m.PaymentSettingsPage),
+      },
+      {
         path: 'ui-kit',
         loadComponent: () => import('./pages/ui-kit/ui-kit').then((m) => m.UiKitComponent),
       },

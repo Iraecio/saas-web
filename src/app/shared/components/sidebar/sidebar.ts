@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, input } from '@an
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AppStateService } from '../../../core/services/app-state';
 import { UserRole } from '../../../core/models/user.model';
+import { ImpersonationService } from '../../../core/services/impersonation';
 
 interface MenuItem {
   icon: string;
@@ -174,14 +175,16 @@ const DIRECT_CLIENT_MENU: MenuItem[] = [
 export class SidebarComponent {
   readonly open = input(true);
   protected readonly appState = inject(AppStateService);
+  protected readonly inspection = inject(ImpersonationService);
 
   readonly widthClasses = computed(() => (this.open() ? 'w-64' : 'w-20'));
 
   readonly menuItems = computed((): MenuItem[] => {
     const user = this.appState.user();
     if (!user?.role) return [];
-    if (user.role === 'CLIENT' && !user.resellerId) return DIRECT_CLIENT_MENU;
-    return MENU_BY_ROLE[user.role] ?? [];
+    const role = this.inspection.effectiveRole() ?? user.role;
+    if (role === 'CLIENT' && !user.resellerId) return DIRECT_CLIENT_MENU;
+    return MENU_BY_ROLE[role] ?? [];
   });
 
   readonly roleLabel = computed((): string => {
@@ -194,7 +197,7 @@ export class SidebarComponent {
       PRODUCER: 'Produtor',
       CLIENT: 'Cliente',
     };
-    const role = this.appState.userRole();
+    const role = this.inspection.effectiveRole() ?? this.appState.userRole();
     return role && role !== 'CLIENT' ? labels[role] : '';
   });
 }

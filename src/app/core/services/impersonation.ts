@@ -3,6 +3,7 @@ import { computed, inject, Injectable, PLATFORM_ID, signal } from '@angular/core
 import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
 import { InspectionSession } from '../models/professional-admin.model';
+import { UserRole } from '../models/user.model';
 import { ApiService } from './api';
 
 const STORAGE_KEY = 'saas-web.inspection';
@@ -18,6 +19,9 @@ export class ImpersonationService {
   readonly active = computed(() => !!this.sessionSignal() && !this.expired());
   readonly token = computed(() =>
     this.active() ? (this.sessionSignal()?.inspectionToken ?? null) : null,
+  );
+  readonly effectiveRole = computed<UserRole | null>(
+    () => this.sessionSignal()?.target.role ?? null,
   );
 
   start(targetUserId: string, reason: string): Observable<InspectionSession> {

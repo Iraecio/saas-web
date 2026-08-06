@@ -19,9 +19,7 @@ export interface Service {
   ownerId: string | null; // null = GLOBAL (plataforma)
   creditCost: number; // inteiro >= 1
   creditType: CreditType; // derivado do scope
-  professionalPayout?: number; // centavos; só visível p/ profissional/admin
-  maxDurationSeconds?: number; // opcional
-  defaultDeliveryHours: number;
+  defaultPayoutCents: number;
   maxRevisions: number;
   isActive: boolean;
   createdById?: string;
@@ -35,13 +33,11 @@ export interface CreateServiceDto {
   professionalRole: ProfessionalRole;
   scope?: ServiceScope; // ADMIN: GLOBAL; RESELLER: inferido PARTICULAR
   creditCost: number;
-  professionalPayout?: number; // obrigatório quando scope = GLOBAL
-  maxDurationSeconds?: number;
-  defaultDeliveryHours: number;
+  defaultPayoutCents: number;
   maxRevisions: number;
 }
 
-// `confirmImpact` é obrigatório ao alterar creditCost/defaultDeliveryHours/maxRevisions.
+// `confirmImpact` é obrigatório ao alterar creditCost/maxRevisions.
 export interface UpdateServiceDto extends Partial<CreateServiceDto> {
   confirmImpact?: boolean;
 }
@@ -61,4 +57,7 @@ export interface ServiceListFilters {
   professionalRole?: ProfessionalRole;
   ownerId?: string; // apenas ADMIN
   includeInactive?: boolean; // ADMIN / RESELLER (próprios)
+  search?: string;
+  scope?: ServiceScope;
+  active?: boolean;
 }

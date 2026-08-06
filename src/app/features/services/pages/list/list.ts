@@ -12,10 +12,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AppStateService } from '../../../../core/services/app-state';
 import { NotificationService } from '../../../../core/services/notification';
 import { ServiceCatalogService } from '../../services/service-catalog';
-import {
-  ProfessionalRole,
-  Service,
-} from '../../../../core/models/service.model';
+import { ProfessionalRole, Service } from '../../../../core/models/service.model';
 
 @Component({
   selector: 'app-services-list',
@@ -58,7 +55,9 @@ import {
 
       @if (loading()) {
         <div class="flex justify-center py-12">
-          <div class="w-6 h-6 border-2 border-neutral-400 border-t-transparent rounded-full animate-spin"></div>
+          <div
+            class="w-6 h-6 border-2 border-neutral-400 border-t-transparent rounded-full animate-spin"
+          ></div>
         </div>
       } @else if (services().length === 0) {
         <p class="py-12 text-center text-sm text-neutral-500">Nenhum serviço encontrado.</p>
@@ -71,7 +70,6 @@ import {
                 <th class="px-4 py-3 font-medium">Tipo</th>
                 <th class="px-4 py-3 font-medium">Escopo</th>
                 <th class="px-4 py-3 font-medium text-right">Créditos</th>
-                <th class="px-4 py-3 font-medium text-right">Prazo (h)</th>
                 <th class="px-4 py-3 font-medium text-center">Revisões</th>
                 <th class="px-4 py-3 font-medium text-center">Status</th>
                 <th class="px-4 py-3"></th>
@@ -80,27 +78,54 @@ import {
             <tbody class="divide-y divide-neutral-200 dark:divide-neutral-800">
               @for (svc of services(); track svc.id) {
                 <tr class="bg-white dark:bg-neutral-950">
-                  <td class="px-4 py-3 font-medium text-neutral-900 dark:text-white">{{ svc.name }}</td>
-                  <td class="px-4 py-3">{{ svc.professionalRole === 'VOICE_ACTOR' ? 'Locução' : 'Produção' }}</td>
+                  <td class="px-4 py-3 font-medium text-neutral-900 dark:text-white">
+                    {{ svc.name }}
+                  </td>
+                  <td class="px-4 py-3">
+                    {{ svc.professionalRole === 'VOICE_ACTOR' ? 'Locução' : 'Produção' }}
+                  </td>
                   <td class="px-4 py-3">{{ svc.scope === 'GLOBAL' ? 'Global' : 'Particular' }}</td>
                   <td class="px-4 py-3 text-right">{{ svc.creditCost | number }}</td>
-                  <td class="px-4 py-3 text-right">{{ svc.defaultDeliveryHours }}</td>
                   <td class="px-4 py-3 text-center">{{ svc.maxRevisions }}</td>
                   <td class="px-4 py-3 text-center">
                     @if (svc.isActive) {
-                      <span class="inline-flex rounded-full bg-green-100 px-2 py-0.5 text-xs text-green-700 dark:bg-green-900/30 dark:text-green-400">Ativo</span>
+                      <span
+                        class="inline-flex rounded-full bg-green-100 px-2 py-0.5 text-xs text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                        >Ativo</span
+                      >
                     } @else {
-                      <span class="inline-flex rounded-full bg-neutral-200 px-2 py-0.5 text-xs text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400">Inativo</span>
+                      <span
+                        class="inline-flex rounded-full bg-neutral-200 px-2 py-0.5 text-xs text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400"
+                        >Inativo</span
+                      >
                     }
                   </td>
                   <td class="px-4 py-3 text-right whitespace-nowrap">
-                    <a [routerLink]="['../services', svc.id, 'audit']" class="text-xs text-blue-600 hover:underline dark:text-blue-400">Histórico</a>
+                    <a
+                      [routerLink]="['../services', svc.id, 'audit']"
+                      class="text-xs text-blue-600 hover:underline dark:text-blue-400"
+                      >Histórico</a
+                    >
                     @if (canManage(svc)) {
-                      <a [routerLink]="['../services', svc.id, 'edit']" class="ml-3 text-xs text-blue-600 hover:underline dark:text-blue-400">Editar</a>
+                      <a
+                        [routerLink]="['../services', svc.id, 'edit']"
+                        class="ml-3 text-xs text-blue-600 hover:underline dark:text-blue-400"
+                        >Editar</a
+                      >
                       @if (svc.isActive) {
-                        <button class="ml-3 text-xs text-red-600 hover:underline" (click)="deactivate(svc)">Inativar</button>
+                        <button
+                          class="ml-3 text-xs text-red-600 hover:underline"
+                          (click)="deactivate(svc)"
+                        >
+                          Inativar
+                        </button>
                       } @else {
-                        <button class="ml-3 text-xs text-green-600 hover:underline" (click)="activate(svc)">Reativar</button>
+                        <button
+                          class="ml-3 text-xs text-green-600 hover:underline"
+                          (click)="activate(svc)"
+                        >
+                          Reativar
+                        </button>
                       }
                     }
                   </td>

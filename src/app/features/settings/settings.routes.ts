@@ -29,6 +29,12 @@ export const SETTINGS_ROUTES: Routes = [
         loadComponent: () => import('./pages/payment/payment').then((m) => m.PaymentSettingsPage),
       },
       {
+        path: 'valor-creditos',
+        canActivate: [roleGuard(['SUPER_ADMIN'])],
+        loadComponent: () =>
+          import('./pages/credit-price/credit-price').then((m) => m.CreditPriceSettingsPage),
+      },
+      {
         path: 'ui-kit',
         loadComponent: () => import('./pages/ui-kit/ui-kit').then((m) => m.UiKitComponent),
       },

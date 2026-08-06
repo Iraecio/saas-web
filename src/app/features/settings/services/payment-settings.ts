@@ -64,6 +64,13 @@ export class PaymentSettingsService {
     });
   }
 
+  deactivateConfiguration(id: string): Observable<PaymentConfiguration> {
+    return this.api.post<PaymentConfiguration>(
+      `/admin/payment-configurations/${id}/deactivate`,
+      {},
+    );
+  }
+
   private action(
     role: PaymentSettingsRole,
     id: string,

@@ -5,6 +5,9 @@ import {
   Professional,
   ProfessionalListFilters,
   ProfessionalListResponse,
+  ProfessionalOffering,
+  ProposeServicePriceDto,
+  ServicePriceNegotiation,
   SetScopeDto,
 } from '../../../core/models/professional.model';
 
@@ -32,21 +35,68 @@ export class ProfessionalService {
   private readonly api = inject(ApiService);
 
   listVoiceActors(filters?: ProfessionalListFilters): Observable<ProfessionalListResponse> {
-    return this.api.get<ProfessionalApiResponse>(
-      '/professionals/voice-actors',
-      this.toParams(filters),
-    ).pipe(map((response) => this.normalizeResponse(response, filters)));
+    return this.api
+      .get<ProfessionalApiResponse>('/professionals/voice-actors', this.toParams(filters))
+      .pipe(map((response) => this.normalizeResponse(response, filters)));
   }
 
   listProducers(filters?: ProfessionalListFilters): Observable<ProfessionalListResponse> {
-    return this.api.get<ProfessionalApiResponse>(
-      '/professionals/producers',
-      this.toParams(filters),
-    ).pipe(map((response) => this.normalizeResponse(response, filters)));
+    return this.api
+      .get<ProfessionalApiResponse>('/professionals/producers', this.toParams(filters))
+      .pipe(map((response) => this.normalizeResponse(response, filters)));
   }
 
   setScope(type: ProfessionalType, id: string, dto: SetScopeDto): Observable<Professional> {
     return this.api.put<Professional>(`/professionals/${type}/${id}/scope`, dto);
+  }
+
+  listOfferings(professionalId: string): Observable<ProfessionalOffering[]> {
+    return this.api.get<ProfessionalOffering[]>(`/professionals/${professionalId}/services`);
+  }
+
+  setOfferingActive(
+    professionalId: string,
+    serviceId: string,
+    active: boolean,
+  ): Observable<ProfessionalOffering> {
+    const action = active ? 'activate' : 'deactivate';
+    return this.api.patch<ProfessionalOffering>(
+      `/professionals/${professionalId}/services/${serviceId}/${action}`,
+      {},
+    );
+  }
+
+  proposePrice(
+    professionalId: string,
+    serviceId: string,
+    dto: ProposeServicePriceDto,
+  ): Observable<ServicePriceNegotiation> {
+    return this.api.post<ServicePriceNegotiation>(
+      `/professionals/${professionalId}/services/${serviceId}/negotiations`,
+      dto,
+    );
+  }
+
+  listNegotiations(
+    professionalId: string,
+    serviceId: string,
+  ): Observable<ServicePriceNegotiation[]> {
+    return this.api.get<ServicePriceNegotiation[]>(
+      `/professionals/${professionalId}/services/${serviceId}/negotiations`,
+    );
+  }
+
+  decideNegotiation(
+    professionalId: string,
+    serviceId: string,
+    negotiationId: string,
+    decision: 'accept' | 'reject',
+    notes?: string,
+  ): Observable<ServicePriceNegotiation> {
+    return this.api.post<ServicePriceNegotiation>(
+      `/professionals/${professionalId}/services/${serviceId}/negotiations/${negotiationId}/${decision}`,
+      notes ? { notes } : {},
+    );
   }
 
   private toParams(filters?: ProfessionalListFilters): Record<string, string | number> {
@@ -67,7 +117,8 @@ export class ProfessionalService {
         ...profile,
         name: profile.name ?? user?.name ?? user?.email ?? 'Profissional',
         avatarUrl: profile.avatarUrl ?? user?.avatarUrl ?? null,
-        demoUrl: profile.demoUrl ?? profile.voiceSamplesUrls?.[0] ?? profile.portfolioUrls?.[0] ?? null,
+        demoUrl:
+          profile.demoUrl ?? profile.voiceSamplesUrls?.[0] ?? profile.portfolioUrls?.[0] ?? null,
         resellerId: profile.resellerId ?? user?.resellerId ?? null,
       })),
       pagination: response.pagination ?? {

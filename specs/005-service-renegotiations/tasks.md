@@ -12,11 +12,11 @@
 
 **Purpose**: Alinhar contratos, rotas e estrutura antes da implementação visual.
 
-- [ ] T001 Confirm the aggregate negotiation response against `specs/005-service-renegotiations/contracts/admin-negotiations-api.md`
-- [ ] T002 [P] Add the feature component directories described by the plan under `src/app/features/services/components/`
-- [ ] T003 [P] Add shared negotiation types and filter defaults in `src/app/core/models/service-negotiation.model.ts`
-- [ ] T004 Add the aggregate manager queue and detail endpoints in `../saas-api/src/modules/professional-pricing/professional-pricing.controller.ts`
-- [ ] T005 Add scoped aggregate query implementation and counters in `../saas-api/src/modules/professional-pricing/professional-pricing.service.ts`
+- [x] T001 Confirm the aggregate negotiation response against `specs/005-service-renegotiations/contracts/admin-negotiations-api.md`
+- [x] T002 [P] Add the feature component directories described by the plan under `src/app/features/services/components/`
+- [x] T003 [P] Add shared negotiation types and filter defaults in `src/app/core/models/service-negotiation.model.ts`
+- [x] T004 Add the aggregate manager queue and detail endpoints in `../saas-api/src/modules/professional-pricing/professional-pricing.controller.ts`
+- [x] T005 Add scoped aggregate query implementation and counters in `../saas-api/src/modules/professional-pricing/professional-pricing.service.ts`
 - [ ] T006 Add API tests for global and reseller isolation in `../saas-api/src/modules/professional-pricing/professional-pricing.service.spec.ts`
 
 ---
@@ -27,14 +27,14 @@
 
 **⚠️ CRITICAL**: No user story work starts before this phase is complete.
 
-- [ ] T007 Write negotiation service contract tests for list, detail, accept, reject and counter paths in `src/app/features/services/services/service-negotiation.spec.ts`
-- [ ] T008 Implement the typed negotiation API client and query serialization in `src/app/features/services/services/service-negotiation.ts`
+- [x] T007 Write negotiation service contract tests for list, detail, accept, reject and counter paths in `src/app/features/services/services/service-negotiation.spec.ts`
+- [x] T008 Implement the typed negotiation API client and query serialization in `src/app/features/services/services/service-negotiation.ts`
 - [ ] T009 [P] Extend catalog service tests for search, scope, active state and mutation refresh behavior in `src/app/features/services/services/service-catalog.spec.ts`
-- [ ] T010 Extend catalog list filtering without changing existing mutation contracts in `src/app/features/services/services/service-catalog.ts`
-- [ ] T011 Create the tabbed catalog orchestration page and query-parameter state in `src/app/features/services/pages/catalog/catalog.ts`
-- [ ] T012 Point the services root route to the catalog orchestration page while preserving form and audit routes in `src/app/features/services/services.routes.ts`
-- [ ] T013 Create shared status, role, money and next-actor presentation helpers in `src/app/features/services/services/service-negotiation.presentation.ts`
-- [ ] T014 Write unit tests for negotiation action eligibility and presentation helpers in `src/app/features/services/services/service-negotiation.presentation.spec.ts`
+- [x] T010 Extend catalog list filtering without changing existing mutation contracts in `src/app/features/services/services/service-catalog.ts`
+- [x] T011 Create the tabbed catalog orchestration page and query-parameter state in `src/app/features/services/pages/catalog/catalog.ts`
+- [x] T012 Point the services root route to the catalog orchestration page while preserving form and audit routes in `src/app/features/services/services.routes.ts`
+- [x] T013 Create shared status, role, money and next-actor presentation helpers in `src/app/features/services/services/service-negotiation.presentation.ts`
+- [x] T014 Write unit tests for negotiation action eligibility and presentation helpers in `src/app/features/services/services/service-negotiation.presentation.spec.ts`
 
 **Checkpoint**: API contract, frontend client, route and navigation state are ready.
 
@@ -53,12 +53,12 @@
 
 ### Implementation for User Story 1
 
-- [ ] T017 [P] [US1] Build reusable service summary metrics in `src/app/features/services/components/service-summary/service-summary.ts`
-- [ ] T018 [US1] Build desktop table and mobile service cards with search, filters and action menus in `src/app/features/services/components/service-list/service-list.ts`
-- [ ] T019 [US1] Integrate service summary, loading skeletons, contextual empty/error states and refresh into `src/app/features/services/pages/catalog/catalog.ts`
-- [ ] T020 [US1] Modernize responsive fields, impact confirmation and inline validation in `src/app/features/services/pages/form/form.ts`
-- [ ] T021 [US1] Modernize the service audit timeline and responsive back navigation in `src/app/features/services/pages/audit/audit.ts`
-- [ ] T022 [US1] Verify owner-based action visibility for superadmin, reseller and reseller manager in `src/app/features/services/components/service-list/service-list.ts`
+- [x] T017 [P] [US1] Build reusable service summary metrics in `src/app/features/services/components/service-summary/service-summary.ts`
+- [x] T018 [US1] Build desktop table and mobile service cards with search, filters and action menus in `src/app/features/services/components/service-list/service-list.ts`
+- [x] T019 [US1] Integrate service summary, loading skeletons, contextual empty/error states and refresh into `src/app/features/services/pages/catalog/catalog.ts`
+- [x] T020 [US1] Modernize responsive fields, impact confirmation and inline validation in `src/app/features/services/pages/form/form.ts`
+- [x] T021 [US1] Modernize the service audit timeline and responsive back navigation in `src/app/features/services/pages/audit/audit.ts`
+- [x] T022 [US1] Verify owner-based action visibility for superadmin, reseller and reseller manager in `src/app/features/services/components/service-list/service-list.ts`
 
 **Checkpoint**: User Story 1 is deployable as an independently useful catalog-management redesign.
 
@@ -77,12 +77,12 @@
 
 ### Implementation for User Story 2
 
-- [ ] T025 [P] [US2] Build negotiation summary counters and loading states in `src/app/features/services/components/service-summary/negotiation-summary.ts`
-- [ ] T026 [US2] Build the paginated desktop queue and mobile cards with professional, service, price, variation and next-actor context in `src/app/features/services/components/negotiation-list/negotiation-list.ts`
-- [ ] T027 [US2] Implement accept confirmation and authoritative response refresh in `src/app/features/services/components/negotiation-detail/negotiation-detail.ts`
-- [ ] T028 [US2] Implement rejection form with required reason and preserved current price in `src/app/features/services/components/negotiation-detail/negotiation-detail.ts`
-- [ ] T029 [US2] Implement counterproposal form with currency conversion, validation and pending-professional state in `src/app/features/services/components/negotiation-detail/negotiation-detail.ts`
-- [ ] T030 [US2] Integrate queue filters, pagination, counters, detail selection and retry states into `src/app/features/services/pages/catalog/catalog.ts`
+- [x] T025 [P] [US2] Build negotiation summary counters and loading states in `src/app/features/services/components/service-summary/negotiation-summary.ts`
+- [x] T026 [US2] Build the paginated desktop queue and mobile cards with professional, service, price, variation and next-actor context in `src/app/features/services/components/negotiation-list/negotiation-list.ts`
+- [x] T027 [US2] Implement accept confirmation and authoritative response refresh in `src/app/features/services/components/negotiation-detail/negotiation-detail.ts`
+- [x] T028 [US2] Implement rejection form with required reason and preserved current price in `src/app/features/services/components/negotiation-detail/negotiation-detail.ts`
+- [x] T029 [US2] Implement counterproposal form with currency conversion, validation and pending-professional state in `src/app/features/services/components/negotiation-detail/negotiation-detail.ts`
+- [x] T030 [US2] Integrate queue filters, pagination, counters, detail selection and retry states into `src/app/features/services/pages/catalog/catalog.ts`
 
 **Checkpoint**: User Stories 1 and 2 work independently; negotiation decisions use official API responses.
 
@@ -100,9 +100,9 @@
 
 ### Implementation for User Story 3
 
-- [ ] T032 [US3] Build the linked chronological timeline and current-step emphasis in `src/app/features/services/components/negotiation-detail/negotiation-detail.ts`
-- [ ] T033 [US3] Add direct-link restoration for an open negotiation and safe fallback when it is unavailable in `src/app/features/services/pages/catalog/catalog.ts`
-- [ ] T034 [US3] Add finalized-history filters and APPLIED/ACCEPTED/REJECTED/COUNTERED presentation in `src/app/features/services/components/negotiation-list/negotiation-list.ts`
+- [x] T032 [US3] Build the linked chronological timeline and current-step emphasis in `src/app/features/services/components/negotiation-detail/negotiation-detail.ts`
+- [x] T033 [US3] Add direct-link restoration for an open negotiation and safe fallback when it is unavailable in `src/app/features/services/pages/catalog/catalog.ts`
+- [x] T034 [US3] Add finalized-history filters and APPLIED/ACCEPTED/REJECTED/COUNTERED presentation in `src/app/features/services/components/negotiation-list/negotiation-list.ts`
 
 **Checkpoint**: The manager can audit the complete lifecycle without leaving the catalog area.
 
@@ -121,10 +121,10 @@
 
 ### Implementation for User Story 4
 
-- [ ] T037 [US4] Implement semantic tablist behavior, arrow-key navigation and visible focus in `src/app/features/services/pages/catalog/catalog.ts`
-- [ ] T038 [US4] Implement responsive drawer focus management, close behavior and focus return in `src/app/features/services/components/negotiation-detail/negotiation-detail.ts`
-- [ ] T039 [US4] Replace hardcoded catalog colors with light/dark design tokens and reduced-motion-safe transitions in `src/styles.scss`
-- [ ] T040 [US4] Verify 44px touch targets, no required horizontal scrolling and equivalent mobile actions in `src/app/features/services/components/negotiation-list/negotiation-list.ts`
+- [x] T037 [US4] Implement semantic tablist behavior, arrow-key navigation and visible focus in `src/app/features/services/pages/catalog/catalog.ts`
+- [x] T038 [US4] Implement responsive drawer focus management, close behavior and focus return in `src/app/features/services/components/negotiation-detail/negotiation-detail.ts`
+- [x] T039 [US4] Replace hardcoded catalog colors with light/dark design tokens and reduced-motion-safe transitions in `src/styles.scss`
+- [x] T040 [US4] Verify 44px touch targets, no required horizontal scrolling and equivalent mobile actions in `src/app/features/services/components/negotiation-list/negotiation-list.ts`
 
 **Checkpoint**: All stories meet responsive, theme and keyboard requirements.
 
@@ -134,10 +134,10 @@
 
 **Purpose**: Final contract, regression, quality and documentation gates.
 
-- [ ] T041 [P] Add Portuguese copy review and consistent direct success/error messages in `src/app/features/services/`
-- [ ] T042 [P] Add service-management and negotiation examples to `specs/005-service-renegotiations/quickstart.md`
+- [x] T041 [P] Add Portuguese copy review and consistent direct success/error messages in `src/app/features/services/`
+- [x] T042 [P] Add service-management and negotiation examples to `specs/005-service-renegotiations/quickstart.md`
 - [ ] T043 Run focused Vitest suites for services and catalog components using `package.json`
-- [ ] T044 Run formatting and production SSR build gates using `package.json`
+- [x] T044 Run formatting and production SSR build gates using `package.json`
 - [ ] T045 Validate all quickstart authorization, concurrency, responsive and theme scenarios in `specs/005-service-renegotiations/quickstart.md`
 
 ---

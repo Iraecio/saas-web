@@ -1,10 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  DestroyRef,
-  inject,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DatePipe, JsonPipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -17,38 +11,52 @@ import { ServiceAuditEntry } from '../../../../core/models/service.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterLink, DatePipe, JsonPipe],
   template: `
-    <div class="p-6 max-w-3xl mx-auto space-y-6">
-      <header class="flex items-center justify-between">
-        <div>
-          <h1 class="text-3xl font-bold text-neutral-900 dark:text-white">Histórico do serviço</h1>
-          <p class="mt-1 text-sm text-neutral-500">Auditoria de alterações</p>
-        </div>
-        <a routerLink="/admin/services" class="btn-secondary">Voltar</a>
-      </header>
+    <main class="min-h-full bg-canvas px-4 py-6 sm:px-6 lg:py-10">
+      <div class="mx-auto max-w-4xl space-y-7">
+        <header class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p class="text-sm font-semibold text-brand">Rastreabilidade</p>
+            <h1 class="mt-2 text-3xl font-semibold tracking-tight text-foreground">
+              Histórico do serviço
+            </h1>
+            <p class="mt-2 text-sm text-muted">
+              Todas as alterações administrativas em ordem cronológica.
+            </p>
+          </div>
+          <a routerLink="/admin/services" class="btn-secondary">Voltar</a>
+        </header>
 
-      @if (loading()) {
-        <div class="flex justify-center py-12">
-          <div class="w-6 h-6 border-2 border-neutral-400 border-t-transparent rounded-full animate-spin"></div>
-        </div>
-      } @else if (entries().length === 0) {
-        <p class="py-12 text-center text-sm text-neutral-500">Nenhum registro de auditoria.</p>
-      } @else {
-        <ol class="space-y-3">
-          @for (e of entries(); track e.id) {
-            <li class="rounded-xl border border-neutral-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-950">
-              <div class="flex items-center justify-between">
-                <span class="inline-flex rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
-                  {{ actionLabel(e.action) }}
-                </span>
-                <span class="text-xs text-neutral-500">{{ e.createdAt | date: 'short' }}</span>
-              </div>
-              <p class="mt-2 text-xs text-neutral-500">Por {{ e.actorRole }} ({{ e.actorId }})</p>
-              <pre class="mt-2 overflow-x-auto rounded bg-neutral-50 p-2 text-xs text-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">{{ e.changedFields | json }}</pre>
-            </li>
-          }
-        </ol>
-      }
-    </div>
+        @if (loading()) {
+          <div class="space-y-3">
+            @for (item of [1, 2, 3]; track item) {
+              <div class="h-28 animate-pulse rounded-xl bg-surface-subtle"></div>
+            }
+          </div>
+        } @else if (entries().length === 0) {
+          <p class="py-12 text-center text-sm text-neutral-500">Nenhum registro de auditoria.</p>
+        } @else {
+          <ol class="space-y-3">
+            @for (e of entries(); track e.id) {
+              <li class="rounded-xl bg-surface p-5 ring-1 ring-border">
+                <div class="flex items-center justify-between">
+                  <span
+                    class="inline-flex rounded-md bg-brand/10 px-2 py-1 text-xs font-semibold text-brand"
+                  >
+                    {{ actionLabel(e.action) }}
+                  </span>
+                  <span class="text-xs text-neutral-500">{{ e.createdAt | date: 'short' }}</span>
+                </div>
+                <p class="mt-2 text-xs text-neutral-500">Por {{ e.actorRole }} ({{ e.actorId }})</p>
+                <pre
+                  class="mt-3 overflow-x-auto rounded-lg bg-surface-subtle p-3 text-xs text-foreground"
+                  >{{ e.changedFields | json }}</pre
+                >
+              </li>
+            }
+          </ol>
+        }
+      </div>
+    </main>
   `,
 })
 export class ServiceAuditPage {

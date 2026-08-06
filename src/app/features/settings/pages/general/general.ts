@@ -52,6 +52,15 @@ import { AppStateService } from '../../../../core/services/app-state';
               Pagamentos
             </a>
           }
+          @if (appState.userRole() === 'SUPER_ADMIN') {
+            <a
+              routerLink="valor-creditos"
+              routerLinkActive="border-b-2 border-neutral-900 dark:border-white text-neutral-900 dark:text-white font-semibold"
+              class="shrink-0 px-4 pb-3 text-sm text-neutral-500 transition-colors hover:text-neutral-700 dark:hover:text-neutral-300"
+            >
+              Valor dos créditos
+            </a>
+          }
         </nav>
       </div>
 

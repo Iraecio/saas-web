@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  OnInit,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { AppStateService } from '../../../../core/services/app-state';
@@ -23,13 +31,19 @@ const ROLE_LABEL: Record<string, string> = {
           Olá, {{ appState.userName() }} 👋
         </h1>
         <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
-          {{ isDirectClient() ? 'Bem-vindo à plataforma. Vamos configurar seu perfil.' : 'O que você precisa hoje?' }}
+          {{
+            isDirectClient()
+              ? 'Bem-vindo à plataforma. Vamos configurar seu perfil.'
+              : 'O que você precisa hoje?'
+          }}
         </p>
       </header>
 
       @if (isDirectClient()) {
         <!-- Card de boas-vindas / onboarding -->
-        <section class="rounded-xl bg-gradient-to-r from-violet-600 to-blue-500 p-6 text-white shadow-lg">
+        <section
+          class="rounded-xl bg-gradient-to-r from-violet-600 to-blue-500 p-6 text-white shadow-lg"
+        >
           <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
               <h2 class="text-xl font-bold">Quer atuar como Revendedor, Locutor ou Produtor?</h2>
@@ -50,11 +64,15 @@ const ROLE_LABEL: Record<string, string> = {
 
         <!-- Status da última solicitação -->
         @if (latestRequest(); as req) {
-          <section class="rounded-xl bg-white p-6 shadow-sm ring-1 ring-neutral-200 dark:bg-neutral-800 dark:ring-neutral-700">
+          <section
+            class="rounded-xl bg-white p-6 shadow-sm ring-1 ring-neutral-200 dark:bg-neutral-800 dark:ring-neutral-700"
+          >
             <div class="flex items-start justify-between gap-4">
               <div class="flex items-start gap-4">
-                <div class="flex h-12 w-12 items-center justify-center rounded-xl text-2xl"
-                     [class]="statusBgClass(req.status)">
+                <div
+                  class="flex h-12 w-12 items-center justify-center rounded-xl text-2xl"
+                  [class]="statusBgClass(req.status)"
+                >
                   {{ statusIcon(req.status) }}
                 </div>
                 <div>
@@ -71,14 +89,18 @@ const ROLE_LABEL: Record<string, string> = {
                   }
                 </div>
               </div>
-              <span class="rounded-full px-3 py-1 text-xs font-semibold whitespace-nowrap"
-                    [class]="statusBadgeClass(req.status)">
+              <span
+                class="rounded-full px-3 py-1 text-xs font-semibold whitespace-nowrap"
+                [class]="statusBadgeClass(req.status)"
+              >
                 {{ statusLabel(req.status) }}
               </span>
             </div>
             <div class="mt-4 flex gap-2">
-              <a routerLink="/admin/role-requests/my"
-                 class="text-sm text-blue-600 hover:underline dark:text-blue-400">
+              <a
+                routerLink="/admin/role-requests/my"
+                class="text-sm text-blue-600 hover:underline dark:text-blue-400"
+              >
                 Ver histórico completo →
               </a>
             </div>
@@ -87,21 +109,27 @@ const ROLE_LABEL: Record<string, string> = {
 
         <!-- Cards informativos -->
         <section class="grid grid-cols-1 gap-4 md:grid-cols-3">
-          <div class="rounded-xl bg-white p-6 shadow-sm ring-1 ring-neutral-200 dark:bg-neutral-800 dark:ring-neutral-700">
+          <div
+            class="rounded-xl bg-white p-6 shadow-sm ring-1 ring-neutral-200 dark:bg-neutral-800 dark:ring-neutral-700"
+          >
             <div class="text-3xl">🎙️</div>
             <h3 class="mt-3 font-semibold text-neutral-900 dark:text-white">Locutor</h3>
             <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
               Trabalhe com locuções comerciais, narrações e vinhetas.
             </p>
           </div>
-          <div class="rounded-xl bg-white p-6 shadow-sm ring-1 ring-neutral-200 dark:bg-neutral-800 dark:ring-neutral-700">
+          <div
+            class="rounded-xl bg-white p-6 shadow-sm ring-1 ring-neutral-200 dark:bg-neutral-800 dark:ring-neutral-700"
+          >
             <div class="text-3xl">🏢</div>
             <h3 class="mt-3 font-semibold text-neutral-900 dark:text-white">Revendedor</h3>
             <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
               Gerencie seus clientes e revenda nossos serviços.
             </p>
           </div>
-          <div class="rounded-xl bg-white p-6 shadow-sm ring-1 ring-neutral-200 dark:bg-neutral-800 dark:ring-neutral-700">
+          <div
+            class="rounded-xl bg-white p-6 shadow-sm ring-1 ring-neutral-200 dark:bg-neutral-800 dark:ring-neutral-700"
+          >
             <div class="text-3xl">🎬</div>
             <h3 class="mt-3 font-semibold text-neutral-900 dark:text-white">Produtor</h3>
             <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
@@ -111,14 +139,18 @@ const ROLE_LABEL: Record<string, string> = {
         </section>
       } @else {
         <!-- Dashboard normal para clientes vinculados a um reseller -->
-        <section class="rounded-xl bg-gradient-to-r from-violet-600 to-blue-500 p-6 text-white shadow-lg">
+        <section
+          class="rounded-xl bg-gradient-to-r from-violet-600 to-blue-500 p-6 text-white shadow-lg"
+        >
           <div class="flex items-center justify-between">
             <div>
               <h2 class="text-xl font-bold">Precisa de uma locução?</h2>
               <p class="mt-1 text-sm text-white/80">Faça seu pedido e receba em minutos.</p>
             </div>
-            <a routerLink="/admin/orders/new"
-               class="flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-bold text-violet-700 shadow transition hover:scale-105">
+            <a
+              routerLink="/admin/orders/new"
+              class="flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-bold text-violet-700 shadow transition hover:scale-105"
+            >
               🎙️ Novo Pedido
             </a>
           </div>
@@ -126,35 +158,20 @@ const ROLE_LABEL: Record<string, string> = {
 
         <section class="grid grid-cols-2 gap-4 sm:grid-cols-4">
           @for (stat of stats; track stat.label) {
-            <div class="rounded-xl bg-white p-4 shadow-sm ring-1 ring-neutral-200 dark:bg-neutral-800 dark:ring-neutral-700">
-              <p class="text-xs font-medium uppercase tracking-wide text-neutral-500 dark:text-neutral-400">{{ stat.label }}</p>
-              <p class="mt-2 text-2xl font-bold text-neutral-900 dark:text-white">{{ stat.value }}</p>
+            <div
+              class="rounded-xl bg-white p-4 shadow-sm ring-1 ring-neutral-200 dark:bg-neutral-800 dark:ring-neutral-700"
+            >
+              <p
+                class="text-xs font-medium uppercase tracking-wide text-neutral-500 dark:text-neutral-400"
+              >
+                {{ stat.label }}
+              </p>
+              <p class="mt-2 text-2xl font-bold text-neutral-900 dark:text-white">
+                {{ stat.value }}
+              </p>
               <p class="mt-1 text-xs text-neutral-400">{{ stat.sub }}</p>
             </div>
           }
-        </section>
-
-        <!-- Cards de navegação -->
-        <section>
-          <h2 class="mb-3 text-sm font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">Acesso Rápido</h2>
-          <div class="grid grid-cols-2 gap-3">
-            <a routerLink="/admin/wallet"
-              class="flex items-center gap-3 rounded-xl bg-white p-4 shadow-sm ring-1 ring-neutral-200 hover:ring-blue-400 transition dark:bg-neutral-800 dark:ring-neutral-700">
-              <span class="text-2xl">💳</span>
-              <div>
-                <p class="text-sm font-semibold text-neutral-900 dark:text-white">Minha Carteira</p>
-                <p class="text-xs text-neutral-500">Saldo e créditos</p>
-              </div>
-            </a>
-            <a routerLink="/admin/profile"
-              class="flex items-center gap-3 rounded-xl bg-white p-4 shadow-sm ring-1 ring-neutral-200 hover:ring-violet-400 transition dark:bg-neutral-800 dark:ring-neutral-700">
-              <span class="text-2xl">👤</span>
-              <div>
-                <p class="text-sm font-semibold text-neutral-900 dark:text-white">Meu Perfil</p>
-                <p class="text-xs text-neutral-500">Dados pessoais</p>
-              </div>
-            </a>
-          </div>
         </section>
       }
     </div>

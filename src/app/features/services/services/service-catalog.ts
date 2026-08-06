@@ -12,7 +12,7 @@ import {
 // Campos cuja alteração exige confirmação de impacto (FR-004 / saas-api 006 FR-011).
 const CRITICAL_FIELDS: (keyof UpdateServiceDto)[] = [
   'creditCost',
-  'defaultDeliveryHours',
+  'defaultPayoutCents',
   'maxRevisions',
 ];
 
@@ -25,6 +25,9 @@ export class ServiceCatalogService {
     if (filters?.professionalRole) params['professionalRole'] = filters.professionalRole;
     if (filters?.ownerId) params['ownerId'] = filters.ownerId;
     if (filters?.includeInactive) params['includeInactive'] = filters.includeInactive;
+    if (filters?.search) params['search'] = filters.search;
+    if (filters?.scope) params['scope'] = filters.scope;
+    if (filters?.active !== undefined) params['active'] = filters.active;
     return this.api.get<Service[]>('/services', params);
   }
 

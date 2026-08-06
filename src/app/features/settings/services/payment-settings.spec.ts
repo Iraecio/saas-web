@@ -89,4 +89,13 @@ describe('PaymentSettingsService', () => {
     expect(request.request.body).toEqual({ reason: 'Credencial expirada' });
     request.flush({});
   });
+
+  it('deactivates a platform configuration without deleting its history', () => {
+    service.deactivateConfiguration('config-1').subscribe();
+    const request = http.expectOne(
+      `${environment.apiUrl}/admin/payment-configurations/config-1/deactivate`,
+    );
+    expect(request.request.method).toBe('POST');
+    request.flush({});
+  });
 });

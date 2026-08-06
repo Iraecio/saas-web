@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Observable, forkJoin } from 'rxjs';
+import { Observable, concatMap, forkJoin, tap } from 'rxjs';
 import {
   PaymentConfiguration,
   PaymentConfigStatus,
@@ -38,600 +38,655 @@ const STATUS_CLASS: Record<PaymentConfigStatus, string> = {
   INVALID: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
 };
 
+const BRAZILIAN_BANKS = [
+  'Banco do Brasil',
+  'Bradesco',
+  'Caixa Econômica Federal',
+  'Itaú Unibanco',
+  'Santander',
+  'Banco Inter',
+  'Banco Original',
+  'BTG Pactual',
+  'C6 Bank',
+  'Mercado Pago',
+  'Neon',
+  'Nubank',
+  'PagBank',
+  'Sicoob',
+  'Sicredi',
+];
+
 @Component({
   selector: 'app-payment-settings',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [ReactiveFormsModule],
   template: `
-    <div class="space-y-6 p-6">
-      <header class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <p class="text-xs font-semibold uppercase tracking-wide text-violet-600">Financeiro</p>
-          <h2 class="mt-1 text-2xl font-bold text-neutral-900 dark:text-white">
-            Meios de pagamento
-          </h2>
-          <p class="mt-1 max-w-2xl text-sm text-neutral-500">
-            @if (isSuperAdmin()) {
-              Defina como a plataforma recebe das revendas e quais modalidades elas podem oferecer.
-            } @else {
-              Defina como seus clientes pagarão pelas compras de créditos da sua revenda.
-            }
-          </p>
-        </div>
-        <button
-          type="button"
-          class="btn-primary"
-          [disabled]="loading() || busy()"
-          (click)="openCreate()"
-        >
-          Novo meio
-        </button>
-      </header>
-
-      @if (success()) {
-        <div
-          role="status"
-          class="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-800/60 dark:bg-emerald-900/20 dark:text-emerald-300"
-        >
-          {{ success() }}
-        </div>
-      }
-
-      @if (error()) {
-        <div
-          role="alert"
-          class="flex flex-col gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 sm:flex-row sm:items-center sm:justify-between dark:border-red-800/60 dark:bg-red-900/20 dark:text-red-300"
-        >
-          <span>{{ error() }}</span>
-          <button type="button" class="btn-secondary shrink-0" (click)="load()">
-            Tentar novamente
-          </button>
-        </div>
-      }
-
-      @if (isSuperAdmin()) {
-        <section
-          class="rounded-xl border border-neutral-200 bg-white p-5 dark:border-neutral-700 dark:bg-neutral-900"
-        >
-          <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h3 class="font-semibold text-neutral-900 dark:text-white">Modalidades globais</h3>
-              <p class="text-sm text-neutral-500">
-                Autorize cada integração para a plataforma e para as revendas.
-              </p>
-            </div>
-            <button type="button" class="btn-secondary" [disabled]="busy()" (click)="openPolicy()">
-              Nova modalidade
-            </button>
-          </div>
-
-          @if (policyEditorOpen()) {
-            <form
-              [formGroup]="policyForm"
-              (ngSubmit)="savePolicy()"
-              class="mt-5 grid gap-4 rounded-lg border border-neutral-200 bg-neutral-50 p-4 md:grid-cols-3 dark:border-neutral-700 dark:bg-neutral-800/50"
+    <div class="relative min-h-full overflow-hidden bg-canvas px-4 py-6 sm:px-6 lg:px-10 lg:py-10">
+      <div
+        class="pointer-events-none absolute -right-32 -top-36 size-[30rem] rounded-full bg-brand/7 blur-3xl"
+        aria-hidden="true"
+      ></div>
+      <div class="relative mx-auto max-w-[86rem] space-y-8">
+        <header class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-end">
+          <div class="max-w-3xl">
+            <p class="text-sm font-semibold tracking-wide text-brand">Configurações financeiras</p>
+            <h2
+              class="mt-2 text-3xl font-semibold tracking-[-0.035em] text-foreground text-balance sm:text-4xl"
             >
-              <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-                Código do provedor
-                <input
-                  class="form-input mt-1 w-full"
-                  formControlName="providerCode"
-                  placeholder="MANUAL"
-                />
-              </label>
-              <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-                Tipo
-                <select class="form-input mt-1 w-full" formControlName="methodType">
-                  <option value="MANUAL">Manual</option>
-                  <option value="PIX">PIX</option>
-                  <option value="PROVIDER">Provedor</option>
-                </select>
-              </label>
-              <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-                Nome exibido
-                <input class="form-input mt-1 w-full" formControlName="displayName" />
-              </label>
-              <label class="flex items-center gap-2 text-sm text-neutral-700 dark:text-neutral-300">
-                <input type="checkbox" formControlName="platformEnabled" />
-                Disponível para a plataforma
-              </label>
-              <label class="flex items-center gap-2 text-sm text-neutral-700 dark:text-neutral-300">
-                <input type="checkbox" formControlName="resellerEnabled" />
-                Revendas podem configurar
-              </label>
-              <div class="flex justify-end gap-2 md:col-span-3">
-                <button type="button" class="btn-secondary" (click)="closePolicy()">
-                  Cancelar
-                </button>
-                <button type="submit" class="btn-primary" [disabled]="policyForm.invalid || busy()">
-                  {{ busy() ? 'Salvando...' : 'Salvar modalidade' }}
-                </button>
-              </div>
-            </form>
-          }
-
-          <div class="mt-5 grid gap-3 lg:grid-cols-2">
-            @for (policy of policies(); track policy.id) {
-              <article class="rounded-lg border border-neutral-200 p-4 dark:border-neutral-700">
-                <div class="flex items-start justify-between gap-3">
-                  <div>
-                    <p class="font-semibold text-neutral-900 dark:text-white">
-                      {{ policy.displayName }}
-                    </p>
-                    <p class="mt-0.5 font-mono text-xs text-neutral-500">
-                      {{ policy.providerCode }}
-                    </p>
-                  </div>
-                  <span
-                    class="rounded-full bg-neutral-100 px-2.5 py-1 text-xs font-medium text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300"
-                  >
-                    {{ methodLabel(policy.methodType) }}
-                  </span>
-                </div>
-                <div class="mt-4 flex flex-wrap gap-2 text-xs">
-                  <span [class]="flagClass(policy.platformEnabled)">
-                    Plataforma: {{ policy.platformEnabled ? 'permitido' : 'bloqueado' }}
-                  </span>
-                  <span [class]="flagClass(policy.resellerEnabled)">
-                    Revendas: {{ policy.resellerEnabled ? 'permitido' : 'bloqueado' }}
-                  </span>
-                </div>
-                <button
-                  type="button"
-                  class="mt-4 text-sm font-medium text-violet-600 hover:text-violet-700"
-                  (click)="editPolicy(policy)"
-                >
-                  Editar modalidade
-                </button>
-              </article>
-            } @empty {
-              @if (!loading()) {
-                <p class="py-6 text-center text-sm text-neutral-500 lg:col-span-2">
-                  Nenhuma modalidade cadastrada. Crie a primeira para habilitar recebimentos.
-                </p>
+              Meios de pagamento
+            </h2>
+            <p class="mt-3 max-w-[65ch] text-sm leading-6 text-muted text-pretty sm:text-base">
+              @if (isSuperAdmin()) {
+                Defina como a plataforma recebe das revendas e quais modalidades elas podem
+                oferecer.
+              } @else {
+                Defina como seus clientes pagarão pelas compras de créditos da sua revenda.
               }
-            }
+            </p>
           </div>
-        </section>
-      }
-
-      @if (editorOpen()) {
-        <section
-          class="rounded-xl border border-violet-200 bg-white p-5 shadow-sm dark:border-violet-800 dark:bg-neutral-900"
-        >
-          <div class="flex items-start justify-between gap-4">
-            <div>
-              <h3 class="font-semibold text-neutral-900 dark:text-white">
-                {{ editing() ? 'Editar meio de pagamento' : 'Novo meio de pagamento' }}
-              </h3>
-              <p class="text-sm text-neutral-500">
-                Alterar uma configuração exige nova validação antes da ativação.
-              </p>
+          <aside
+            class="rounded-2xl bg-foreground p-5 text-surface shadow-[0_18px_50px_-24px_rgba(21,94,239,0.45)]"
+          >
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <p class="text-xs font-medium text-surface/65">Configurações ativas</p>
+                <p class="mt-1 font-mono text-3xl font-semibold tabular-nums">
+                  {{ activeCount() }}
+                </p>
+              </div>
+              <span
+                class="mt-1 size-2.5 rounded-full bg-accent shadow-[0_0_0_5px_rgba(71,215,177,0.16)]"
+              ></span>
             </div>
             <button
               type="button"
-              class="text-sm text-neutral-500 hover:text-neutral-900 dark:hover:text-white"
-              (click)="closeEditor()"
+              class="mt-5 inline-flex min-h-10 w-full items-center justify-center rounded-lg bg-surface px-4 text-sm font-semibold text-foreground transition duration-200 hover:-translate-y-0.5 hover:bg-surface-subtle active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              [disabled]="loading() || busy()"
+              (click)="openCreate()"
             >
-              Fechar
+              {{ hasBankAccount() ? 'Adicionar meio ou conta' : 'Novo meio' }}
+            </button>
+          </aside>
+        </header>
+
+        @if (success()) {
+          <div
+            role="status"
+            class="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-800/60 dark:bg-emerald-900/20 dark:text-emerald-300"
+          >
+            {{ success() }}
+          </div>
+        }
+
+        @if (error()) {
+          <div
+            role="alert"
+            class="flex flex-col gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 sm:flex-row sm:items-center sm:justify-between dark:border-red-800/60 dark:bg-red-900/20 dark:text-red-300"
+          >
+            <span>{{ error() }}</span>
+            <button type="button" class="btn-secondary shrink-0" (click)="load()">
+              Tentar novamente
             </button>
           </div>
+        }
 
-          <form
-            [formGroup]="configurationForm"
-            (ngSubmit)="saveConfiguration()"
-            class="mt-6 space-y-6"
+        @if (false) {
+          <section
+            class="rounded-xl border border-neutral-200 bg-white p-5 dark:border-neutral-700 dark:bg-neutral-900"
           >
-            <fieldset>
-              <legend class="text-sm font-semibold text-neutral-900 dark:text-white">
-                1. Escolha como receber
-              </legend>
-              <p class="mt-1 text-sm text-neutral-500">
-                Selecione uma modalidade autorizada para este ambiente.
-              </p>
-              <div class="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                @for (policy of eligiblePolicies(); track policy.id) {
-                  <button
-                    type="button"
-                    class="group flex min-h-28 items-start gap-3 rounded-xl border p-4 text-left transition-all"
-                    [class.border-brand]="configurationForm.controls.policyId.value === policy.id"
-                    [class.bg-brand/5]="configurationForm.controls.policyId.value === policy.id"
-                    [class.ring-2]="configurationForm.controls.policyId.value === policy.id"
-                    [class.ring-brand/15]="configurationForm.controls.policyId.value === policy.id"
-                    [class.border-neutral-200]="
-                      configurationForm.controls.policyId.value !== policy.id
-                    "
-                    [disabled]="!!editing()"
-                    (click)="selectPolicy(policy)"
-                  >
-                    <span
-                      class="flex size-10 shrink-0 items-center justify-center rounded-lg text-xl"
-                      [class]="providerIconClass(policy.providerCode)"
-                    >
-                      {{ providerIcon(policy.providerCode) }}
-                    </span>
-                    <span>
-                      <span class="block font-semibold text-neutral-900 dark:text-white">
-                        {{ policy.displayName }}
-                      </span>
-                      <span class="mt-1 block text-xs leading-5 text-neutral-500">
-                        {{ providerDescription(policy.providerCode) }}
-                      </span>
-                    </span>
-                  </button>
-                }
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h3 class="font-semibold text-neutral-900 dark:text-white">Modalidades globais</h3>
+                <p class="text-sm text-neutral-500">
+                  Autorize cada integração para a plataforma e para as revendas.
+                </p>
               </div>
-            </fieldset>
-
-            <div
-              class="grid gap-4 rounded-xl border border-neutral-200 bg-neutral-50/70 p-4 md:grid-cols-4 dark:border-neutral-700 dark:bg-neutral-800/40"
-            >
-              <label
-                class="text-sm font-medium text-neutral-700 md:col-span-2 dark:text-neutral-300"
-              >
-                Nome para identificação
-                <input
-                  class="form-input mt-1 w-full"
-                  formControlName="name"
-                  placeholder="Ex.: PIX principal"
-                />
-                <span class="mt-1 block text-xs font-normal text-neutral-500">
-                  Visível apenas para sua equipe.
-                </span>
-              </label>
-              <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-                Prioridade
-                <input
-                  type="number"
-                  min="0"
-                  class="form-input mt-1 w-full"
-                  formControlName="priority"
-                />
-              </label>
-              <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-                Moeda
-                <input
-                  maxlength="3"
-                  class="form-input mt-1 w-full uppercase"
-                  formControlName="currency"
-                />
-              </label>
-            </div>
-
-            @if (selectedProvider() === 'PIX_MANUAL') {
-              <section
-                class="rounded-xl border border-cyan-200 bg-cyan-50/50 p-5 dark:border-cyan-900 dark:bg-cyan-950/20"
-              >
-                <div class="mb-5">
-                  <h4 class="font-semibold text-neutral-900 dark:text-white">Dados da chave PIX</h4>
-                  <p class="text-sm text-neutral-500">
-                    O pagador verá estes dados e enviará o comprovante para análise.
-                  </p>
-                </div>
-                <div class="grid gap-4 md:grid-cols-2">
-                  <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-                    Tipo da chave
-                    <select class="form-input mt-1" formControlName="pixKeyType">
-                      <option value="CPF">CPF</option>
-                      <option value="CNPJ">CNPJ</option>
-                      <option value="EMAIL">E-mail</option>
-                      <option value="PHONE">Telefone</option>
-                      <option value="RANDOM">Chave aleatória</option>
-                    </select>
-                  </label>
-                  <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-                    Chave PIX
-                    <input
-                      class="form-input mt-1"
-                      formControlName="pixKey"
-                      placeholder="Digite a chave"
-                    />
-                  </label>
-                  <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-                    Nome do favorecido
-                    <input class="form-input mt-1" formControlName="beneficiaryName" />
-                  </label>
-                  <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-                    CPF ou CNPJ do favorecido
-                    <input
-                      class="form-input mt-1"
-                      formControlName="beneficiaryDocument"
-                      inputmode="numeric"
-                    />
-                  </label>
-                </div>
-              </section>
-            }
-
-            @if (selectedProvider() === 'BANK_TRANSFER_MANUAL' || selectedProvider() === 'MANUAL') {
-              <section
-                class="rounded-xl border border-blue-200 bg-blue-50/50 p-5 dark:border-blue-900 dark:bg-blue-950/20"
-              >
-                <div class="mb-5">
-                  <h4 class="font-semibold text-neutral-900 dark:text-white">Dados bancários</h4>
-                  <p class="text-sm text-neutral-500">
-                    Use uma conta apta a receber depósitos e transferências.
-                  </p>
-                </div>
-                <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                  <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-                    Banco
-                    <input
-                      class="form-input mt-1"
-                      formControlName="bankName"
-                      placeholder="Nome ou código"
-                    />
-                  </label>
-                  <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-                    Agência
-                    <input class="form-input mt-1" formControlName="agency" />
-                  </label>
-                  <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-                    Conta com dígito
-                    <input class="form-input mt-1" formControlName="account" />
-                  </label>
-                  <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-                    Tipo de conta
-                    <select class="form-input mt-1" formControlName="accountType">
-                      <option value="CHECKING">Conta corrente</option>
-                      <option value="SAVINGS">Conta poupança</option>
-                      <option value="PAYMENT">Conta de pagamento</option>
-                    </select>
-                  </label>
-                  <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-                    Nome do titular
-                    <input class="form-input mt-1" formControlName="holderName" />
-                  </label>
-                  <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-                    CPF ou CNPJ do titular
-                    <input
-                      class="form-input mt-1"
-                      formControlName="holderDocument"
-                      inputmode="numeric"
-                    />
-                  </label>
-                </div>
-              </section>
-            }
-
-            @if (selectedProvider() === 'MERCADO_PAGO') {
-              <section
-                class="rounded-xl border border-sky-200 bg-sky-50/50 p-5 dark:border-sky-900 dark:bg-sky-950/20"
-              >
-                <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                  <div>
-                    <h4 class="font-semibold text-neutral-900 dark:text-white">
-                      Integração Mercado Pago
-                    </h4>
-                    <p class="max-w-2xl text-sm text-neutral-500">
-                      Informe as credenciais de produção da conta que receberá os pagamentos.
-                    </p>
-                  </div>
-                  @if (editing()?.hasCredentials) {
-                    <span
-                      class="w-fit rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700"
-                    >
-                      Credenciais configuradas
-                    </span>
-                  }
-                </div>
-                <div class="mt-5 grid gap-4 md:grid-cols-2">
-                  <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-                    Access token
-                    <input
-                      type="password"
-                      class="form-input mt-1"
-                      formControlName="accessToken"
-                      autocomplete="new-password"
-                      placeholder="{{
-                        editing()?.hasCredentials ? 'Deixe vazio para manter' : 'APP_USR-...'
-                      }}"
-                    />
-                  </label>
-                  <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-                    Assinatura secreta do webhook
-                    <input
-                      type="password"
-                      class="form-input mt-1"
-                      formControlName="webhookSecret"
-                      autocomplete="new-password"
-                      placeholder="{{
-                        editing()?.hasCredentials
-                          ? 'Deixe vazio para manter'
-                          : 'Chave gerada no Mercado Pago'
-                      }}"
-                    />
-                  </label>
-                </div>
-                <div
-                  class="mt-4 rounded-lg border border-sky-200 bg-white/70 p-3 text-xs leading-5 text-neutral-600 dark:border-sky-900 dark:bg-neutral-900/40 dark:text-neutral-400"
-                >
-                  As credenciais são criptografadas pela API e nunca voltam a ser exibidas. Após
-                  salvar, use <strong>Validar</strong> para testar a conexão antes de ativar.
-                </div>
-              </section>
-            }
-
-            @if (selectedProvider() && selectedProvider() !== 'MERCADO_PAGO') {
-              <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
-                Instruções para o pagador
-                <textarea
-                  rows="4"
-                  class="form-input mt-1 resize-y"
-                  formControlName="instructions"
-                  placeholder="Explique como realizar o pagamento e enviar o comprovante."
-                ></textarea>
-              </label>
-            }
-
-            @if (formError()) {
-              <p
-                role="alert"
-                class="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700 dark:bg-red-950/30 dark:text-red-300"
-              >
-                {{ formError() }}
-              </p>
-            }
-            <div
-              class="sticky bottom-0 -mx-5 flex flex-col-reverse gap-2 border-t border-neutral-200 bg-white/95 px-5 py-4 backdrop-blur sm:flex-row sm:justify-end dark:border-neutral-700 dark:bg-neutral-900/95"
-            >
-              <button type="button" class="btn-secondary" (click)="closeEditor()">Cancelar</button>
               <button
-                type="submit"
-                class="btn-primary"
-                [disabled]="configurationForm.invalid || busy()"
+                type="button"
+                class="btn-secondary"
+                [disabled]="busy()"
+                (click)="openPolicy()"
               >
-                {{ busy() ? 'Salvando...' : editing() ? 'Salvar alterações' : 'Criar meio' }}
+                Nova modalidade
               </button>
             </div>
-          </form>
-        </section>
-      }
 
-      <section>
-        <div>
-          <h3 class="font-semibold text-neutral-900 dark:text-white">
-            {{ isSuperAdmin() ? 'Recebimentos da plataforma' : 'Recebimentos da revenda' }}
-          </h3>
-          <p class="text-sm text-neutral-500">
-            Valide os dados antes de ativar um meio para novas compras.
-          </p>
-        </div>
-
-        @if (loading()) {
-          <div class="mt-4 grid gap-4 lg:grid-cols-2">
-            @for (item of [1, 2]; track item) {
-              <div class="h-52 animate-pulse rounded-xl bg-neutral-100 dark:bg-neutral-800"></div>
-            }
-          </div>
-        } @else {
-          <div class="mt-4 grid gap-4 lg:grid-cols-2">
-            @for (configuration of configurations(); track configuration.id) {
-              <article
-                class="rounded-xl border border-neutral-200 bg-white p-5 dark:border-neutral-700 dark:bg-neutral-900"
+            @if (policyEditorOpen()) {
+              <form
+                [formGroup]="policyForm"
+                (ngSubmit)="savePolicy()"
+                class="mt-5 grid gap-4 rounded-lg border border-neutral-200 bg-neutral-50 p-4 md:grid-cols-3 dark:border-neutral-700 dark:bg-neutral-800/50"
               >
-                <div class="flex items-start justify-between gap-4">
-                  <div>
-                    <h4 class="font-semibold text-neutral-900 dark:text-white">
-                      {{ configuration.name }}
-                    </h4>
-                    <p class="mt-1 text-sm text-neutral-500">
-                      {{ configuration.policy.displayName }} · {{ configuration.currency }} ·
-                      prioridade {{ configuration.priority }}
-                    </p>
-                  </div>
-                  <span
-                    class="rounded-full px-2.5 py-1 text-xs font-semibold"
-                    [class]="statusClass(configuration.status)"
-                  >
-                    {{ statusLabel(configuration.status) }}
-                  </span>
-                </div>
-
-                <dl class="mt-5 grid grid-cols-2 gap-3 text-sm">
-                  <div>
-                    <dt class="text-neutral-500">Validação</dt>
-                    <dd class="mt-0.5 font-medium text-neutral-800 dark:text-neutral-200">
-                      {{
-                        configuration.validatedAt
-                          ? formatDate(configuration.validatedAt)
-                          : 'Pendente'
-                      }}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt class="text-neutral-500">Credenciais</dt>
-                    <dd class="mt-0.5 font-medium text-neutral-800 dark:text-neutral-200">
-                      {{
-                        configuration.hasCredentials ? 'Configuradas' : 'Não necessárias/ausentes'
-                      }}
-                    </dd>
-                  </div>
-                </dl>
-
-                <div
-                  class="mt-5 flex flex-wrap gap-2 border-t border-neutral-100 pt-4 dark:border-neutral-800"
+                <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                  Código do provedor
+                  <input
+                    class="form-input mt-1 w-full"
+                    formControlName="providerCode"
+                    placeholder="MANUAL"
+                  />
+                </label>
+                <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                  Tipo
+                  <select class="form-input mt-1 w-full" formControlName="methodType">
+                    <option value="MANUAL">Manual</option>
+                    <option value="PIX">PIX</option>
+                    <option value="PROVIDER">Provedor</option>
+                  </select>
+                </label>
+                <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                  Nome exibido
+                  <input class="form-input mt-1 w-full" formControlName="displayName" />
+                </label>
+                <label
+                  class="flex items-center gap-2 text-sm text-neutral-700 dark:text-neutral-300"
                 >
-                  <button
-                    type="button"
-                    class="btn-secondary"
-                    [disabled]="busy()"
-                    (click)="openEdit(configuration)"
-                  >
-                    Editar
+                  <input type="checkbox" formControlName="platformEnabled" />
+                  Disponível para a plataforma
+                </label>
+                <label
+                  class="flex items-center gap-2 text-sm text-neutral-700 dark:text-neutral-300"
+                >
+                  <input type="checkbox" formControlName="resellerEnabled" />
+                  Revendas podem configurar
+                </label>
+                <div class="flex justify-end gap-2 md:col-span-3">
+                  <button type="button" class="btn-secondary" (click)="closePolicy()">
+                    Cancelar
                   </button>
                   <button
-                    type="button"
-                    class="btn-secondary"
-                    [disabled]="busy()"
-                    (click)="validate(configuration)"
-                  >
-                    Validar
-                  </button>
-                  <button
-                    type="button"
+                    type="submit"
                     class="btn-primary"
-                    [disabled]="
-                      busy() || !configuration.validatedAt || configuration.status === 'ACTIVE'
-                    "
-                    (click)="activate(configuration)"
+                    [disabled]="policyForm.invalid || busy()"
                   >
-                    Ativar
+                    {{ busy() ? 'Salvando...' : 'Salvar modalidade' }}
                   </button>
-                  @if (isSuperAdmin() && configuration.status === 'ACTIVE') {
+                </div>
+              </form>
+            }
+
+            <div class="mt-5 grid gap-3 lg:grid-cols-2">
+              @for (policy of policies(); track policy.id) {
+                <article class="rounded-lg border border-neutral-200 p-4 dark:border-neutral-700">
+                  <div class="flex items-start justify-between gap-3">
+                    <div>
+                      <p class="font-semibold text-neutral-900 dark:text-white">
+                        {{ policy.displayName }}
+                      </p>
+                      <p class="mt-0.5 font-mono text-xs text-neutral-500">
+                        {{ policy.providerCode }}
+                      </p>
+                    </div>
+                    <span
+                      class="rounded-full bg-neutral-100 px-2.5 py-1 text-xs font-medium text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300"
+                    >
+                      {{ methodLabel(policy.methodType) }}
+                    </span>
+                  </div>
+                  <div class="mt-4 flex flex-wrap gap-2 text-xs">
+                    <span [class]="flagClass(policy.platformEnabled)">
+                      Plataforma: {{ policy.platformEnabled ? 'permitido' : 'bloqueado' }}
+                    </span>
+                    <span [class]="flagClass(policy.resellerEnabled)">
+                      Revendas: {{ policy.resellerEnabled ? 'permitido' : 'bloqueado' }}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    class="mt-4 text-sm font-medium text-violet-600 hover:text-violet-700"
+                    (click)="editPolicy(policy)"
+                  >
+                    Editar modalidade
+                  </button>
+                </article>
+              } @empty {
+                @if (!loading()) {
+                  <p class="py-6 text-center text-sm text-neutral-500 lg:col-span-2">
+                    Nenhuma modalidade cadastrada. Crie a primeira para habilitar recebimentos.
+                  </p>
+                }
+              }
+            </div>
+          </section>
+        }
+
+        @if (editorOpen()) {
+          <section
+            class="overflow-hidden rounded-2xl bg-surface shadow-[0_20px_65px_-42px_rgba(21,94,239,0.55)] ring-1 ring-border"
+          >
+            <div class="h-1 bg-brand"></div>
+            <div class="p-5 sm:p-7">
+              <div class="flex items-start justify-between gap-4">
+                <div>
+                  <h3 class="font-semibold text-neutral-900 dark:text-white">
+                    {{ editing() ? 'Editar meio de pagamento' : 'Novo meio de pagamento' }}
+                  </h3>
+                  <p class="text-sm text-neutral-500">
+                    Alterar uma configuração exige nova validação antes da ativação.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  class="text-sm text-neutral-500 hover:text-neutral-900 dark:hover:text-white"
+                  (click)="closeEditor()"
+                >
+                  Fechar
+                </button>
+              </div>
+
+              <form
+                [formGroup]="configurationForm"
+                (ngSubmit)="saveConfiguration()"
+                class="mt-7 space-y-7"
+              >
+                <fieldset>
+                  <legend class="text-sm font-semibold text-neutral-900 dark:text-white">
+                    1. Escolha como receber
+                  </legend>
+                  <p class="mt-1 text-sm text-neutral-500">
+                    Selecione uma modalidade autorizada para este ambiente.
+                  </p>
+                  <div class="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                    @for (policy of eligiblePolicies(); track policy.id) {
+                      <button
+                        type="button"
+                        class="group flex min-h-28 items-start gap-3 rounded-xl border p-4 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-brand/40 hover:shadow-md active:translate-y-0"
+                        [class.border-brand]="
+                          configurationForm.controls.policyId.value === policy.id
+                        "
+                        [class.bg-brand/5]="configurationForm.controls.policyId.value === policy.id"
+                        [class.ring-2]="configurationForm.controls.policyId.value === policy.id"
+                        [class.ring-brand/15]="
+                          configurationForm.controls.policyId.value === policy.id
+                        "
+                        [class.border-neutral-200]="
+                          configurationForm.controls.policyId.value !== policy.id
+                        "
+                        [disabled]="!!editing()"
+                        (click)="selectPolicy(policy)"
+                      >
+                        <span
+                          class="flex size-10 shrink-0 items-center justify-center rounded-lg text-xl"
+                          [class]="providerIconClass(policy.providerCode)"
+                        >
+                          {{ providerIcon(policy.providerCode) }}
+                        </span>
+                        <span>
+                          <span class="block font-semibold text-neutral-900 dark:text-white">
+                            {{ policy.displayName }}
+                          </span>
+                          <span class="mt-1 block text-xs leading-5 text-neutral-500">
+                            {{ providerDescription(policy.providerCode) }}
+                          </span>
+                        </span>
+                      </button>
+                    }
+                  </div>
+                </fieldset>
+
+                @if (selectedProvider() === 'PIX_MANUAL') {
+                  <section class="rounded-xl bg-brand/5 p-5 ring-1 ring-brand/15">
+                    <div class="mb-5">
+                      <h4 class="font-semibold text-neutral-900 dark:text-white">
+                        Dados da chave PIX
+                      </h4>
+                      <p class="text-sm text-neutral-500">
+                        O pagador verá estes dados e enviará o comprovante para análise.
+                      </p>
+                    </div>
+                    <div>
+                      <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                        Chave PIX
+                        <input
+                          class="form-input mt-1 w-full"
+                          formControlName="pixKey"
+                          placeholder="CPF, CNPJ, e-mail, telefone ou chave aleatória"
+                        />
+                      </label>
+                    </div>
+                  </section>
+                }
+
+                @if (
+                  selectedProvider() === 'BANK_TRANSFER_MANUAL' || selectedProvider() === 'MANUAL'
+                ) {
+                  <section class="rounded-xl bg-brand/5 p-5 ring-1 ring-brand/15">
+                    <div class="mb-5">
+                      <h4 class="font-semibold text-neutral-900 dark:text-white">
+                        Dados bancários
+                      </h4>
+                      <p class="text-sm text-neutral-500">
+                        Escolha o banco e informe a conta. Você pode cadastrar quantas contas
+                        precisar.
+                      </p>
+                    </div>
+                    <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                      <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                        Banco
+                        <select class="form-input mt-1" formControlName="bankName">
+                          <option value="">Selecione o banco</option>
+                          @for (bank of banks; track bank) {
+                            <option [value]="bank">{{ bank }}</option>
+                          }
+                        </select>
+                      </label>
+                      <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                        Agência
+                        <input class="form-input mt-1" formControlName="agency" />
+                      </label>
+                      <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                        Conta com dígito
+                        <input class="form-input mt-1" formControlName="account" />
+                      </label>
+                      <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                        Tipo de conta
+                        <select class="form-input mt-1" formControlName="accountType">
+                          <option value="CHECKING">Conta corrente</option>
+                          <option value="SAVINGS">Conta poupança</option>
+                          <option value="PAYMENT">Conta de pagamento</option>
+                        </select>
+                      </label>
+                      <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                        Nome do titular
+                        <input class="form-input mt-1" formControlName="holderName" />
+                      </label>
+                      <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                        CPF ou CNPJ do titular
+                        <input
+                          class="form-input mt-1"
+                          formControlName="holderDocument"
+                          inputmode="numeric"
+                        />
+                      </label>
+                    </div>
+                  </section>
+                }
+
+                @if (selectedProvider() === 'MERCADO_PAGO') {
+                  <section class="rounded-xl bg-brand/5 p-5 ring-1 ring-brand/15">
+                    <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                      <div>
+                        <h4 class="font-semibold text-neutral-900 dark:text-white">
+                          Integração Mercado Pago
+                        </h4>
+                        <p class="max-w-2xl text-sm text-neutral-500">
+                          Informe as credenciais de produção da conta que receberá os pagamentos.
+                        </p>
+                      </div>
+                      @if (editing()?.hasCredentials) {
+                        <span
+                          class="w-fit rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700"
+                        >
+                          Credenciais configuradas
+                        </span>
+                      }
+                    </div>
+                    <div class="mt-5 grid gap-4 md:grid-cols-2">
+                      <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                        Access token
+                        <input
+                          type="password"
+                          class="form-input mt-1"
+                          formControlName="accessToken"
+                          autocomplete="new-password"
+                          placeholder="{{
+                            editing()?.hasCredentials ? 'Deixe vazio para manter' : 'APP_USR-...'
+                          }}"
+                        />
+                      </label>
+                      <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                        Assinatura secreta do webhook
+                        <input
+                          type="password"
+                          class="form-input mt-1"
+                          formControlName="webhookSecret"
+                          autocomplete="new-password"
+                          placeholder="{{
+                            editing()?.hasCredentials
+                              ? 'Deixe vazio para manter'
+                              : 'Chave gerada no Mercado Pago'
+                          }}"
+                        />
+                      </label>
+                    </div>
+                    <div
+                      class="mt-4 rounded-lg bg-surface/80 p-3 text-xs leading-5 text-muted ring-1 ring-brand/10"
+                    >
+                      As credenciais são criptografadas pela API e nunca voltam a ser exibidas. Após
+                      continuar, o sistema testa o acesso diretamente no Mercado Pago. O meio só
+                      será ativado se a conexão estiver válida.
+                    </div>
+                  </section>
+                }
+
+                @if (
+                  selectedProvider() &&
+                  selectedProvider() !== 'MERCADO_PAGO' &&
+                  selectedProvider() !== 'PIX_MANUAL' &&
+                  selectedProvider() !== 'BANK_TRANSFER_MANUAL' &&
+                  selectedProvider() !== 'MANUAL'
+                ) {
+                  <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                    Instruções para o pagador
+                    <textarea
+                      rows="4"
+                      class="form-input mt-1 resize-y"
+                      formControlName="instructions"
+                      placeholder="Explique como realizar o pagamento e enviar o comprovante."
+                    ></textarea>
+                  </label>
+                }
+
+                @if (formError()) {
+                  <p
+                    role="alert"
+                    class="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700 dark:bg-red-950/30 dark:text-red-300"
+                  >
+                    {{ formError() }}
+                  </p>
+                }
+                <div
+                  class="sticky bottom-0 -mx-5 flex flex-col-reverse gap-2 border-t border-neutral-200 bg-white/95 px-5 py-4 backdrop-blur sm:flex-row sm:justify-end dark:border-neutral-700 dark:bg-neutral-900/95"
+                >
+                  <button type="button" class="btn-secondary" (click)="closeEditor()">
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    class="btn-primary"
+                    [disabled]="configurationForm.invalid || busy()"
+                  >
+                    {{
+                      busy() ? 'Ativando...' : editing() ? submitLabel(true) : submitLabel(false)
+                    }}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </section>
+        }
+
+        <section>
+          <div>
+            <h3 class="text-lg font-semibold tracking-tight text-foreground">
+              {{ isSuperAdmin() ? 'Recebimentos da plataforma' : 'Recebimentos da revenda' }}
+            </h3>
+            <p class="mt-1 text-sm text-muted">
+              Valide os dados antes de ativar um meio para novas compras.
+            </p>
+          </div>
+
+          @if (loading()) {
+            <div class="mt-5 grid gap-4 lg:grid-cols-2">
+              @for (item of [1, 2]; track item) {
+                <div class="h-52 animate-pulse rounded-xl bg-neutral-100 dark:bg-neutral-800"></div>
+              }
+            </div>
+          } @else {
+            <div class="mt-4 grid gap-4 lg:grid-cols-2">
+              @for (configuration of configurations(); track configuration.id) {
+                <article
+                  class="group relative overflow-hidden rounded-2xl bg-surface p-5 shadow-[0_16px_48px_-38px_rgba(15,23,42,0.65)] ring-1 ring-border transition duration-200 hover:-translate-y-0.5 hover:ring-border-strong sm:p-6"
+                >
+                  <div
+                    class="absolute inset-y-0 left-0 w-1 bg-brand/70 opacity-0 transition-opacity group-hover:opacity-100"
+                  ></div>
+                  <div class="flex items-start justify-between gap-4">
+                    <div>
+                      <h4 class="font-semibold text-neutral-900 dark:text-white">
+                        {{ configuration.name }}
+                      </h4>
+                      <p class="mt-1 text-sm text-neutral-500">
+                        {{ configuration.policy.displayName }} · {{ configuration.currency }} ·
+                        prioridade {{ configuration.priority }}
+                      </p>
+                    </div>
+                    <span
+                      class="rounded-md px-2.5 py-1 text-xs font-semibold"
+                      [class]="statusClass(configuration.status)"
+                    >
+                      {{ statusLabel(configuration.status) }}
+                    </span>
+                  </div>
+
+                  <dl class="mt-6 grid grid-cols-2 gap-3 text-sm">
+                    <div class="rounded-lg bg-surface-subtle p-3">
+                      <dt class="text-neutral-500">Validação</dt>
+                      <dd class="mt-0.5 font-medium text-neutral-800 dark:text-neutral-200">
+                        {{
+                          configuration.validatedAt
+                            ? formatDate(configuration.validatedAt)
+                            : 'Pendente'
+                        }}
+                      </dd>
+                    </div>
+                    <div class="rounded-lg bg-surface-subtle p-3">
+                      <dt class="text-neutral-500">Credenciais</dt>
+                      <dd class="mt-0.5 font-medium text-neutral-800 dark:text-neutral-200">
+                        {{
+                          configuration.hasCredentials ? 'Configuradas' : 'Não necessárias/ausentes'
+                        }}
+                      </dd>
+                    </div>
+                  </dl>
+
+                  <div
+                    class="mt-5 flex flex-wrap gap-2 border-t border-neutral-100 pt-4 dark:border-neutral-800"
+                  >
                     <button
                       type="button"
                       class="btn-secondary"
                       [disabled]="busy()"
-                      (click)="startSuspend(configuration)"
+                      (click)="openEdit(configuration)"
                     >
-                      Suspender
+                      Editar
                     </button>
-                  }
-                </div>
-
-                @if (suspendingId() === configuration.id) {
-                  <form
-                    class="mt-4 flex flex-col gap-2 rounded-lg bg-neutral-50 p-3 sm:flex-row dark:bg-neutral-800/60"
-                    (ngSubmit)="suspend(configuration)"
-                  >
-                    <input
-                      class="form-input flex-1"
-                      placeholder="Motivo da suspensão"
-                      [value]="suspendReason()"
-                      (input)="suspendReason.set($any($event.target).value)"
-                    />
                     <button
-                      type="submit"
-                      class="btn-primary"
-                      [disabled]="busy() || suspendReason().trim().length < 3"
+                      type="button"
+                      class="btn-secondary"
+                      [disabled]="busy()"
+                      (click)="validate(configuration)"
                     >
-                      Confirmar
+                      Validar
                     </button>
-                    <button type="button" class="btn-secondary" (click)="cancelSuspend()">
-                      Cancelar
+                    <button
+                      type="button"
+                      class="btn-primary"
+                      [disabled]="
+                        busy() || !configuration.validatedAt || configuration.status === 'ACTIVE'
+                      "
+                      (click)="activate(configuration)"
+                    >
+                      Ativar
                     </button>
-                  </form>
-                }
-              </article>
-            } @empty {
-              <div
-                class="rounded-xl border border-dashed border-neutral-300 px-6 py-12 text-center lg:col-span-2 dark:border-neutral-700"
-              >
-                <p class="font-medium text-neutral-800 dark:text-neutral-200">
-                  Nenhum meio configurado
-                </p>
-                <p class="mt-1 text-sm text-neutral-500">
-                  Crie o primeiro meio para começar a receber pagamentos.
-                </p>
-                <button type="button" class="btn-primary mt-4" (click)="openCreate()">
-                  Criar meio
-                </button>
-              </div>
-            }
-          </div>
-        }
-      </section>
+                    @if (isSuperAdmin() && configuration.status === 'ACTIVE') {
+                      <button
+                        type="button"
+                        class="btn-secondary"
+                        [disabled]="busy()"
+                        (click)="startSuspend(configuration)"
+                      >
+                        Suspender
+                      </button>
+                    }
+                    @if (isSuperAdmin() && configuration.status !== 'INACTIVE') {
+                      <button
+                        type="button"
+                        class="btn-secondary text-red-600"
+                        [disabled]="busy()"
+                        (click)="startRemove(configuration)"
+                      >
+                        Remover
+                      </button>
+                    }
+                  </div>
+
+                  @if (removingId() === configuration.id) {
+                    <div
+                      class="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300"
+                    >
+                      <p>
+                        Este meio deixará de aparecer nas novas compras. O histórico de pagamentos
+                        será preservado.
+                      </p>
+                      <div class="mt-3 flex gap-2">
+                        <button
+                          type="button"
+                          class="btn-primary"
+                          [disabled]="busy()"
+                          (click)="remove(configuration)"
+                        >
+                          Confirmar remoção
+                        </button>
+                        <button type="button" class="btn-secondary" (click)="cancelRemove()">
+                          Cancelar
+                        </button>
+                      </div>
+                    </div>
+                  }
+
+                  @if (suspendingId() === configuration.id) {
+                    <form
+                      class="mt-4 flex flex-col gap-2 rounded-lg bg-neutral-50 p-3 sm:flex-row dark:bg-neutral-800/60"
+                      (ngSubmit)="suspend(configuration)"
+                    >
+                      <input
+                        class="form-input flex-1"
+                        placeholder="Motivo da suspensão"
+                        [value]="suspendReason()"
+                        (input)="suspendReason.set($any($event.target).value)"
+                      />
+                      <button
+                        type="submit"
+                        class="btn-primary"
+                        [disabled]="busy() || suspendReason().trim().length < 3"
+                      >
+                        Confirmar
+                      </button>
+                      <button type="button" class="btn-secondary" (click)="cancelSuspend()">
+                        Cancelar
+                      </button>
+                    </form>
+                  }
+                </article>
+              } @empty {
+                <div
+                  class="rounded-2xl bg-surface px-6 py-14 text-center ring-1 ring-dashed ring-border-strong lg:col-span-2"
+                >
+                  <p class="font-medium text-neutral-800 dark:text-neutral-200">
+                    Nenhum meio configurado
+                  </p>
+                  <p class="mt-1 text-sm text-neutral-500">
+                    Crie o primeiro meio para começar a receber pagamentos.
+                  </p>
+                  <button type="button" class="btn-primary mt-4" (click)="openCreate()">
+                    Criar meio
+                  </button>
+                </div>
+              }
+            </div>
+          }
+        </section>
+      </div>
     </div>
   `,
 })
@@ -652,8 +707,10 @@ export class PaymentSettingsPage {
   readonly editing = signal<PaymentConfiguration | null>(null);
   readonly policyEditorOpen = signal(false);
   readonly suspendingId = signal<string | null>(null);
+  readonly removingId = signal<string | null>(null);
   readonly suspendReason = signal('');
   readonly selectedProvider = signal<string | null>(null);
+  readonly banks = BRAZILIAN_BANKS;
 
   readonly role = computed(() => this.appState.userRole() as PaymentSettingsRole);
   readonly isSuperAdmin = computed(() => this.role() === 'SUPER_ADMIN');
@@ -661,6 +718,15 @@ export class PaymentSettingsPage {
     this.policies().filter((policy) =>
       this.isSuperAdmin() ? policy.platformEnabled : policy.resellerEnabled,
     ),
+  );
+  readonly hasBankAccount = computed(() =>
+    this.configurations().some(
+      ({ policy }) =>
+        policy.providerCode === 'BANK_TRANSFER_MANUAL' || policy.providerCode === 'MANUAL',
+    ),
+  );
+  readonly activeCount = computed(
+    () => this.configurations().filter(({ status }) => status === 'ACTIVE').length,
   );
 
   readonly configurationForm = this.fb.nonNullable.group({
@@ -722,12 +788,12 @@ export class PaymentSettingsPage {
     const firstPolicy = this.eligiblePolicies()[0];
     this.configurationForm.reset({
       policyId: firstPolicy?.id ?? '',
-      name: '',
+      name: firstPolicy?.displayName ?? '',
       priority: 0,
       currency: 'BRL',
       instructions: '',
       pixKey: '',
-      pixKeyType: 'EMAIL',
+      pixKeyType: 'RANDOM',
       beneficiaryName: '',
       beneficiaryDocument: '',
       bankName: '',
@@ -798,25 +864,35 @@ export class PaymentSettingsPage {
             webhookSecret: values.webhookSecret.trim(),
           }
         : undefined;
+    const name = this.configurationName(provider, values);
     const current = this.editing();
-    const request = current
+    const saveRequest = current
       ? this.service.updateConfiguration(this.role(), current.id, {
-          name: values.name.trim(),
+          name,
           priority: values.priority,
           publicConfig,
           ...(credentials ? { credentials } : {}),
         })
       : this.service.createConfiguration(this.role(), {
           policyId: values.policyId,
-          name: values.name.trim(),
+          name,
           priority: values.priority,
           currency: values.currency.toUpperCase(),
           publicConfig,
           ...(credentials ? { credentials } : {}),
         });
-    this.runMutation(request, current ? 'Meio atualizado.' : 'Meio criado.', () =>
-      this.closeEditor(),
+    const request = saveRequest.pipe(
+      tap((configuration) => {
+        if (!current) this.editing.set(configuration);
+      }),
+      concatMap((configuration) =>
+        this.service.validateConfiguration(this.role(), configuration.id),
+      ),
+      concatMap((configuration) =>
+        this.service.activateConfiguration(this.role(), configuration.id),
+      ),
     );
+    this.runMutation(request, 'Meio de pagamento salvo e ativado.', () => this.closeEditor());
   }
 
   openPolicy(): void {
@@ -890,6 +966,22 @@ export class PaymentSettingsPage {
     );
   }
 
+  startRemove(configuration: PaymentConfiguration): void {
+    this.removingId.set(configuration.id);
+  }
+
+  cancelRemove(): void {
+    this.removingId.set(null);
+  }
+
+  remove(configuration: PaymentConfiguration): void {
+    this.runMutation(
+      this.service.deactivateConfiguration(configuration.id),
+      'Meio de pagamento removido.',
+      () => this.cancelRemove(),
+    );
+  }
+
   statusLabel(status: PaymentConfigStatus): string {
     return STATUS_LABEL[status];
   }
@@ -905,6 +997,7 @@ export class PaymentSettingsPage {
   selectPolicy(policy: PaymentMethodPolicy): void {
     if (this.editing()) return;
     this.configurationForm.controls.policyId.setValue(policy.id);
+    this.configurationForm.controls.name.setValue(policy.displayName);
     this.selectedProvider.set(policy.providerCode);
     this.formError.set(null);
   }
@@ -935,6 +1028,13 @@ export class PaymentSettingsPage {
     return 'Integração de pagamento autorizada.';
   }
 
+  submitLabel(editing: boolean): string {
+    if (this.selectedProvider() === 'MERCADO_PAGO') {
+      return editing ? 'Testar conexão e reativar' : 'Testar conexão e ativar';
+    }
+    return editing ? 'Salvar e ativar' : 'Ativar meio de pagamento';
+  }
+
   flagClass(enabled: boolean): string {
     return enabled
       ? 'rounded-full bg-emerald-100 px-2.5 py-1 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300'
@@ -958,13 +1058,8 @@ export class PaymentSettingsPage {
   ): string | null {
     if (!provider) return 'Selecione uma modalidade de pagamento.';
     if (provider === 'PIX_MANUAL') {
-      if (
-        !values.pixKey.trim() ||
-        !values.beneficiaryName.trim() ||
-        !values.beneficiaryDocument.trim() ||
-        !values.instructions.trim()
-      ) {
-        return 'Preencha a chave PIX, o favorecido, o documento e as instruções.';
+      if (!values.pixKey.trim()) {
+        return 'Informe a chave PIX.';
       }
     }
     if (provider === 'BANK_TRANSFER_MANUAL' || provider === 'MANUAL') {
@@ -973,10 +1068,9 @@ export class PaymentSettingsPage {
         !values.agency.trim() ||
         !values.account.trim() ||
         !values.holderName.trim() ||
-        !values.holderDocument.trim() ||
-        !values.instructions.trim()
+        !values.holderDocument.trim()
       ) {
-        return 'Preencha todos os dados bancários e as instruções para o pagador.';
+        return 'Escolha o banco e preencha todos os dados da conta.';
       }
     }
     if (
@@ -1001,16 +1095,14 @@ export class PaymentSettingsPage {
   ): Record<string, unknown> {
     if (provider === 'PIX_MANUAL') {
       return {
-        instructions: values.instructions.trim(),
+        instructions: 'Faça o pagamento pela chave PIX informada e envie o comprovante.',
         pixKey: values.pixKey.trim(),
-        pixKeyType: values.pixKeyType,
-        beneficiaryName: values.beneficiaryName.trim(),
-        beneficiaryDocument: values.beneficiaryDocument.trim(),
+        pixKeyType: this.inferPixKeyType(values.pixKey),
       };
     }
     if (provider === 'BANK_TRANSFER_MANUAL' || provider === 'MANUAL') {
       return {
-        instructions: values.instructions.trim(),
+        instructions: 'Faça a transferência para a conta informada e envie o comprovante.',
         bankName: values.bankName.trim(),
         agency: values.agency.trim(),
         account: values.account.trim(),
@@ -1022,6 +1114,28 @@ export class PaymentSettingsPage {
     return {};
   }
 
+  private configurationName(
+    provider: string | null,
+    values: ReturnType<typeof this.configurationForm.getRawValue>,
+  ): string {
+    if (provider === 'PIX_MANUAL') return 'Pix';
+    if (provider === 'MERCADO_PAGO') return 'Mercado Pago';
+    if (provider === 'BANK_TRANSFER_MANUAL' || provider === 'MANUAL') {
+      return `${values.bankName.trim()} • Ag. ${values.agency.trim()} / ${values.account.trim()}`;
+    }
+    return values.name.trim();
+  }
+
+  private inferPixKeyType(key: string): 'CPF' | 'CNPJ' | 'EMAIL' | 'PHONE' | 'RANDOM' {
+    const value = key.trim();
+    if (value.includes('@')) return 'EMAIL';
+    const digits = value.replace(/\D/g, '');
+    if (digits.length === 11 && value.startsWith('+')) return 'PHONE';
+    if (digits.length === 11) return 'CPF';
+    if (digits.length === 14) return 'CNPJ';
+    return 'RANDOM';
+  }
+
   private runMutation(
     request: Observable<unknown>,
     message: string,
@@ -1031,6 +1145,7 @@ export class PaymentSettingsPage {
     this.busy.set(true);
     this.error.set(null);
     this.success.set(null);
+    this.formError.set(null);
     request.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.busy.set(false);
@@ -1040,7 +1155,12 @@ export class PaymentSettingsPage {
       },
       error: (error: Error) => {
         this.busy.set(false);
-        this.error.set(error.message || 'Não foi possível concluir a operação.');
+        const message = error.message || 'Não foi possível concluir a operação.';
+        if (this.editorOpen()) {
+          this.formError.set(message);
+        } else {
+          this.error.set(message);
+        }
       },
     });
   }

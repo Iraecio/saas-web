@@ -48,7 +48,6 @@ const MENU_BY_ROLE: Record<UserRole, MenuItem[]> = {
     { icon: '🪙', label: 'Comprar Créditos', route: '/admin/reseller-credits/purchases' },
     { icon: '📦', label: 'Estoque', route: '/admin/reseller-credits/stock' },
     { icon: '💵', label: 'Vendas', route: '/admin/reseller-credits/sales' },
-    { icon: '💳', label: 'Minha Carteira', route: '/admin/wallet' },
     { icon: '⚙️', label: 'Configurações', route: '/admin/settings' },
   ],
   RESELLER_MANAGER: [
@@ -59,13 +58,13 @@ const MENU_BY_ROLE: Record<UserRole, MenuItem[]> = {
     { icon: '🪙', label: 'Comprar Créditos', route: '/admin/reseller-credits/purchases' },
     { icon: '📦', label: 'Estoque', route: '/admin/reseller-credits/stock' },
     { icon: '💵', label: 'Vendas', route: '/admin/reseller-credits/sales' },
-    { icon: '💳', label: 'Minha Carteira', route: '/admin/wallet' },
     { icon: '📈', label: 'Relatórios', route: '/admin/reports' },
     { icon: '⚙️', label: 'Configurações', route: '/admin/settings' },
   ],
   VOICE_ACTOR: [
     { icon: '📊', label: 'Dashboard', route: '/admin/dashboard' },
     { icon: '📦', label: 'Meus Pedidos', route: '/admin/orders' },
+    { icon: '🎛️', label: 'Meus Serviços', route: '/admin/professionals/my-services' },
     { icon: '💸', label: 'Meus Saques', route: '/admin/withdrawals' },
     { icon: '💳', label: 'Minha Carteira', route: '/admin/wallet' },
     { icon: '⚙️', label: 'Configurações', route: '/admin/settings' },

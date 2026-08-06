@@ -13,7 +13,7 @@ import { CreditPackage, ResellerPricing } from '../../../../core/models/reseller
 export class ResellerPricingPage {
   private readonly svc=inject(ResellerCreditService); private readonly destroyRef=inject(DestroyRef);
   readonly packages=signal<CreditPackage[]>([]); readonly error=signal(''); platformPriceCents=0; unitPriceCents=0; allowDirectPurchase=false;
-  constructor(){ this.svc.getPlatformPrice().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({next:p=>this.platformPriceCents=p.unitPriceCents,error:e=>this.error.set(e.message)}); this.reload(); }
+  constructor(){ this.svc.getPlatformPrice().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({next:p=>this.platformPriceCents=p?.unitPriceCents ?? 0,error:e=>this.error.set(e.message)}); this.reload(); }
   reload(){this.svc.getPricing().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({next:(p:ResellerPricing)=>{this.unitPriceCents=p.unitPriceCents;this.allowDirectPurchase=p.allowDirectPurchase;this.packages.set(p.packages??[]);},error:e=>this.error.set(e.message)});}
   save(){this.svc.updatePricing({unitPriceCents:this.unitPriceCents,allowDirectPurchase:this.allowDirectPurchase}).subscribe({next:()=>this.reload(),error:e=>this.error.set(e.message)});}
   toggle(p:CreditPackage){this.svc.togglePackage(p.id,!p.isActive).subscribe({next:()=>this.reload(),error:e=>this.error.set(e.message)});}

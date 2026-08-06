@@ -1,7 +1,12 @@
 // ── Enums ────────────────────────────────────────────────────────────────────
 export type CreditStatus = 'AVAILABLE' | 'FROZEN' | 'SPENT' | 'CANCELLED' | 'REFUNDED' | 'EXPIRED';
 export type CreditType = 'PAID' | 'PROMOTIONAL' | 'EARNED' | 'BONUS';
-export type CreditOriginType = 'PURCHASE' | 'SERVICE_PAYMENT' | 'ADJUSTMENT' | 'PROMOTION' | 'BONUS';
+export type CreditOriginType =
+  | 'PURCHASE'
+  | 'SERVICE_PAYMENT'
+  | 'ADJUSTMENT'
+  | 'PROMOTION'
+  | 'BONUS';
 export type CreditEventType =
   | 'ISSUED'
   | 'TRANSFERRED'
@@ -43,6 +48,7 @@ export interface Wallet {
   totalRefunded: number;
   currency: string;
   createdAt: string;
+  balanceSource?: 'RESELLER_STOCK';
 }
 
 export type WalletSummary = Wallet;

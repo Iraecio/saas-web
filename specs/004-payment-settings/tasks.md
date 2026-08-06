@@ -82,6 +82,24 @@
 
 ---
 
+## Phase 7: Extensão - Valor dos créditos do superadmin
+
+**Purpose**: Permitir que o superadmin defina o custo unitário dos créditos vendidos às revendas usando o contrato append-only da API.
+
+- [x] T019 Verificar os contratos `GET/POST /admin/credit-price` em `../saas-api/src/modules/credit-pricing/`
+- [x] T020 Criar modelos e serviço tipado em `src/app/core/models/credit-price.model.ts` e `src/app/features/settings/services/credit-price-settings.ts`
+- [x] T021 Cobrir paths, verbos, query params e payload do serviço em `src/app/features/settings/services/credit-price-settings.spec.ts`
+- [x] T022 Criar a página com preço vigente, nova vigência e histórico em `src/app/features/settings/pages/credit-price/credit-price.ts`
+- [x] T023 Adicionar aba e rota exclusivas para `SUPER_ADMIN` em `src/app/features/settings/pages/general/general.ts` e `src/app/features/settings/settings.routes.ts`
+- [x] T024 Formatar, executar os testes de contrato e validar o build SSR de produção
+- [x] T025 Corrigir o consumo do envelope `{ current }` no preço exibido ao revendedor e cobrir respostas com e sem preço vigente
+- [x] T026 Exibir chave PIX, dados públicos e QR Code/copia-e-cola disponíveis antes e depois de iniciar a compra, preservando instruções entre eventos
+- [x] T027 Relacionar histórico de compras e transações para permitir envio de comprovante e acompanhamento da resolução pela revenda
+- [x] T028 Aceitar comprovantes privados em JPEG, PNG, WebP, HEIC, HEIF e PDF para compras de revendas e clientes, com validação de 10 MB na API e frontend
+- [x] T029 Serializar `PaymentProof.fileSize` em JSON com segurança após o upload de comprovantes
+
+---
+
 ## Dependencies & Execution Order
 
 ### Phase Dependencies

@@ -2,6 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   DestroyRef,
   inject,
   OnInit,
@@ -12,7 +13,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { AuthService } from '../../../../core/services/auth';
+import { AuthService, DevLoginUser } from '../../../../core/services/auth';
 import { AppStateService } from '../../../../core/services/app-state';
 import { UserRole } from '../../../../core/models/user.model';
 
@@ -202,21 +203,48 @@ import { UserRole } from '../../../../core/models/user.model';
           >
             Acesso rápido · dev
           </p>
-          <div class="grid grid-cols-2 gap-2">
-            @for (u of devUsers; track u.email) {
-              <button
-                type="button"
-                (click)="quickLogin(u.email)"
-                [disabled]="loading()"
-                class="flex flex-col items-start rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-left transition-colors hover:border-neutral-600 hover:bg-neutral-800 disabled:opacity-40"
-              >
-                <span class="text-[10px] font-semibold uppercase tracking-wide" [class]="u.color">{{
-                  u.role
-                }}</span>
-                <span class="mt-0.5 truncate text-xs text-neutral-300">{{ u.name }}</span>
-              </button>
-            }
-          </div>
+          @if (devUsersLoading()) {
+            <p class="py-3 text-center text-xs text-neutral-500">Carregando usuários...</p>
+          } @else if (devUsersError()) {
+            <p class="py-3 text-center text-xs text-neutral-500">{{ devUsersError() }}</p>
+          } @else {
+            <div class="space-y-4">
+              @for (group of devUserGroups(); track group.role) {
+                <section>
+                  <p
+                    class="mb-2 text-[10px] font-semibold uppercase tracking-widest"
+                    [class]="roleColor(group.role)"
+                  >
+                    {{ roleLabel(group.role) }} · {{ group.users.length }}
+                  </p>
+                  <div class="grid grid-cols-2 gap-2">
+                    @for (u of group.users; track u.email) {
+                      <button
+                        type="button"
+                        (click)="quickLogin(u.email)"
+                        [disabled]="loading()"
+                        class="flex min-w-0 flex-col items-start rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-left transition-colors hover:border-neutral-600 hover:bg-neutral-800 disabled:opacity-40"
+                      >
+                        <span
+                          class="text-[10px] font-semibold uppercase tracking-wide"
+                          [class]="roleColor(u.role)"
+                          >{{ roleLabel(u.role) }}</span
+                        >
+                        <span class="mt-0.5 w-full truncate text-xs text-neutral-300">{{
+                          u.name || u.email
+                        }}</span>
+                        <span class="w-full truncate text-[10px] text-neutral-600">{{
+                          u.email
+                        }}</span>
+                      </button>
+                    }
+                  </div>
+                </section>
+              } @empty {
+                <p class="py-3 text-center text-xs text-neutral-500">Nenhum usuário disponível.</p>
+              }
+            </div>
+          }
         </div>
 
         <!-- Link Registrar -->
@@ -262,40 +290,23 @@ export class LoginComponent implements OnInit {
   readonly loading = signal(false);
   readonly error = signal<string | undefined>(undefined);
   readonly showPassword = signal(false);
-
-  readonly devUsers = [
-    {
-      name: 'Administrador Principal',
-      email: 'admin1@gmail.com',
-      role: 'Super Admin',
-      color: 'text-red-400',
-    },
-    {
-      name: 'Carlos Mendes',
-      email: 'revenda1@gmail.com',
-      role: 'Revendedor',
-      color: 'text-blue-400',
-    },
-    {
-      name: 'Fernanda Lima',
-      email: 'revenda2@gmail.com',
-      role: 'Revendedor',
-      color: 'text-blue-400',
-    },
-    {
-      name: 'Roberto Alves',
-      email: 'revenda3@gmail.com',
-      role: 'Revendedor',
-      color: 'text-blue-400',
-    },
-    { name: 'Ana Silva', email: 'locutor1@gmail.com', role: 'Locutor', color: 'text-purple-400' },
-    {
-      name: 'Lucas Martins',
-      email: 'cliente1@gmail.com',
-      role: 'Cliente',
-      color: 'text-green-400',
-    },
-  ];
+  readonly devUsers = signal<DevLoginUser[]>([]);
+  readonly devUsersLoading = signal(false);
+  readonly devUsersError = signal<string | undefined>(undefined);
+  readonly devUserGroups = computed(() => {
+    const roleOrder: UserRole[] = [
+      'SUPER_ADMIN',
+      'ADMIN',
+      'RESELLER',
+      'RESELLER_MANAGER',
+      'VOICE_ACTOR',
+      'PRODUCER',
+      'CLIENT',
+    ];
+    return roleOrder
+      .map((role) => ({ role, users: this.devUsers().filter((user) => user.role === role) }))
+      .filter((group) => group.users.length > 0);
+  });
 
   private readonly roleDashboardMap: Record<UserRole, string> = {
     SUPER_ADMIN: 'admin',
@@ -314,6 +325,7 @@ export class LoginComponent implements OnInit {
 
   ngOnInit(): void {
     if (!isPlatformBrowser(this.platformId)) return;
+    this.loadDevUsers();
     // Supabase redireciona para a URL base com o token no hash fragment
     // ex: /auth/login#access_token=...&type=recovery
     const hash = window.location.hash.slice(1);
@@ -326,6 +338,47 @@ export class LoginComponent implements OnInit {
         replaceUrl: true,
       });
     }
+  }
+
+  roleLabel(role: UserRole): string {
+    return {
+      SUPER_ADMIN: 'Super Admin',
+      ADMIN: 'Admin',
+      RESELLER: 'Revendedor',
+      RESELLER_MANAGER: 'Gestor',
+      VOICE_ACTOR: 'Locutor',
+      PRODUCER: 'Produtor',
+      CLIENT: 'Cliente',
+    }[role];
+  }
+
+  roleColor(role: UserRole): string {
+    return {
+      SUPER_ADMIN: 'text-red-400',
+      ADMIN: 'text-orange-400',
+      RESELLER: 'text-blue-400',
+      RESELLER_MANAGER: 'text-cyan-400',
+      VOICE_ACTOR: 'text-purple-400',
+      PRODUCER: 'text-pink-400',
+      CLIENT: 'text-green-400',
+    }[role];
+  }
+
+  private loadDevUsers(): void {
+    this.devUsersLoading.set(true);
+    this.auth
+      .listDevUsers()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (users) => {
+          this.devUsers.set(users);
+          this.devUsersLoading.set(false);
+        },
+        error: () => {
+          this.devUsersError.set('Acesso rápido indisponível neste ambiente.');
+          this.devUsersLoading.set(false);
+        },
+      });
   }
 
   togglePassword(): void {

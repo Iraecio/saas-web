@@ -45,7 +45,7 @@ import {
           <textarea class="form-input w-full" rows="2" formControlName="description"></textarea>
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid gap-4 sm:grid-cols-2">
           <div>
             <label class="form-label">Tipo de profissional</label>
             <select class="form-input w-full" formControlName="professionalRole">
@@ -59,10 +59,15 @@ import {
           </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid gap-4 sm:grid-cols-2">
           <div>
-            <label class="form-label">Prazo de entrega (horas)</label>
-            <input type="number" min="1" class="form-input w-full" formControlName="defaultDeliveryHours" />
+            <label class="form-label">Repasse padrão (centavos)</label>
+            <input
+              type="number"
+              min="1"
+              class="form-input w-full"
+              formControlName="defaultPayoutCents"
+            />
           </div>
           <div>
             <label class="form-label">Revisões incluídas</label>
@@ -70,22 +75,11 @@ import {
           </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="form-label">
-              Repasse ao profissional (centavos){{ isAdmin() ? '' : ' (opcional)' }}
-            </label>
-            <input type="number" min="1" class="form-input w-full" formControlName="professionalPayout" />
-          </div>
-          <div>
-            <label class="form-label">Duração máx. (s) (opcional)</label>
-            <input type="number" min="1" class="form-input w-full" formControlName="maxDurationSeconds" />
-          </div>
-        </div>
-
         @if (isEdit() && criticalChanged()) {
-          <div class="rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-700 dark:bg-amber-900/20 dark:text-amber-300">
-            ⚠️ Você alterou campos críticos (custo, prazo ou revisões). A mudança afetará
+          <div
+            class="rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-700 dark:bg-amber-900/20 dark:text-amber-300"
+          >
+            Você alterou campos comerciais (custo, repasse ou revisões). A mudança afetará
             <strong>novos pedidos</strong>. Ao salvar, a confirmação de impacto será enviada.
           </div>
         }
@@ -116,17 +110,19 @@ export class ServiceFormPage {
   readonly criticalChanged = signal(false);
 
   // Valores originais dos campos críticos (para detectar alteração na edição).
-  private originalCritical: { creditCost?: number; defaultDeliveryHours?: number; maxRevisions?: number } = {};
+  private originalCritical: {
+    creditCost?: number;
+    defaultPayoutCents?: number;
+    maxRevisions?: number;
+  } = {};
 
   readonly form = this.fb.group({
     name: ['', Validators.required],
     description: [''],
     professionalRole: ['VOICE_ACTOR' as ProfessionalRole, Validators.required],
     creditCost: [1, [Validators.required, Validators.min(1)]],
-    defaultDeliveryHours: [48, [Validators.required, Validators.min(1)]],
+    defaultPayoutCents: [100, [Validators.required, Validators.min(1)]],
     maxRevisions: [2, [Validators.required, Validators.min(0)]],
-    professionalPayout: [null as number | null],
-    maxDurationSeconds: [null as number | null],
   });
 
   constructor() {
@@ -142,14 +138,12 @@ export class ServiceFormPage {
               description: svc.description ?? '',
               professionalRole: svc.professionalRole,
               creditCost: svc.creditCost,
-              defaultDeliveryHours: svc.defaultDeliveryHours,
+              defaultPayoutCents: svc.defaultPayoutCents,
               maxRevisions: svc.maxRevisions,
-              professionalPayout: svc.professionalPayout ?? null,
-              maxDurationSeconds: svc.maxDurationSeconds ?? null,
             });
             this.originalCritical = {
               creditCost: svc.creditCost,
-              defaultDeliveryHours: svc.defaultDeliveryHours,
+              defaultPayoutCents: svc.defaultPayoutCents,
               maxRevisions: svc.maxRevisions,
             };
           },
@@ -160,7 +154,7 @@ export class ServiceFormPage {
       this.form.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((v) => {
         const changed =
           v.creditCost !== this.originalCritical.creditCost ||
-          v.defaultDeliveryHours !== this.originalCritical.defaultDeliveryHours ||
+          v.defaultPayoutCents !== this.originalCritical.defaultPayoutCents ||
           v.maxRevisions !== this.originalCritical.maxRevisions;
         this.criticalChanged.set(changed);
       });
@@ -178,10 +172,8 @@ export class ServiceFormPage {
         description: raw.description ?? undefined,
         professionalRole: raw.professionalRole!,
         creditCost: raw.creditCost!,
-        defaultDeliveryHours: raw.defaultDeliveryHours!,
+        defaultPayoutCents: raw.defaultPayoutCents!,
         maxRevisions: raw.maxRevisions!,
-        professionalPayout: raw.professionalPayout ?? undefined,
-        maxDurationSeconds: raw.maxDurationSeconds ?? undefined,
       };
       this.catalog.update(this.serviceId()!, dto).subscribe({
         next: () => this.onSaved('Serviço atualizado.'),
@@ -196,10 +188,8 @@ export class ServiceFormPage {
         professionalRole: raw.professionalRole!,
         scope,
         creditCost: raw.creditCost!,
-        defaultDeliveryHours: raw.defaultDeliveryHours!,
+        defaultPayoutCents: raw.defaultPayoutCents!,
         maxRevisions: raw.maxRevisions!,
-        professionalPayout: raw.professionalPayout ?? undefined,
-        maxDurationSeconds: raw.maxDurationSeconds ?? undefined,
       };
       this.catalog.create(dto).subscribe({
         next: () => this.onSaved('Serviço criado.'),

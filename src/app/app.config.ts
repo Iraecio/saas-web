@@ -1,12 +1,14 @@
 import {
   APP_INITIALIZER,
   ApplicationConfig,
+  LOCALE_ID,
   PLATFORM_ID,
   inject,
   provideBrowserGlobalErrorListeners,
   provideZonelessChangeDetection,
 } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser, registerLocaleData } from '@angular/common';
+import localePt from '@angular/common/locales/pt';
 import { provideRouter, withComponentInputBinding, withViewTransitions } from '@angular/router';
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
@@ -17,8 +19,11 @@ import { responseTransformInterceptor } from './core/interceptors/response-trans
 import { errorInterceptor } from './core/interceptors/error.interceptor';
 import { AuthService } from './core/services/auth';
 
+registerLocaleData(localePt, 'pt-BR');
+
 export const appConfig: ApplicationConfig = {
   providers: [
+    { provide: LOCALE_ID, useValue: 'pt-BR' },
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
     provideRouter(routes, withComponentInputBinding(), withViewTransitions()),

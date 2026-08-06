@@ -31,3 +31,38 @@ export interface SetScopeDto {
   scope: ServiceScope;
   resellerId?: string;
 }
+
+export type ProfessionalRole = 'VOICE_ACTOR' | 'PRODUCER';
+export type NegotiationInitiator = 'PROFESSIONAL' | 'MANAGER';
+export type NegotiationStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'COUNTERED' | 'APPLIED';
+
+export interface ProfessionalOffering {
+  serviceId: string;
+  serviceName: string;
+  professionalRole: ProfessionalRole;
+  scope: ServiceScope;
+  priceCents: number;
+  active: boolean;
+  pendingNegotiationId?: string | null;
+  updatedAt: string;
+}
+
+export interface ServicePriceNegotiation {
+  id: string;
+  pricingId: string;
+  initiator: NegotiationInitiator;
+  initiatedById: string;
+  previousPriceCents: number;
+  proposedPriceCents: number;
+  status: NegotiationStatus;
+  counteredFromId?: string | null;
+  decidedById?: string | null;
+  decidedAt?: string | null;
+  notes?: string | null;
+  createdAt: string;
+}
+
+export interface ProposeServicePriceDto {
+  proposedPriceCents: number;
+  notes?: string;
+}

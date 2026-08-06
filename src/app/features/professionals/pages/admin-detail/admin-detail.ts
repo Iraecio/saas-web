@@ -388,7 +388,7 @@ export class ProfessionalAdminDetailPage {
       .pipe(
         switchMap((profile) =>
           profile
-            ? this.service.getDetail(userId, profile)
+            ? this.service.getDetail(profile.userId, profile)
             : throwError(() => new Error('Profissional não encontrado.')),
         ),
         takeUntilDestroyed(this.destroyRef),

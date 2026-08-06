@@ -65,7 +65,7 @@ export class ProfessionalAdminService {
   getDetail(userId: string, profile: ProfessionalAdminItem): Observable<ProfessionalAdminDetail> {
     return this.api.get<User>(`/users/${userId}`).pipe(
       switchMap((user) =>
-        this.professionals.listOfferings(profile.id).pipe(
+        this.professionals.listOfferings(profile.userId).pipe(
           map(
             (offerings): ProfessionalAdminDetail => ({
               professional: {

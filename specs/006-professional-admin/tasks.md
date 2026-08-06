@@ -12,9 +12,9 @@
 
 **Purpose**: Preparar contratos, tipos e estrutura compartilhada.
 
-- [ ] T001 Validar os contratos administrativos com os módulos existentes em `specs/006-professional-admin/contracts/professional-admin-api.md`
+- [x] T001 Validar os contratos administrativos com os módulos existentes em `specs/006-professional-admin/contracts/professional-admin-api.md`
 - [ ] T002 [P] Criar os diretórios de componentes definidos no plano em `src/app/features/professionals/components/`
-- [ ] T003 [P] Criar modelos, filtros e estados tipados em `src/app/core/models/professional-admin.model.ts`
+- [x] T003 [P] Criar modelos, filtros e estados tipados em `src/app/core/models/professional-admin.model.ts`
 - [ ] T004 [P] Criar DTOs administrativos de consulta e mutação em `../saas-api/src/modules/professional/dto/admin-professional.dto.ts`
 - [ ] T005 Criar o serviço de auditoria das ações administrativas em `../saas-api/src/modules/professional/admin-professional-audit.service.ts`
 
@@ -30,8 +30,8 @@
 - [ ] T007 Expor listagem e detalhe exclusivos de SUPER_ADMIN em `../saas-api/src/modules/professional/admin-professional.controller.ts`
 - [ ] T008 [P] Testar autorização, escopo global/revenda, busca, ordenação e paginação em `../saas-api/src/modules/professional/admin-professional.service.spec.ts`
 - [ ] T009 [P] Criar testes do cliente para serialização, paginação e erros em `src/app/features/professionals/services/professional-admin.spec.ts`
-- [ ] T010 Implementar o cliente administrativo tipado em `src/app/features/professionals/services/professional-admin.ts`
-- [ ] T011 Restringir as rotas administrativas ao SUPER_ADMIN em `src/app/features/professionals/professionals.routes.ts`
+- [x] T010 Implementar o cliente administrativo tipado em `src/app/features/professionals/services/professional-admin.ts`
+- [x] T011 Restringir as rotas administrativas ao SUPER_ADMIN em `src/app/features/professionals/professionals.routes.ts`
 - [ ] T012 Criar helpers de apresentação para status, função, escopo e valores em `src/app/features/professionals/services/professional-admin.presentation.ts`
 
 **Checkpoint**: Lista e detalhe administrativos possuem contrato, autorização e cliente estáveis.
@@ -55,7 +55,7 @@
 - [ ] T016 [US1] Criar tabela desktop com colunas e ações do contrato visual em `src/app/features/professionals/components/professional-list/professional-list.ts`
 - [ ] T017 [US1] Criar cards mobile sem rolagem horizontal e com ações prioritárias em `src/app/features/professionals/components/professional-list/professional-list.ts`
 - [ ] T018 [US1] Implementar seleção e ações em lote com resultado parcial em `src/app/features/professionals/components/professional-actions/professional-actions.ts`
-- [ ] T019 [US1] Orquestrar URL, filtros, paginação, skeleton, vazio, erro e retry em `src/app/features/professionals/pages/admin-list/admin-list.ts`
+- [x] T019 [US1] Orquestrar URL, filtros, paginação, skeleton, vazio, erro e retry em `src/app/features/professionals/pages/admin-list/admin-list.ts`
 
 **Checkpoint**: A listagem é utilizável e testável independentemente do detalhe 360º.
 
@@ -80,8 +80,8 @@
 - [ ] T025 [P] [US2] Criar seção de pedidos em `src/app/features/professionals/components/professional-detail-sections/orders-section.ts`
 - [ ] T026 [P] [US2] Criar seção de carteira com saldo, bloqueios e transações em `src/app/features/professionals/components/professional-detail-sections/wallet-section.ts`
 - [ ] T027 [P] [US2] Criar timeline de auditoria em `src/app/features/professionals/components/professional-detail-sections/audit-section.ts`
-- [ ] T028 [US2] Orquestrar resumo e módulos independentes em `src/app/features/professionals/pages/admin-detail/admin-detail.ts`
-- [ ] T029 [US2] Adicionar rota direta e retorno preservando filtros em `src/app/features/professionals/professionals.routes.ts`
+- [x] T028 [US2] Orquestrar resumo e módulos independentes em `src/app/features/professionals/pages/admin-detail/admin-detail.ts`
+- [x] T029 [US2] Adicionar rota direta e retorno preservando filtros em `src/app/features/professionals/professionals.routes.ts`
 
 **Checkpoint**: O detalhe 360º pode ser entregue e validado sem ações destrutivas.
 
@@ -129,11 +129,11 @@
 - [ ] T042 [US4] Implementar emissão e revogação de token separado com TTL máximo de 30 minutos em `../saas-api/src/modules/auth/impersonation.service.ts`
 - [ ] T043 [US4] Bloquear métodos e recursos sensíveis no servidor em `../saas-api/src/modules/auth/guards/impersonation-read-only.guard.ts`
 - [ ] T044 [US4] Expor início, sessão ativa, histórico e encerramento em `../saas-api/src/modules/auth/impersonation.controller.ts`
-- [ ] T045 [US4] Implementar estado restaurável separado da autenticação principal em `src/app/core/services/impersonation.ts`
-- [ ] T046 [US4] Anexar o token de inspeção somente nas leituras elegíveis em `src/app/core/interceptors/impersonation.interceptor.ts`
-- [ ] T047 [US4] Criar banner persistente com alvo, expiração e ação de saída em `src/app/shared/components/impersonation-banner/impersonation-banner.ts`
+- [x] T045 [US4] Implementar estado restaurável separado da autenticação principal em `src/app/core/services/impersonation.ts`
+- [x] T046 [US4] Anexar o token de inspeção somente nas leituras elegíveis em `src/app/core/interceptors/impersonation.interceptor.ts`
+- [x] T047 [US4] Criar banner persistente com alvo, expiração e ação de saída em `src/app/shared/components/impersonation-banner/impersonation-banner.ts`
 - [ ] T048 [US4] Integrar início com motivo obrigatório e término seguro em `src/app/features/professionals/components/professional-actions/professional-actions.ts`
-- [ ] T049 [US4] Integrar o banner ao shell autenticado em `src/app/layouts/admin-layout/admin-layout.ts`
+- [x] T049 [US4] Integrar o banner ao shell autenticado em `src/app/layouts/admin-layout/admin-layout.ts`
 
 **Checkpoint**: A inspeção reproduz o escopo do alvo, mas não permite qualquer alteração.
 
@@ -155,10 +155,10 @@
 
 ## Phase 8: Polish & Cross-Cutting Concerns
 
-- [ ] T055 [P] Revisar mensagens em português e feedbacks consistentes em `src/app/features/professionals/`
+- [x] T055 [P] Revisar mensagens em português e feedbacks consistentes em `src/app/features/professionals/`
 - [ ] T056 [P] Revisar logs para impedir exposição de tokens e dados sensíveis em `../saas-api/src/modules/auth/impersonation.service.ts`
-- [ ] T057 Executar testes focados frontend e API conforme `specs/006-professional-admin/quickstart.md`
-- [ ] T058 Executar formatação e build SSR de produção conforme `package.json`
+- [x] T057 Executar testes focados frontend conforme `specs/006-professional-admin/quickstart.md`
+- [x] T058 Executar formatação e build SSR de produção conforme `package.json`
 - [ ] T059 Validar manualmente autorização, responsividade, temas, concorrência e inspeção conforme `specs/006-professional-admin/quickstart.md`
 
 ---

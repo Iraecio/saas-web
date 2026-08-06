@@ -17,6 +17,7 @@ import { routes } from './app.routes';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { responseTransformInterceptor } from './core/interceptors/response-transform.interceptor';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
+import { impersonationInterceptor } from './core/interceptors/impersonation.interceptor';
 import { AuthService } from './core/services/auth';
 
 registerLocaleData(localePt, 'pt-BR');
@@ -29,7 +30,12 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes, withComponentInputBinding(), withViewTransitions()),
     provideHttpClient(
       withFetch(),
-      withInterceptors([responseTransformInterceptor, authInterceptor, errorInterceptor]),
+      withInterceptors([
+        responseTransformInterceptor,
+        authInterceptor,
+        impersonationInterceptor,
+        errorInterceptor,
+      ]),
     ),
     provideClientHydration(withEventReplay()),
     {

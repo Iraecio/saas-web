@@ -9,6 +9,14 @@ export const PROFESSIONALS_ROUTES: Routes = [
   },
   {
     path: '',
-    loadComponent: () => import('./pages/list/list').then((m) => m.ProfessionalsListPage),
+    canActivate: [roleGuard(['SUPER_ADMIN'])],
+    loadComponent: () =>
+      import('./pages/admin-list/admin-list').then((m) => m.ProfessionalAdminListPage),
+  },
+  {
+    path: ':userId',
+    canActivate: [roleGuard(['SUPER_ADMIN'])],
+    loadComponent: () =>
+      import('./pages/admin-detail/admin-detail').then((m) => m.ProfessionalAdminDetailPage),
   },
 ];

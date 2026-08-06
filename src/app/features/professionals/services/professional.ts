@@ -16,6 +16,7 @@ type ProfessionalType = 'voice-actors' | 'producers';
 interface ProfessionalApiItem extends Omit<Professional, 'name'> {
   name?: string;
   user?: {
+    id?: string;
     name?: string | null;
     email?: string | null;
     avatarUrl?: string | null;
@@ -115,7 +116,9 @@ export class ProfessionalService {
     return {
       professionals: items.map(({ user, ...profile }) => ({
         ...profile,
+        userId: profile.userId ?? user?.id ?? profile.id,
         name: profile.name ?? user?.name ?? user?.email ?? 'Profissional',
+        email: profile.email ?? user?.email ?? null,
         avatarUrl: profile.avatarUrl ?? user?.avatarUrl ?? null,
         demoUrl:
           profile.demoUrl ?? profile.voiceSamplesUrls?.[0] ?? profile.portfolioUrls?.[0] ?? null,

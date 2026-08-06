@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { forkJoin, map, Observable, switchMap } from 'rxjs';
+import { expand, forkJoin, map, Observable, reduce, switchMap } from 'rxjs';
 import { ApiService } from '../../../core/services/api';
 import {
   InspectionSession,
@@ -85,14 +85,13 @@ export class ProfessionalAdminService {
 
   findByUserId(userId: string): Observable<ProfessionalAdminItem | undefined> {
     return forkJoin({
-      voices: this.professionals.listVoiceActors({ limit: 100 }),
-      producers: this.professionals.listProducers({ limit: 100 }),
+      voices: this.listAll('VOICE_ACTOR'),
+      producers: this.listAll('PRODUCER'),
     }).pipe(
       map(({ voices, producers }) => {
-        const voice = voices.professionals.find((item) => item.userId === userId);
-        if (voice) return this.toAdminItem(voice, 'VOICE_ACTOR');
-        const producer = producers.professionals.find((item) => item.userId === userId);
-        return producer ? this.toAdminItem(producer, 'PRODUCER') : undefined;
+        return [...voices, ...producers].find(
+          (item) => item.userId === userId || item.id === userId,
+        );
       }),
     );
   }
@@ -148,5 +147,22 @@ export class ProfessionalAdminService {
     if (sort === 'wallet') return (b.walletBalanceCents ?? 0) - (a.walletBalanceCents ?? 0);
     if (sort === 'lastLoginAt') return (b.lastLoginAt ?? '').localeCompare(a.lastLoginAt ?? '');
     return a.name.localeCompare(b.name, 'pt-BR');
+  }
+
+  private listAll(role: ProfessionalAdminItem['role']): Observable<ProfessionalAdminItem[]> {
+    const load = (page: number) =>
+      (role === 'VOICE_ACTOR'
+        ? this.professionals.listVoiceActors({ page, limit: 100 })
+        : this.professionals.listProducers({ page, limit: 100 })
+      ).pipe(map((response) => ({ response, page })));
+
+    return load(1).pipe(
+      expand(({ response, page }) => {
+        const total = response.pagination?.total ?? response.professionals.length;
+        return page * 100 < total ? load(page + 1) : [];
+      }),
+      map(({ response }) => response.professionals.map((item) => this.toAdminItem(item, role))),
+      reduce((all, page) => [...all, ...page], [] as ProfessionalAdminItem[]),
+    );
   }
 }

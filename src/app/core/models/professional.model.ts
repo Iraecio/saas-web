@@ -7,6 +7,7 @@ export interface Professional {
   scope: ServiceScope; // GLOBAL | PARTICULAR
   resellerId: string | null;
   name: string;
+  email?: string | null;
   avatarUrl?: string | null;
   demoUrl?: string | null;
   voiceSamplesUrls?: string[];

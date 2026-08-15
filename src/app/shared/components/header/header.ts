@@ -31,7 +31,7 @@ import { WalletService } from '../../../features/wallet/services/wallet';
   imports: [DatePipe, DecimalPipe, LucideAngularModule, RouterLink],
   template: `
     <header
-      class="flex h-16 items-center justify-between border-b border-neutral-200 bg-white px-4 sm:px-6 dark:border-neutral-700 dark:bg-neutral-800"
+      class="flex h-16 items-center justify-between border-b border-border bg-surface px-4 text-foreground sm:px-6"
     >
       <button
         type="button"

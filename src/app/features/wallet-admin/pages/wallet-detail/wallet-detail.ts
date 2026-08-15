@@ -613,23 +613,79 @@ type DetailSection = 'overview' | 'credits' | 'pending' | 'audit';
         }
       }
       :host-context(.dark) .detail-shell {
-        color: #fafafa;
+        color: var(--ui-foreground);
       }
       :host-context(.dark) .secondary,
       :host-context(.dark) .overview-grid > article,
       :host-context(.dark) .pending-grid > article {
-        border-color: #3f3f46;
+        color: var(--ui-foreground);
+        background: var(--ui-surface);
+        border-color: var(--ui-border);
       }
       :host-context(.dark) .tabs {
-        border-color: #3f3f46;
+        border-color: var(--ui-border);
       }
       :host-context(.dark) .tabs button.active {
-        color: #bfdbfe;
-        border-color: #93c5fd;
+        color: var(--ui-primary);
+        border-color: var(--ui-primary);
       }
       :host-context(.dark) .primary {
-        background: #dbeafe;
-        color: #172554;
+        color: var(--ui-primary-foreground);
+        background: var(--ui-primary);
+      }
+      :host-context(.dark) .breadcrumb,
+      :host-context(.dark) .identity p,
+      :host-context(.dark) .meta,
+      :host-context(.dark) .section-title > span,
+      :host-context(.dark) .overview-grid dt,
+      :host-context(.dark) .rows small,
+      :host-context(.dark) .timeline small,
+      :host-context(.dark) .empty,
+      :host-context(.dark) .state p {
+        color: var(--ui-muted);
+      }
+      :host-context(.dark) .avatar {
+        color: #b9e3df;
+        background: #244047;
+      }
+      :host-context(.dark) .secondary,
+      :host-context(.dark) .state button {
+        color: var(--ui-foreground);
+        background: var(--ui-surface);
+        border-color: var(--ui-border-strong);
+      }
+      :host-context(.dark) .alert {
+        color: #f8cf8d;
+        background: #362d20;
+        border-color: #72592e;
+      }
+      :host-context(.dark) .tabs button {
+        color: var(--ui-muted);
+      }
+      :host-context(.dark) .tabs span,
+      :host-context(.dark) .credit-status {
+        color: var(--ui-muted);
+        background: var(--ui-surface-subtle);
+      }
+      :host-context(.dark) .credit-status.available {
+        color: #8ce0bc;
+        background: #19382f;
+      }
+      :host-context(.dark) .overview-grid dl div,
+      :host-context(.dark) .rows,
+      :host-context(.dark) .rows article,
+      :host-context(.dark) .pending-item {
+        border-color: var(--ui-border);
+      }
+      :host-context(.dark) .timeline i {
+        background: var(--ui-primary);
+      }
+      :host-context(.dark) .detail-skeleton i {
+        background: var(--ui-surface-subtle);
+      }
+      :host-context(.dark) .balance-board {
+        background: #15272b;
+        box-shadow: inset 0 0 0 1px #ffffff0d;
       }
       @media (prefers-reduced-motion: reduce) {
         * {

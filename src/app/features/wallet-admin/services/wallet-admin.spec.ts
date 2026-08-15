@@ -73,8 +73,68 @@ describe('WalletAdminService contracts', () => {
     expect(total).toBe(1);
   });
 
+  it('loads the owner when a legacy wallet response does not include user data', () => {
+    let owner: { name: string; email: string } | undefined;
+    service.listWallets({ page: 1, pageSize: 20 }).subscribe((page) => {
+      owner = {
+        name: page.items[0].ownerName,
+        email: page.items[0].ownerEmail,
+      };
+    });
+
+    http.expectOne(`${environment.apiUrl}/wallet/admin/wallets?page=1&pageSize=20`).flush({
+      items: [
+        {
+          id: 'w-owner',
+          userId: 'u-owner',
+          availableCredits: 12,
+          frozenCredits: 0,
+          expiredCredits: 0,
+          totalReceived: 12,
+          totalSpent: 0,
+          totalRefunded: 0,
+          currency: 'BRL',
+          createdAt: '2026-08-01T00:00:00Z',
+          updatedAt: '2026-08-02T00:00:00Z',
+        },
+      ],
+      total: 1,
+    });
+    http.expectOne(`${environment.apiUrl}/users/u-owner`).flush({
+      id: 'u-owner',
+      name: 'Luana Ribeiro',
+      email: 'luana@example.com',
+      role: 'VOICE_ACTOR',
+      isActive: true,
+    });
+
+    expect(owner).toEqual({ name: 'Luana Ribeiro', email: 'luana@example.com' });
+  });
+
   it('uses the consolidated overview endpoint', () => {
     service.getOverview().subscribe();
     http.expectOne(`${environment.apiUrl}/wallet/admin/overview`).flush({});
+  });
+
+  it('falls back to legacy wallet and analytics endpoints when overview is unavailable', () => {
+    let result: { wallets: number; totalIssued: number } | undefined;
+    service.getOverview().subscribe((overview) => (result = overview));
+    http
+      .expectOne(`${environment.apiUrl}/wallet/admin/overview`)
+      .flush(
+        { message: 'Cannot GET /v1/wallet/admin/overview' },
+        { status: 404, statusText: 'Not Found' },
+      );
+    http
+      .expectOne(`${environment.apiUrl}/wallet/admin/wallets?page=1&pageSize=100`)
+      .flush({ items: [], total: 12 });
+    http.expectOne(`${environment.apiUrl}/wallet/admin/analytics`).flush({
+      totalIssued: 80,
+      totalSpent: 20,
+      totalRefunded: 3,
+      totalExpired: 2,
+    });
+    expect(result?.wallets).toBe(12);
+    expect(result?.totalIssued).toBe(80);
   });
 });

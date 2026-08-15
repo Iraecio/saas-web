@@ -781,43 +781,105 @@ import { WalletAdminService } from '../../services/wallet-admin';
         }
       }
       :host-context(.dark) {
-        color: #f4f4f5;
+        color: var(--ui-foreground);
       }
-      .dark .workspace,
-      .dark .secondary-button,
-      .dark .filter-button,
-      .dark .sort-field select,
-      .dark .filter-panel select,
-      .dark .filter-panel input,
-      .dark .pagination button {
-        background: #18181b;
-        border-color: #3f3f46;
+      :host-context(.dark) .workspace,
+      :host-context(.dark) .secondary-button,
+      :host-context(.dark) .filter-button,
+      :host-context(.dark) .sort-field select,
+      :host-context(.dark) .filter-panel select,
+      :host-context(.dark) .filter-panel input,
+      :host-context(.dark) .pagination button,
+      :host-context(.dark) .wallet-card {
+        color: var(--ui-foreground);
+        background: var(--ui-surface);
+        border-color: var(--ui-border);
       }
-      .dark .filter-panel,
-      .dark th {
-        background: #202024;
+      :host-context(.dark) .secondary-button:hover,
+      :host-context(.dark) .filter-button:hover,
+      :host-context(.dark) .pagination button:not(:disabled):hover,
+      :host-context(.dark) tbody tr:hover {
+        background: var(--ui-surface-subtle);
       }
-      .dark td,
-      .dark .toolbar,
-      .dark .list-heading,
-      .dark .pagination {
-        border-color: #303036;
+      :host-context(.dark) .filter-panel,
+      :host-context(.dark) th {
+        color: var(--ui-muted);
+        background: #1d272c;
       }
-      .dark .search-wrap {
-        background: #27272a;
+      :host-context(.dark) td,
+      :host-context(.dark) .toolbar,
+      :host-context(.dark) .list-heading,
+      :host-context(.dark) .pagination,
+      :host-context(.dark) .card-balance,
+      :host-context(.dark) .wallet-card {
+        border-color: var(--ui-border);
       }
-      .dark .state-panel strong {
-        color: #fafafa;
+      :host-context(.dark) .search-wrap,
+      :host-context(.dark) .state-mark,
+      :host-context(.dark) .tabs span {
+        color: var(--ui-foreground);
+        background: var(--ui-surface-subtle);
       }
-      .dark .wallet-card {
-        border-color: #3f3f46;
+      :host-context(.dark) .search-wrap input {
+        color: var(--ui-foreground);
       }
-      .dark .card-balance {
-        border-color: #3f3f46;
+      :host-context(.dark) .search-wrap input::placeholder {
+        color: var(--ui-muted);
       }
-      .dark .primary-button {
-        background: #dbeafe;
-        color: #172554;
+      :host-context(.dark) .page-header p,
+      :host-context(.dark) .eyebrow,
+      :host-context(.dark) .list-heading p,
+      :host-context(.dark) .sort-field,
+      :host-context(.dark) .owner small,
+      :host-context(.dark) .number small,
+      :host-context(.dark) .status-line,
+      :host-context(.dark) .muted,
+      :host-context(.dark) time,
+      :host-context(.dark) .card-balance span,
+      :host-context(.dark) .card-balance small,
+      :host-context(.dark) .state-panel {
+        color: var(--ui-muted);
+      }
+      :host-context(.dark) .state-panel strong,
+      :host-context(.dark) .owner a,
+      :host-context(.dark) .number strong,
+      :host-context(.dark) .role-label {
+        color: var(--ui-foreground);
+      }
+      :host-context(.dark) .avatar {
+        color: #b9e3df;
+        background: #244047;
+      }
+      :host-context(.dark) .selection-chip {
+        color: #b9e3df;
+        background: #21383e;
+      }
+      :host-context(.dark) .signal {
+        color: #f8cf8d;
+        background: #3b3020;
+      }
+      :host-context(.dark) .signal.danger {
+        color: #ffb4ad;
+        background: #442625;
+      }
+      :host-context(.dark) .detail-link,
+      :host-context(.dark) .card-footer a {
+        color: var(--ui-primary);
+      }
+      :host-context(.dark) .primary-button {
+        color: var(--ui-primary-foreground);
+        background: var(--ui-primary);
+      }
+      :host-context(.dark) .metric-strip {
+        background: #15272b;
+        box-shadow: inset 0 0 0 1px #ffffff0d;
+      }
+      :host-context(.dark) .metric-strip .attention {
+        background: #3d2524;
+      }
+      :host-context(.dark) .skeleton-row {
+        background: linear-gradient(90deg, #1d272c, #2b373d, #1d272c);
+        background-size: 200%;
       }
       @media (prefers-reduced-motion: reduce) {
         * {

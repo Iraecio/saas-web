@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, map } from 'rxjs';
+import { Observable, catchError, forkJoin, map, of, switchMap } from 'rxjs';
 import { ApiService } from '../../../core/services/api';
 import {
   CreditWithContext,
@@ -20,6 +20,7 @@ import {
   AdminWalletQuery,
   AdminWalletSummary,
 } from '../../../core/models/wallet-admin.model';
+import { User } from '../../../core/models/user.model';
 
 @Injectable({ providedIn: 'root' })
 export class WalletAdminService {
@@ -35,7 +36,10 @@ export class WalletAdminService {
       .get<
         AdminWalletPage | { items: AdminWalletSummary[]; total: number } | AdminWalletSummary[]
       >(`/wallet/admin/wallets${qs ? '?' + qs : ''}`)
-      .pipe(map((response) => this.normalizeWalletPage(response, params)));
+      .pipe(
+        map((response) => this.normalizeWalletPage(response, params)),
+        switchMap((page) => this.enrichMissingOwners(page)),
+      );
   }
 
   getWalletDetails(walletId: string): Observable<AdminWalletDetail> {
@@ -47,7 +51,9 @@ export class WalletAdminService {
     if (params?.from) query.set('from', params.from);
     if (params?.to) query.set('to', params.to);
     const qs = query.toString();
-    return this.api.get<AdminWalletOverview>(`/wallet/admin/overview${qs ? '?' + qs : ''}`);
+    return this.api
+      .get<AdminWalletOverview>(`/wallet/admin/overview${qs ? '?' + qs : ''}`)
+      .pipe(catchError(() => this.getLegacyOverview(params)));
   }
 
   searchCredits(params?: {
@@ -200,6 +206,71 @@ export class WalletAdminService {
       },
       queryFingerprint: supplied.queryFingerprint,
     };
+  }
+
+  private getLegacyOverview(params?: {
+    from?: string;
+    to?: string;
+  }): Observable<AdminWalletOverview> {
+    return forkJoin({
+      wallets: this.listWallets({ page: 1, pageSize: 100 }),
+      analytics: this.getAnalytics(params),
+    }).pipe(
+      map(({ wallets, analytics }) => {
+        const roles = new Map<string, { count: number; balance: number }>();
+        for (const wallet of wallets.items) {
+          const current = roles.get(wallet.role) ?? { count: 0, balance: 0 };
+          current.count += 1;
+          current.balance += wallet.availableCredits;
+          roles.set(wallet.role, current);
+        }
+        return {
+          ...wallets.totals,
+          ...analytics,
+          byRole: Array.from(roles, ([role, values]) => ({
+            role: role as AdminWalletSummary['role'],
+            ...values,
+          })),
+        };
+      }),
+    );
+  }
+
+  private enrichMissingOwners(page: AdminWalletPage): Observable<AdminWalletPage> {
+    const walletsWithoutOwner = page.items.filter(
+      (wallet) =>
+        wallet.ownerName === 'Usuário sem nome' || wallet.ownerEmail === 'E-mail não informado',
+    );
+
+    if (walletsWithoutOwner.length === 0) return of(page);
+
+    return forkJoin(
+      walletsWithoutOwner.map((wallet) =>
+        this.api.get<User>(`/users/${wallet.userId}`).pipe(
+          map((user) => ({ walletId: wallet.walletId, user })),
+          catchError(() => of({ walletId: wallet.walletId, user: null })),
+        ),
+      ),
+    ).pipe(
+      map((profiles) => {
+        const usersByWallet = new Map(profiles.map(({ walletId, user }) => [walletId, user]));
+        return {
+          ...page,
+          items: page.items.map((wallet) => {
+            const user = usersByWallet.get(wallet.walletId);
+            if (!user) return wallet;
+            return {
+              ...wallet,
+              ownerName: user.name?.trim() || user.email || 'Usuário sem nome',
+              ownerEmail: user.email || 'E-mail não informado',
+              role: user.role,
+              accountStatus: user.isActive === false ? ('BLOCKED' as const) : wallet.accountStatus,
+              resellerId: user.resellerId ?? wallet.resellerId,
+            };
+          }),
+        };
+      }),
+    );
   }
 
   private normalizeWallet(item: any): AdminWalletSummary {

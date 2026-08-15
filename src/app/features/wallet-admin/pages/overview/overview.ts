@@ -362,18 +362,66 @@ import { walletRoleLabel } from '../../services/wallet-admin.presentation';
         }
       }
       :host-context(.dark) .overview-shell {
-        color: #fafafa;
+        color: var(--ui-foreground);
       }
       :host-context(.dark) .lower-grid > article {
-        background: #18181b;
-        border-color: #3f3f46;
+        color: var(--ui-foreground);
+        background: var(--ui-surface);
+        border-color: var(--ui-border);
       }
       :host-context(.dark) .secondary {
-        border-color: #52525b;
+        color: var(--ui-foreground);
+        background: var(--ui-surface);
+        border-color: var(--ui-border-strong);
       }
       :host-context(.dark) .primary {
-        background: #dbeafe;
-        color: #172554;
+        color: var(--ui-primary-foreground);
+        background: var(--ui-primary);
+      }
+      :host-context(.dark) header p,
+      :host-context(.dark) .kicker,
+      :host-context(.dark) .section-title span,
+      :host-context(.dark) .movement-panel dt {
+        color: var(--ui-muted);
+      }
+      :host-context(.dark) .section-title a,
+      :host-context(.dark) .movement-panel nav a {
+        color: var(--ui-primary);
+      }
+      :host-context(.dark) .role-list i {
+        background: var(--ui-surface-subtle);
+      }
+      :host-context(.dark) .role-list b {
+        background: var(--ui-primary);
+      }
+      :host-context(.dark) .movement-panel dl div,
+      :host-context(.dark) .movement-panel nav a {
+        border-color: var(--ui-border);
+      }
+      :host-context(.dark) .state {
+        color: var(--ui-foreground);
+        background: var(--ui-surface);
+        border-color: var(--ui-border);
+      }
+      :host-context(.dark) .state p {
+        color: var(--ui-muted);
+      }
+      :host-context(.dark) .state button {
+        color: var(--ui-foreground);
+        border-color: var(--ui-border-strong);
+      }
+      :host-context(.dark) .loading-grid span {
+        background: linear-gradient(90deg, #1d272c, #2b373d, #1d272c);
+        background-size: 200%;
+      }
+      :host-context(.dark) .hero-grid {
+        background: #15272b;
+        box-shadow:
+          inset 0 0 0 1px #ffffff0d,
+          0 1.4rem 4rem #07111466;
+      }
+      :host-context(.dark) .hero-grid article.warning {
+        background: #3d2524;
       }
       @media (prefers-reduced-motion: reduce) {
         * {

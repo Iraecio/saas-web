@@ -42,8 +42,14 @@ export class WalletAdminService {
       );
   }
 
-  getWalletDetails(walletId: string): Observable<AdminWalletDetail> {
-    return this.api.get<AdminWalletDetail>(`/wallet/admin/wallets/${walletId}`);
+  getWalletDetails(userId: string): Observable<AdminWalletDetail> {
+    return this.api.get<AdminWalletDetail>(`/wallet/admin/wallets/${userId}`).pipe(
+      map((wallet) => ({
+        ...wallet,
+        ...this.normalizeWallet({ ...wallet, userId: wallet.userId ?? userId }),
+      })),
+      switchMap((wallet) => this.enrichWalletOwner(wallet)),
+    );
   }
 
   getOverview(params?: { from?: string; to?: string }): Observable<AdminWalletOverview> {
@@ -244,32 +250,34 @@ export class WalletAdminService {
 
     if (walletsWithoutOwner.length === 0) return of(page);
 
-    return forkJoin(
-      walletsWithoutOwner.map((wallet) =>
-        this.api.get<User>(`/users/${wallet.userId}`).pipe(
-          map((user) => ({ walletId: wallet.walletId, user })),
-          catchError(() => of({ walletId: wallet.walletId, user: null })),
-        ),
-      ),
-    ).pipe(
-      map((profiles) => {
-        const usersByWallet = new Map(profiles.map(({ walletId, user }) => [walletId, user]));
+    return forkJoin(walletsWithoutOwner.map((wallet) => this.enrichWalletOwner(wallet))).pipe(
+      map((enrichedWallets) => {
+        const enrichedById = new Map(enrichedWallets.map((wallet) => [wallet.walletId, wallet]));
         return {
           ...page,
-          items: page.items.map((wallet) => {
-            const user = usersByWallet.get(wallet.walletId);
-            if (!user) return wallet;
-            return {
-              ...wallet,
-              ownerName: user.name?.trim() || user.email || 'Usuário sem nome',
-              ownerEmail: user.email || 'E-mail não informado',
-              role: user.role,
-              accountStatus: user.isActive === false ? ('BLOCKED' as const) : wallet.accountStatus,
-              resellerId: user.resellerId ?? wallet.resellerId,
-            };
-          }),
+          items: page.items.map((wallet) => enrichedById.get(wallet.walletId) ?? wallet),
         };
       }),
+    );
+  }
+
+  private enrichWalletOwner<T extends AdminWalletSummary>(wallet: T): Observable<T> {
+    if (wallet.ownerName !== 'Usuário sem nome' && wallet.ownerEmail !== 'E-mail não informado') {
+      return of(wallet);
+    }
+
+    return this.api.get<User>(`/users/${wallet.userId}`).pipe(
+      map(
+        (user): T => ({
+          ...wallet,
+          ownerName: user.name?.trim() || user.email || 'Usuário sem nome',
+          ownerEmail: user.email || 'E-mail não informado',
+          role: user.role,
+          accountStatus: user.isActive === false ? ('BLOCKED' as const) : wallet.accountStatus,
+          resellerId: user.resellerId ?? wallet.resellerId,
+        }),
+      ),
+      catchError(() => of(wallet)),
     );
   }
 

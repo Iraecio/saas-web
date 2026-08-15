@@ -111,6 +111,34 @@ describe('WalletAdminService contracts', () => {
     expect(owner).toEqual({ name: 'Luana Ribeiro', email: 'luana@example.com' });
   });
 
+  it('loads wallet details using the owner user id and enriches a legacy response', () => {
+    let ownerName = '';
+    service.getWalletDetails('u-owner').subscribe((wallet) => (ownerName = wallet.ownerName));
+
+    http.expectOne(`${environment.apiUrl}/wallet/admin/wallets/u-owner`).flush({
+      id: 'w-owner',
+      userId: 'u-owner',
+      availableCredits: 12,
+      frozenCredits: 0,
+      expiredCredits: 0,
+      totalReceived: 12,
+      totalSpent: 0,
+      totalRefunded: 0,
+      currency: 'BRL',
+      createdAt: '2026-08-01T00:00:00Z',
+      updatedAt: '2026-08-02T00:00:00Z',
+    });
+    http.expectOne(`${environment.apiUrl}/users/u-owner`).flush({
+      id: 'u-owner',
+      name: 'Luana Ribeiro',
+      email: 'luana@example.com',
+      role: 'VOICE_ACTOR',
+      isActive: true,
+    });
+
+    expect(ownerName).toBe('Luana Ribeiro');
+  });
+
   it('uses the consolidated overview endpoint', () => {
     service.getOverview().subscribe();
     http.expectOne(`${environment.apiUrl}/wallet/admin/overview`).flush({});

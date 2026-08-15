@@ -199,7 +199,10 @@ import { WalletAdminService } from '../../services/wallet-admin';
                       <div class="owner">
                         <span class="avatar">{{ initials(wallet.ownerName) }}</span>
                         <div>
-                          <a [routerLink]="[wallet.userId]">{{ wallet.ownerName }}</a
+                          <a
+                            [routerLink]="[wallet.userId]"
+                            [queryParams]="{ walletId: wallet.walletId }"
+                            >{{ wallet.ownerName }}</a
                           ><small>{{ wallet.ownerEmail }}</small>
                         </div>
                       </div>
@@ -241,6 +244,7 @@ import { WalletAdminService } from '../../services/wallet-admin';
                       <a
                         class="detail-link"
                         [routerLink]="[wallet.userId]"
+                        [queryParams]="{ walletId: wallet.walletId }"
                         aria-label="Abrir detalhes da carteira"
                         >→</a
                       >
@@ -258,7 +262,10 @@ import { WalletAdminService } from '../../services/wallet-admin';
                   <div class="owner">
                     <span class="avatar">{{ initials(wallet.ownerName) }}</span>
                     <div>
-                      <a [routerLink]="[wallet.userId]">{{ wallet.ownerName }}</a
+                      <a
+                        [routerLink]="[wallet.userId]"
+                        [queryParams]="{ walletId: wallet.walletId }"
+                        >{{ wallet.ownerName }}</a
                       ><small>{{ roleLabel(wallet.role) }}</small>
                     </div>
                   </div>
@@ -277,7 +284,9 @@ import { WalletAdminService } from '../../services/wallet-admin';
                   <span class="status-line"
                     ><i [class]="'status-dot ' + wallet.accountStatus.toLowerCase()"></i
                     >{{ statusLabel(wallet.accountStatus) }}</span
-                  ><a [routerLink]="[wallet.userId]">Ver carteira →</a>
+                  ><a [routerLink]="[wallet.userId]" [queryParams]="{ walletId: wallet.walletId }"
+                    >Ver carteira →</a
+                  >
                 </div>
               </article>
             }

@@ -139,6 +139,36 @@ describe('WalletAdminService contracts', () => {
     expect(ownerName).toBe('Luana Ribeiro');
   });
 
+  it('retries wallet details with the wallet id when the deployed API rejects the user id', () => {
+    let walletId = '';
+    service
+      .getWalletDetails('u-owner', 'w-owner')
+      .subscribe((wallet) => (walletId = wallet.walletId));
+
+    http
+      .expectOne(`${environment.apiUrl}/wallet/admin/wallets/u-owner`)
+      .flush({ message: 'Wallet não encontrada' }, { status: 404, statusText: 'Not Found' });
+    http.expectOne(`${environment.apiUrl}/wallet/admin/wallets/w-owner`).flush({
+      id: 'w-owner',
+      userId: 'u-owner',
+      ownerName: 'Luana Ribeiro',
+      ownerEmail: 'luana@example.com',
+      role: 'VOICE_ACTOR',
+      accountStatus: 'ACTIVE',
+      availableCredits: 12,
+      frozenCredits: 0,
+      expiredCredits: 0,
+      totalReceived: 12,
+      totalSpent: 0,
+      totalRefunded: 0,
+      currency: 'BRL',
+      createdAt: '2026-08-01T00:00:00Z',
+      updatedAt: '2026-08-02T00:00:00Z',
+    });
+
+    expect(walletId).toBe('w-owner');
+  });
+
   it('uses the consolidated overview endpoint', () => {
     service.getOverview().subscribe();
     http.expectOne(`${environment.apiUrl}/wallet/admin/overview`).flush({});

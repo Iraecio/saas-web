@@ -723,8 +723,9 @@ export class WalletDetailAdminPage implements OnInit {
     this.loading.set(true);
     this.error.set('');
     const id = this.route.snapshot.paramMap.get('userId') || '';
+    const walletId = this.route.snapshot.queryParamMap.get('walletId') || undefined;
     this.service
-      .getWalletDetails(id)
+      .getWalletDetails(id, walletId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data) => {

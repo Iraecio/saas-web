@@ -42,11 +42,25 @@ export class WalletAdminService {
       );
   }
 
-  getWalletDetails(userId: string): Observable<AdminWalletDetail> {
-    return this.api.get<AdminWalletDetail>(`/wallet/admin/wallets/${userId}`).pipe(
+  getWalletDetails(userId: string, walletId?: string): Observable<AdminWalletDetail> {
+    return this.loadWalletDetails(userId).pipe(
+      catchError((error: Error & { status?: number }) => {
+        const walletNotFound =
+          error.status === 404 ||
+          error.message.toLocaleLowerCase('pt-BR').includes('não encontrada');
+        if (walletNotFound && walletId && walletId !== userId) {
+          return this.loadWalletDetails(walletId, userId);
+        }
+        throw error;
+      }),
+    );
+  }
+
+  private loadWalletDetails(id: string, fallbackUserId = id): Observable<AdminWalletDetail> {
+    return this.api.get<AdminWalletDetail>(`/wallet/admin/wallets/${id}`).pipe(
       map((wallet) => ({
         ...wallet,
-        ...this.normalizeWallet({ ...wallet, userId: wallet.userId ?? userId }),
+        ...this.normalizeWallet({ ...wallet, userId: wallet.userId ?? fallbackUserId }),
       })),
       switchMap((wallet) => this.enrichWalletOwner(wallet)),
     );

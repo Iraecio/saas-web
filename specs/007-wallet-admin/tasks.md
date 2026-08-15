@@ -18,10 +18,10 @@
 
 **Purpose**: Preparar contratos, modelos e rotas sem alterar o comportamento entregue.
 
-- [ ] T001 Criar modelos administrativos paginados e versionados em `src/app/core/models/wallet-admin.model.ts`
-- [ ] T002 [P] Criar utilitários de apresentação de papéis, valores e estados em `src/app/features/wallet-admin/services/wallet-admin.presentation.ts`
-- [ ] T003 [P] Criar estado serializável de consulta e seleção em `src/app/features/wallet-admin/services/wallet-admin-query.ts`
-- [ ] T004 Atualizar rotas e restringir todo o módulo a SUPER_ADMIN em `src/app/app.routes.ts` e `src/app/features/wallet-admin/wallet-admin.routes.ts`
+- [x] T001 Criar modelos administrativos paginados e versionados em `src/app/core/models/wallet-admin.model.ts`
+- [x] T002 [P] Criar utilitários de apresentação de papéis, valores e estados em `src/app/features/wallet-admin/services/wallet-admin.presentation.ts`
+- [x] T003 [P] Criar estado serializável de consulta e seleção em `src/app/features/wallet-admin/services/wallet-admin-query.ts`
+- [x] T004 Atualizar rotas e restringir todo o módulo a SUPER_ADMIN em `src/app/app.routes.ts` e `src/app/features/wallet-admin/wallet-admin.routes.ts`
 - [ ] T005 [P] Criar fixtures de carteiras de todos os papéis e estados em `src/app/features/wallet-admin/testing/wallet-admin.fixtures.ts`
 
 ---
@@ -35,13 +35,13 @@
 - [ ] T006 Implementar DTOs de consulta, página, detalhe, versão, prévia e resultado em `../saas-api/src/modules/wallet/dto/admin-wallet.dto.ts`
 - [ ] T007 [P] Implementar DTOs de seleção, ação individual, lote e exportação em `../saas-api/src/modules/wallet/dto/admin-wallet-action.dto.ts`
 - [ ] T008 Adicionar consultas agregadas sem N+1 e paginação server-side em `../saas-api/src/modules/wallet/repositories/wallet.repository.ts`
-- [ ] T009 Implementar autorização exclusiva, overview, lista, detalhe e coleções paginadas em `../saas-api/src/modules/wallet/wallet.controller.ts` e `../saas-api/src/modules/wallet/wallet.service.ts`
+- [x] T009 Implementar autorização exclusiva, overview, lista, detalhe e coleções paginadas em `../saas-api/src/modules/wallet/wallet.controller.ts` e `../saas-api/src/modules/wallet/wallet.service.ts`
 - [ ] T010 Implementar prévia, idempotência, mutações compensatórias, versão e conflito em `../saas-api/src/modules/wallet/wallet.controller.ts` e `../saas-api/src/modules/wallet/wallet.service.ts`
 - [ ] T011 [P] Criar testes de contrato, autorização e paginação administrativa em `../saas-api/src/modules/wallet/wallet.controller.spec.ts`
 - [ ] T012 [P] Criar testes de integridade, idempotência e concorrência em `../saas-api/src/modules/wallet/wallet.service.methods.spec.ts`
 - [ ] T013 Atualizar o cliente para overview, lista, detalhe, coleções, prévias e ações em `src/app/features/wallet-admin/services/wallet-admin.ts`
-- [ ] T014 [P] Cobrir serialização de query, restauração e descarte seguro da seleção em `src/app/features/wallet-admin/services/wallet-admin-query.spec.ts`
-- [ ] T015 [P] Cobrir URLs, envelopes, conflitos e consulta idempotente em `src/app/features/wallet-admin/services/wallet-admin.spec.ts`
+- [x] T014 [P] Cobrir serialização de query, restauração e descarte seguro da seleção em `src/app/features/wallet-admin/services/wallet-admin-query.spec.ts`
+- [x] T015 [P] Cobrir URLs, envelopes, conflitos e consulta idempotente em `src/app/features/wallet-admin/services/wallet-admin.spec.ts`
 - [ ] T016 Criar dialog acessível reutilizável de prévia/confirmacão em `src/app/features/wallet-admin/components/wallet-admin-actions/wallet-admin-actions.ts`
 - [ ] T017 [P] Criar componentes compartilhados de skeleton, vazio, erro, offline e stale em `src/app/features/wallet-admin/components/wallet-admin-state/wallet-admin-state.ts`
 
@@ -57,21 +57,21 @@
 
 ### Tests for User Story 1
 
-- [ ] T018 [P] [US1] Testar apresentação, formatação inteira e descrição textual de estados em `src/app/features/wallet-admin/services/wallet-admin.presentation.spec.ts`
+- [x] T018 [P] [US1] Testar apresentação, formatação inteira e descrição textual de estados em `src/app/features/wallet-admin/services/wallet-admin.presentation.spec.ts`
 - [ ] T019 [P] [US1] Testar filtros, ordenação, paginação, vazio e erro da lista em `src/app/features/wallet-admin/pages/wallets/wallets.spec.ts`
 - [ ] T020 [P] [US1] Testar resumo e falhas independentes das seções em `src/app/features/wallet-admin/pages/wallet-detail/wallet-detail.spec.ts`
 
 ### Implementation for User Story 1
 
-- [ ] T021 [P] [US1] Implementar cards de indicadores e alertas acionáveis em `src/app/features/wallet-admin/pages/overview/overview.ts`
+- [x] T021 [P] [US1] Implementar cards de indicadores e alertas acionáveis em `src/app/features/wallet-admin/pages/overview/overview.ts`
 - [ ] T022 [P] [US1] Implementar formulário de filtros com painel desktop e drawer mobile em `src/app/features/wallet-admin/components/wallet-admin-filters/wallet-admin-filters.ts`
 - [ ] T023 [P] [US1] Implementar tabela desktop/tablet ordenável e acessível em `src/app/features/wallet-admin/components/wallet-admin-table/wallet-admin-table.ts`
 - [ ] T024 [P] [US1] Implementar cards mobile sem rolagem horizontal em `src/app/features/wallet-admin/components/wallet-admin-cards/wallet-admin-cards.ts`
-- [ ] T025 [US1] Integrar overview, query parameters, lista, totais, paginação e estados em `src/app/features/wallet-admin/pages/wallets/wallets.ts`
+- [x] T025 [US1] Integrar overview, query parameters, lista, totais, paginação e estados em `src/app/features/wallet-admin/pages/wallets/wallets.ts`
 - [ ] T026 [P] [US1] Criar seções de saldo, créditos e movimentações em `src/app/features/wallet-admin/components/wallet-detail-sections/`
 - [ ] T027 [P] [US1] Criar seções de reservas, disputas, estornos e auditoria em `src/app/features/wallet-admin/components/wallet-detail-sections/`
-- [ ] T028 [US1] Integrar resumo prioritário, navegação de seção e repetição isolada em `src/app/features/wallet-admin/pages/wallet-detail/wallet-detail.ts`
-- [ ] T029 [US1] Preservar compatibilidade e redirecionamentos das URLs administrativas legadas em `src/app/features/wallet-admin/wallet-admin.routes.ts`
+- [x] T028 [US1] Integrar resumo prioritário, navegação de seção e repetição isolada em `src/app/features/wallet-admin/pages/wallet-detail/wallet-detail.ts`
+- [x] T029 [US1] Preservar compatibilidade e redirecionamentos das URLs administrativas legadas em `src/app/features/wallet-admin/wallet-admin.routes.ts`
 
 **Checkpoint**: O superadmin consegue investigar qualquer carteira em qualquer breakpoint; a história é demonstrável sem ações administrativas.
 
@@ -121,7 +121,7 @@
 - [ ] T044 [US3] Implementar barra acessível de seleção e resumo do escopo em `src/app/features/wallet-admin/components/wallet-bulk-bar/wallet-bulk-bar.ts`
 - [ ] T045 [US3] Integrar seleção explícita e lógica com tabela/cards/listagem em `src/app/features/wallet-admin/pages/wallets/wallets.ts`
 - [ ] T046 [US3] Implementar prévia, acompanhamento e relatório de resultados em `src/app/features/wallet-admin/pages/bulk-operation/bulk-operation.ts`
-- [ ] T047 [US3] Integrar criação e download de exportações em `src/app/features/wallet-admin/services/wallet-admin.ts` e `src/app/features/wallet-admin/pages/wallets/wallets.ts`
+- [x] T047 [US3] Integrar criação e download de exportações em `src/app/features/wallet-admin/services/wallet-admin.ts` e `src/app/features/wallet-admin/pages/wallets/wallets.ts`
 
 **Checkpoint**: Operações de grande volume são previsíveis, revalidadas e auditáveis.
 
@@ -140,9 +140,9 @@
 
 ### Implementation for User Story 4
 
-- [ ] T050 [US4] Expandir agregados por papel, estado, período e alerta em `../saas-api/src/modules/wallet/wallet.service.ts`
-- [ ] T051 [US4] Implementar visualizações acessíveis de distribuição e tendência em `src/app/features/wallet-admin/pages/overview/overview.ts`
-- [ ] T052 [US4] Integrar atalhos de indicadores ao estado persistido da listagem em `src/app/features/wallet-admin/pages/overview/overview.ts`
+- [x] T050 [US4] Expandir agregados por papel, estado, período e alerta em `../saas-api/src/modules/wallet/wallet.service.ts`
+- [x] T051 [US4] Implementar visualizações acessíveis de distribuição e tendência em `src/app/features/wallet-admin/pages/overview/overview.ts`
+- [x] T052 [US4] Integrar atalhos de indicadores ao estado persistido da listagem em `src/app/features/wallet-admin/pages/overview/overview.ts`
 
 **Checkpoint**: Alertas e indicadores priorizam investigações sem criar um fluxo separado.
 
@@ -157,8 +157,8 @@
 - [ ] T055 Tratar acesso negado, sessão expirada e limpeza de dados administrativos em `src/app/core/interceptors/error.interceptor.ts` e `src/app/features/wallet-admin/`
 - [ ] T056 [P] Adicionar testes de navegação e guarda SUPER_ADMIN em `src/app/app.routes.spec.ts`
 - [ ] T057 Executar e registrar todos os cenários de `specs/007-wallet-admin/quickstart.md`
-- [ ] T058 Executar `npm test -- --watch=false` e `npm run build` no `saas-web`
-- [ ] T059 Executar `npm run db:generate`, `npm test -- --runInBand` e `npm run build` no `saas-api`
+- [x] T058 Executar `npm test -- --watch=false` e `npm run build` no `saas-web`
+- [x] T059 Executar `npm run db:generate`, `npm test -- --runInBand` e `npm run build` no `saas-api`
 
 ---
 

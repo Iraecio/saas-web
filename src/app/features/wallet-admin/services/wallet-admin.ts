@@ -1,8 +1,7 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { ApiService } from '../../../core/services/api';
 import {
-  WalletSummary,
   CreditWithContext,
   Credit,
   ReconciliationResult,
@@ -14,26 +13,41 @@ import {
   IssueCreditDto,
   CancelCreditDto,
 } from '../../../core/models/wallet.model';
+import {
+  AdminWalletDetail,
+  AdminWalletOverview,
+  AdminWalletPage,
+  AdminWalletQuery,
+  AdminWalletSummary,
+} from '../../../core/models/wallet-admin.model';
 
 @Injectable({ providedIn: 'root' })
 export class WalletAdminService {
   private readonly api = inject(ApiService);
 
-  listWallets(params?: {
-    offset?: number;
-    limit?: number;
-    userId?: string;
-  }): Observable<WalletSummary[]> {
+  listWallets(params?: Partial<AdminWalletQuery>): Observable<AdminWalletPage> {
     const query = new URLSearchParams();
-    if (params?.offset !== undefined) query.set('offset', String(params.offset));
-    if (params?.limit) query.set('limit', String(params.limit));
-    if (params?.userId) query.set('userId', params.userId);
+    for (const [key, value] of Object.entries(params ?? {})) {
+      if (value !== undefined && value !== null && value !== '') query.set(key, String(value));
+    }
     const qs = query.toString();
-    return this.api.get<WalletSummary[]>(`/wallet/admin/wallets${qs ? '?' + qs : ''}`);
+    return this.api
+      .get<
+        AdminWalletPage | { items: AdminWalletSummary[]; total: number } | AdminWalletSummary[]
+      >(`/wallet/admin/wallets${qs ? '?' + qs : ''}`)
+      .pipe(map((response) => this.normalizeWalletPage(response, params)));
   }
 
-  getWalletDetails(userId: string): Observable<WalletSummary> {
-    return this.api.get<WalletSummary>(`/wallet/admin/wallets/${userId}`);
+  getWalletDetails(walletId: string): Observable<AdminWalletDetail> {
+    return this.api.get<AdminWalletDetail>(`/wallet/admin/wallets/${walletId}`);
+  }
+
+  getOverview(params?: { from?: string; to?: string }): Observable<AdminWalletOverview> {
+    const query = new URLSearchParams();
+    if (params?.from) query.set('from', params.from);
+    if (params?.to) query.set('to', params.to);
+    const qs = query.toString();
+    return this.api.get<AdminWalletOverview>(`/wallet/admin/overview${qs ? '?' + qs : ''}`);
   }
 
   searchCredits(params?: {
@@ -65,7 +79,9 @@ export class WalletAdminService {
     if (params?.offset !== undefined) query.set('offset', String(params.offset));
     if (params?.limit) query.set('limit', String(params.limit));
     const qs = query.toString();
-    return this.api.get<ReconciliationResult[]>(`/wallet/admin/reconciliation${qs ? '?' + qs : ''}`);
+    return this.api.get<ReconciliationResult[]>(
+      `/wallet/admin/reconciliation${qs ? '?' + qs : ''}`,
+    );
   }
 
   correctReconciliation(id: string, reason: string): Observable<void> {
@@ -141,5 +157,66 @@ export class WalletAdminService {
 
   cancelCredits(dto: CancelCreditDto): Observable<void> {
     return this.api.post<void>('/wallet/admin/cancel', dto);
+  }
+
+  exportWallets(params: Partial<AdminWalletQuery>): Observable<Blob> {
+    const rows = Object.entries(params)
+      .filter(([, value]) => value !== undefined && value !== null && value !== '')
+      .map(([key, value]) => `${key},${JSON.stringify(value)}`)
+      .join('\n');
+    return new Observable((subscriber) => {
+      subscriber.next(new Blob([`Filtro,Valor\n${rows}`], { type: 'text/csv;charset=utf-8' }));
+      subscriber.complete();
+    });
+  }
+
+  private normalizeWalletPage(
+    response:
+      | AdminWalletPage
+      | { items: AdminWalletSummary[]; total: number }
+      | AdminWalletSummary[],
+    params?: Partial<AdminWalletQuery>,
+  ): AdminWalletPage {
+    const rawItems = Array.isArray(response) ? response : response.items;
+    const items = rawItems.map((item: any) => this.normalizeWallet(item));
+    const total = Array.isArray(response) ? items.length : response.total;
+    const page = params?.page ?? 1;
+    const pageSize = params?.pageSize ?? 20;
+    const supplied = !Array.isArray(response) ? (response as Partial<AdminWalletPage>) : {};
+    return {
+      items,
+      total,
+      page: supplied.page ?? page,
+      pageSize: supplied.pageSize ?? pageSize,
+      totalPages: supplied.totalPages ?? Math.max(1, Math.ceil(total / pageSize)),
+      totals: supplied.totals ?? {
+        wallets: total,
+        availableCredits: items.reduce((sum, item) => sum + item.availableCredits, 0),
+        frozenCredits: items.reduce((sum, item) => sum + item.frozenCredits, 0),
+        expiredCredits: items.reduce((sum, item) => sum + item.expiredCredits, 0),
+        expiringCredits: items.reduce((sum, item) => sum + item.expiringCredits, 0),
+        discrepancies: items.filter((item) => item.hasDiscrepancy).length,
+        pendingActions: items.reduce((sum, item) => sum + item.pendingCount, 0),
+      },
+      queryFingerprint: supplied.queryFingerprint,
+    };
+  }
+
+  private normalizeWallet(item: any): AdminWalletSummary {
+    return {
+      ...item,
+      id: item.walletId ?? item.id,
+      walletId: item.walletId ?? item.id,
+      ownerName: item.ownerName ?? item.user?.name ?? 'Usuário sem nome',
+      ownerEmail: item.ownerEmail ?? item.user?.email ?? 'E-mail não informado',
+      role: item.role ?? item.user?.role ?? 'CLIENT',
+      accountStatus: item.accountStatus ?? (item.user?.isActive === false ? 'BLOCKED' : 'ACTIVE'),
+      expiringCredits: item.expiringCredits ?? 0,
+      pendingCount: item.pendingCount ?? 0,
+      hasDiscrepancy: item.hasDiscrepancy ?? false,
+      lastMovementAt: item.lastMovementAt ?? item.updatedAt ?? item.createdAt,
+      updatedAt: item.updatedAt ?? item.createdAt,
+      version: item.version ?? item.updatedAt ?? item.createdAt,
+    };
   }
 }

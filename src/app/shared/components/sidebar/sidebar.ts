@@ -36,7 +36,6 @@ const MENU_BY_ROLE: Record<UserRole, MenuItem[]> = {
     { icon: '🎙️', label: 'Profissionais', route: '/admin/professionals' },
     { icon: '💸', label: 'Saques', route: '/admin/withdrawals/admin' },
     { icon: '🪙', label: 'Compras de Créditos', route: '/admin/reseller-credits/admin-purchases' },
-    { icon: '💰', label: 'Carteiras', route: '/admin/wallet-admin' },
     { icon: '💼', label: 'Revendedores', route: '/admin/resellers' },
     { icon: '📈', label: 'Relatórios', route: '/admin/reports' },
     { icon: '⚙️', label: 'Configurações', route: '/admin/settings' },

@@ -18,10 +18,10 @@
 
 **Purpose**: Preparar limites administrativos e arquivos compartilhados sem alterar o fluxo atual.
 
-- [ ] T001 Registrar as rotas `manage` antes de `:id` e protegê-las com `roleGuard(['SUPER_ADMIN'])` em `src/app/features/orders/orders.routes.ts`
-- [ ] T002 [P] Criar o barrel de componentes administrativos em `src/app/features/orders/components/admin/index.ts`
-- [ ] T003 [P] Criar os tokens visuais responsivos e de estado reutilizáveis em `src/styles.css`
-- [ ] T004 [P] Adicionar item de navegação exclusivo do superadmin para a gestão de pedidos em `src/app/layouts/admin-layout/admin-layout.ts`
+- [x] T001 Registrar as rotas `manage` antes de `:id` e protegê-las com `roleGuard(['SUPER_ADMIN'])` em `src/app/features/orders/orders.routes.ts`
+- [x] T002 [P] Criar o barrel de componentes administrativos em `src/app/features/orders/components/admin/index.ts`
+- [x] T003 [P] Criar os tokens visuais responsivos e de estado reutilizáveis em `src/styles.css`
+- [x] T004 [P] Adicionar item de navegação exclusivo do superadmin para a gestão de pedidos em `src/app/layouts/admin-layout/admin-layout.ts`
 
 ---
 
@@ -31,18 +31,18 @@
 
 **⚠️ CRITICAL**: Nenhuma história começa antes desta fase.
 
-- [ ] T005 Criar DTOs de consulta, resumo, detalhe, seleção, prévia, execução, exportação e erro em `src/app/core/models/order-admin.model.ts`
+- [x] T005 Criar DTOs de consulta, resumo, detalhe, seleção, prévia, execução, exportação e erro em `src/app/core/models/order-admin.model.ts`
 - [ ] T006 [P] Criar DTOs validados de consulta e comandos administrativos em `../saas-api/src/modules/order/dto/admin-order-query.dto.ts` e `../saas-api/src/modules/order/dto/admin-order-action.dto.ts`
 - [ ] T007 [P] Adicionar testes de autorização `SUPER_ADMIN` e rejeição dos demais papéis em `../saas-api/src/modules/order/order.controller.spec.ts`
-- [ ] T008 Implementar endpoints administrativos aditivos e guards em `../saas-api/src/modules/order/order.controller.ts`
-- [ ] T009 Implementar consulta global paginada, filtros, busca, ordenação estável e agregados sem N+1 em `../saas-api/src/modules/order/repositories/order.repository.ts`
-- [ ] T010 [P] Adicionar testes de paginação, filtros combinados, desempate e zero resultados em `../saas-api/src/modules/order/repositories/order.repository.spec.ts`
+- [x] T008 Implementar endpoints administrativos aditivos e guards em `../saas-api/src/modules/order/order.controller.ts`
+- [x] T009 Implementar consulta global paginada, filtros, busca, ordenação estável e agregados sem N+1 em `../saas-api/src/modules/order/repositories/order.repository.ts`
+- [x] T010 [P] Adicionar testes de paginação, filtros combinados, desempate e zero resultados em `../saas-api/src/modules/order/repositories/order.repository.spec.ts`
 - [ ] T011 Implementar orquestração administrativa, versionamento, idempotência e auditoria em `../saas-api/src/modules/order/order.service.ts`
 - [ ] T012 [P] Adicionar testes de prévia expirada, idempotência, conflito e auditoria em `../saas-api/src/modules/order/order.service.spec.ts`
-- [ ] T013 Criar cliente tipado para lista, detalhe, opções, prévia, execução e exportação em `src/app/features/orders/services/order-admin.ts`
-- [ ] T014 [P] Testar URLs, parâmetros, payloads e mapeamento de erros do cliente em `src/app/features/orders/services/order-admin.spec.ts`
-- [ ] T015 Criar parser/serializer canônico de query params com defaults e validação em `src/app/features/orders/services/order-admin-query.ts`
-- [ ] T016 [P] Testar round-trip, parâmetros inválidos e restauração da consulta em `src/app/features/orders/services/order-admin-query.spec.ts`
+- [x] T013 Criar cliente tipado para lista, detalhe, opções, prévia, execução e exportação em `src/app/features/orders/services/order-admin.ts`
+- [x] T014 [P] Testar URLs, parâmetros, payloads e mapeamento de erros do cliente em `src/app/features/orders/services/order-admin.spec.ts`
+- [x] T015 Criar parser/serializer canônico de query params com defaults e validação em `src/app/features/orders/services/order-admin-query.ts`
+- [x] T016 [P] Testar round-trip, parâmetros inválidos e restauração da consulta em `src/app/features/orders/services/order-admin-query.spec.ts`
 - [ ] T017 Criar presenter puro de status, prazos, origem, ações e prioridade mobile em `src/app/features/orders/services/order-admin.presentation.ts`
 - [ ] T018 [P] Testar apresentação textual sem dependência exclusiva de cor em `src/app/features/orders/services/order-admin.presentation.spec.ts`
 
@@ -68,9 +68,9 @@
 - [ ] T023 [P] [US1] Implementar formulário reativo de filtros, erros por campo e modo drawer em `src/app/features/orders/components/admin/order-admin-filters/order-admin-filters.ts`
 - [ ] T024 [P] [US1] Implementar tabela desktop com seleção, colunas, ordenação, paginação e skeleton em `src/app/features/orders/components/admin/order-admin-table/order-admin-table.ts`
 - [ ] T025 [P] [US1] Implementar cards mobile com seleção, dados prioritários e ações acessíveis em `src/app/features/orders/components/admin/order-admin-cards/order-admin-cards.ts`
-- [ ] T026 [US1] Integrar query state, requisições canceláveis, URL, breakpoints e estados na página em `src/app/features/orders/pages/admin-list/admin-list.ts`
-- [ ] T027 [US1] Implementar paginação acessível, intervalo/total e tamanhos 25/50/100 na página em `src/app/features/orders/pages/admin-list/admin-list.ts`
-- [ ] T028 [US1] Integrar acesso negado, sessão expirada e offline aos handlers centrais em `src/app/features/orders/pages/admin-list/admin-list.ts`
+- [x] T026 [US1] Integrar query state, requisições canceláveis, URL, breakpoints e estados na página em `src/app/features/orders/pages/admin-list/admin-list.ts`
+- [x] T027 [US1] Implementar paginação acessível, intervalo/total e tamanhos 25/50/100 na página em `src/app/features/orders/pages/admin-list/admin-list.ts`
+- [x] T028 [US1] Integrar acesso negado, sessão expirada e offline aos handlers centrais em `src/app/features/orders/pages/admin-list/admin-list.ts`
 
 **Checkpoint**: A visão global é utilizável e testável sem detalhe ou mutações.
 
@@ -92,8 +92,8 @@
 - [ ] T031 [P] [US2] Implementar resumo, participantes, indicadores financeiros e prazos em `src/app/features/orders/components/admin/order-admin-detail-sections/order-summary-section.ts`
 - [ ] T032 [P] [US2] Implementar itens, briefing, pronunciamentos e entregas reutilizando mídia existente em `src/app/features/orders/components/admin/order-admin-detail-sections/order-content-section.ts`
 - [ ] T033 [P] [US2] Implementar disputa, timeline e auditoria paginada em `src/app/features/orders/components/admin/order-admin-detail-sections/order-audit-section.ts`
-- [ ] T034 [US2] Integrar seções, retries isolados, atualização e indicador de versão em `src/app/features/orders/pages/admin-detail/admin-detail.ts`
-- [ ] T035 [US2] Conectar links de lista/card ao detalhe preservando retorno à consulta em `src/app/features/orders/pages/admin-list/admin-list.ts`
+- [x] T034 [US2] Integrar seções, retries isolados, atualização e indicador de versão em `src/app/features/orders/pages/admin-detail/admin-detail.ts`
+- [x] T035 [US2] Conectar links de lista/card ao detalhe preservando retorno à consulta em `src/app/features/orders/pages/admin-list/admin-list.ts`
 
 **Checkpoint**: Consulta e diagnóstico completo funcionam sem comandos administrativos.
 
@@ -161,7 +161,7 @@
 - [ ] T052 [P] [US5] Criar serviço SSR-safe de colunas e densidade por usuário em `src/app/features/orders/services/order-view-preferences.ts`
 - [ ] T053 [US5] Integrar seletor de colunas/densidade na toolbar e tabela em `src/app/features/orders/components/admin/order-admin-toolbar/order-admin-toolbar.ts`
 - [ ] T054 [US5] Implementar job e acesso temporário de exportação em `../saas-api/src/modules/order/order.service.ts`
-- [ ] T055 [US5] Integrar criação, progresso, sucesso e falha de exportação em `src/app/features/orders/pages/admin-list/admin-list.ts`
+- [x] T055 [US5] Integrar criação, progresso, sucesso e falha de exportação em `src/app/features/orders/pages/admin-list/admin-list.ts`
 
 **Checkpoint**: Preferências e exportações respeitam usuário e consulta.
 
@@ -174,9 +174,9 @@
 - [ ] T056 [P] Executar auditoria de teclado, foco, leitor de tela, contraste e redução de movimento conforme `specs/008-order-admin/quickstart.md`
 - [ ] T057 [P] Validar 320, 390, 768, 1024 e 1440 px em claro/escuro e corrigir overflow em `src/app/features/orders/components/admin/`
 - [ ] T058 [P] Validar estados carregando, vazio, erro, offline, acesso negado, sessão expirada e conflito em `src/app/features/orders/pages/admin-list/admin-list.spec.ts` e `src/app/features/orders/pages/admin-detail/admin-detail.spec.ts`
-- [ ] T059 Executar e corrigir testes do frontend com `npm test -- --watch=false` e formatação com `npm run format:check`
-- [ ] T060 Executar e corrigir testes do módulo order da API em `../saas-api/src/modules/order/`
-- [ ] T061 Executar e corrigir build SSR de produção com `npm run build`
+- [x] T059 Executar e corrigir testes do frontend com `npm test -- --watch=false` e formatação com `npm run format:check`
+- [x] T060 Executar e corrigir testes do módulo order da API em `../saas-api/src/modules/order/`
+- [x] T061 Executar e corrigir build SSR de produção com `npm run build`
 - [ ] T062 Validar manualmente todos os cenários e registrar resultados em `specs/008-order-admin/quickstart.md`
 
 ---

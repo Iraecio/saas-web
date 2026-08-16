@@ -19,7 +19,7 @@ const MENU_BY_ROLE: Record<UserRole, MenuItem[]> = {
     { icon: '💼', label: 'Revendedores', route: '/admin/resellers' },
     { icon: '💰', label: 'Carteiras', route: '/admin/wallet-admin' },
     { icon: '🎯', label: 'Solicitações de Papel', route: '/admin/role-requests' },
-    { icon: '📦', label: 'Pedidos', route: '/admin/orders' },
+    { icon: '📦', label: 'Gestão de Pedidos', route: '/admin/orders/manage' },
     { icon: '🛎️', label: 'Catálogo', route: '/admin/services' },
     { icon: '💸', label: 'Saques', route: '/admin/withdrawals/admin' },
     { icon: '🪙', label: 'Compras de Créditos', route: '/admin/reseller-credits/admin-purchases' },

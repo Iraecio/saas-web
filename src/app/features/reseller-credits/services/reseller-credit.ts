@@ -12,6 +12,11 @@ import {
   PlatformCreditPrice,
   PlatformPaymentMethod,
   ResellerPricing,
+  PricingOverview,
+  PricingPreview,
+  PackageQuery,
+  PackagePage,
+  PricingHistoryPage,
   StockSummary,
   StockManagementView,
   StockMovementType,
@@ -28,17 +33,59 @@ export class ResellerCreditService {
   getPricing(): Observable<ResellerPricing> {
     return this.api.get('/reseller/pricing');
   }
+  getPricingOverview(): Observable<PricingOverview> {
+    return this.api.get('/reseller/pricing/overview');
+  }
+  previewPricing(dto: {
+    unitPriceCents: number;
+    allowDirectPurchase: boolean;
+    expectedVersion?: number;
+  }): Observable<PricingPreview> {
+    return this.api.post('/reseller/pricing/preview', dto);
+  }
+  confirmPricing(previewId: string, reason?: string): Observable<ResellerPricing> {
+    return this.api.put('/reseller/pricing/confirm', { previewId, confirmation: true, reason });
+  }
+  listPackages(query: PackageQuery): Observable<PackagePage> {
+    return this.api.get('/reseller/pricing/packages', { ...query });
+  }
+  listPricingHistory(page = 1, pageSize = 10): Observable<PricingHistoryPage> {
+    return this.api.get('/reseller/pricing/history', { page, pageSize });
+  }
   updatePricing(dto: {
     unitPriceCents: number;
     allowDirectPurchase: boolean;
   }): Observable<ResellerPricing> {
     return this.api.put('/reseller/pricing', dto);
   }
-  createPackage(dto: { creditAmount: number; priceCents: number }): Observable<CreditPackage> {
+  createPackage(dto: {
+    name?: string;
+    creditAmount: number;
+    priceCents: number;
+    expectedPricingVersion?: number;
+  }): Observable<CreditPackage> {
     return this.api.post('/reseller/pricing/packages', dto);
   }
-  togglePackage(id: string, isActive: boolean): Observable<CreditPackage> {
-    return this.api.patch(`/reseller/pricing/packages/${id}`, { isActive });
+  togglePackage(
+    id: string,
+    isActive: boolean,
+    expectedVersion?: number,
+  ): Observable<CreditPackage> {
+    return this.api.patch(`/reseller/pricing/packages/${id}`, { isActive, expectedVersion });
+  }
+  previewPackageBulk(
+    action: 'ACTIVATE' | 'DEACTIVATE',
+    packageIds: string[],
+  ): Observable<{ previewId: string; eligible: string[]; ineligible: string[] }> {
+    return this.api.post('/reseller/pricing/packages/actions/preview', { action, packageIds });
+  }
+  executePackageBulk(
+    previewId: string,
+  ): Observable<{ results: { id: string; success: boolean }[]; ineligible: string[] }> {
+    return this.api.post('/reseller/pricing/packages/actions/execute', {
+      previewId,
+      confirmation: true,
+    });
   }
   listPlatformPaymentMethods(): Observable<PlatformPaymentMethod[]> {
     return this.api.get('/payment-methods', { context: 'PLATFORM_RESELLER' });

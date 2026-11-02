@@ -10,7 +10,7 @@ import { ImpersonationBannerComponent } from '../../shared/components/impersonat
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterOutlet, SidebarComponent, HeaderComponent, ImpersonationBannerComponent],
   template: `
-    <div class="flex h-screen overflow-hidden bg-neutral-50 dark:bg-neutral-900">
+    <div class="flex h-screen overflow-hidden bg-canvas text-foreground">
       <app-sidebar [open]="appState.sidebarOpen()" />
 
       <div class="flex flex-1 flex-col overflow-hidden">

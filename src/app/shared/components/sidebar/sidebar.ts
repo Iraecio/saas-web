@@ -15,14 +15,14 @@ const MENU_BY_ROLE: Record<UserRole, MenuItem[]> = {
   SUPER_ADMIN: [
     { icon: '📊', label: 'Dashboard', route: '/admin/dashboard' },
     { icon: '👥', label: 'Usuários', route: '/admin/users' },
-    { icon: '🎯', label: 'Solicitações de Papel', route: '/admin/role-requests' },
-    { icon: '📦', label: 'Pedidos', route: '/admin/orders' },
-    { icon: '🛎️', label: 'Catálogo', route: '/admin/services' },
     { icon: '🎙️', label: 'Profissionais', route: '/admin/professionals' },
+    { icon: '💼', label: 'Revendedores', route: '/admin/resellers' },
+    { icon: '💰', label: 'Carteiras', route: '/admin/wallet-admin' },
+    { icon: '🎯', label: 'Solicitações de Papel', route: '/admin/role-requests' },
+    { icon: '📦', label: 'Gestão de Pedidos', route: '/admin/orders/manage' },
+    { icon: '🛎️', label: 'Catálogo', route: '/admin/services' },
     { icon: '💸', label: 'Saques', route: '/admin/withdrawals/admin' },
     { icon: '🪙', label: 'Compras de Créditos', route: '/admin/reseller-credits/admin-purchases' },
-    { icon: '💰', label: 'Carteiras', route: '/admin/wallet-admin' },
-    { icon: '💼', label: 'Revendedores', route: '/admin/resellers' },
     { icon: '📈', label: 'Relatórios', route: '/admin/reports' },
     { icon: '🗂️', label: 'Armazenamento', route: '/admin/storage' },
     { icon: '⚙️', label: 'Configurações', route: '/admin/settings' },
@@ -36,7 +36,6 @@ const MENU_BY_ROLE: Record<UserRole, MenuItem[]> = {
     { icon: '🎙️', label: 'Profissionais', route: '/admin/professionals' },
     { icon: '💸', label: 'Saques', route: '/admin/withdrawals/admin' },
     { icon: '🪙', label: 'Compras de Créditos', route: '/admin/reseller-credits/admin-purchases' },
-    { icon: '💰', label: 'Carteiras', route: '/admin/wallet-admin' },
     { icon: '💼', label: 'Revendedores', route: '/admin/resellers' },
     { icon: '📈', label: 'Relatórios', route: '/admin/reports' },
     { icon: '⚙️', label: 'Configurações', route: '/admin/settings' },
@@ -49,6 +48,7 @@ const MENU_BY_ROLE: Record<UserRole, MenuItem[]> = {
     { icon: '🪙', label: 'Comprar Créditos', route: '/admin/reseller-credits/purchases' },
     { icon: '📦', label: 'Estoque', route: '/admin/reseller-credits/stock' },
     { icon: '💵', label: 'Vendas', route: '/admin/reseller-credits/sales' },
+    { icon: '🏷️', label: 'Preços e pacotes', route: '/admin/reseller-credits/pricing' },
     { icon: '⚙️', label: 'Configurações', route: '/admin/settings' },
   ],
   RESELLER_MANAGER: [
@@ -59,6 +59,7 @@ const MENU_BY_ROLE: Record<UserRole, MenuItem[]> = {
     { icon: '🪙', label: 'Comprar Créditos', route: '/admin/reseller-credits/purchases' },
     { icon: '📦', label: 'Estoque', route: '/admin/reseller-credits/stock' },
     { icon: '💵', label: 'Vendas', route: '/admin/reseller-credits/sales' },
+    { icon: '🏷️', label: 'Preços e pacotes', route: '/admin/reseller-credits/pricing' },
     { icon: '📈', label: 'Relatórios', route: '/admin/reports' },
     { icon: '⚙️', label: 'Configurações', route: '/admin/settings' },
   ],
@@ -103,13 +104,11 @@ const DIRECT_CLIENT_MENU: MenuItem[] = [
   imports: [RouterLink, RouterLinkActive],
   template: `
     <aside
-      class="flex h-full flex-col border-r border-neutral-200 bg-white transition-all duration-300 dark:border-neutral-700 dark:bg-neutral-800"
+      class="flex h-full flex-col border-r border-border bg-surface text-foreground transition-all duration-300"
       [class]="widthClasses()"
     >
-      <div
-        class="flex h-16 items-center justify-center border-b border-neutral-200 px-6 dark:border-neutral-700"
-      >
-        <h2 class="text-xl font-bold text-neutral-900 dark:text-white">
+      <div class="flex h-16 items-center justify-center border-b border-border px-6">
+        <h2 class="text-xl font-bold text-foreground">
           @if (open()) {
             <span>SaaS Web</span>
           } @else {

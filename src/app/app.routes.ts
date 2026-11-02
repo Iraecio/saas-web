@@ -7,8 +7,7 @@ export const routes: Routes = [
     path: 'auth',
     loadComponent: () =>
       import('./layouts/auth-layout/auth-layout').then((m) => m.AuthLayoutComponent),
-    loadChildren: () =>
-      import('./features/auth/auth.routes').then((m) => m.AUTH_ROUTES),
+    loadChildren: () => import('./features/auth/auth.routes').then((m) => m.AUTH_ROUTES),
   },
   {
     path: 'admin',
@@ -23,8 +22,7 @@ export const routes: Routes = [
       },
       {
         path: 'users',
-        loadChildren: () =>
-          import('./features/users/users.routes').then((m) => m.USERS_ROUTES),
+        loadChildren: () => import('./features/users/users.routes').then((m) => m.USERS_ROUTES),
       },
       {
         path: 'settings',
@@ -39,7 +37,9 @@ export const routes: Routes = [
       {
         path: 'role-requests',
         loadChildren: () =>
-          import('./features/role-requests/role-requests.routes').then((m) => m.ROLE_REQUESTS_ROUTES),
+          import('./features/role-requests/role-requests.routes').then(
+            (m) => m.ROLE_REQUESTS_ROUTES,
+          ),
       },
       {
         path: 'resellers',
@@ -61,16 +61,13 @@ export const routes: Routes = [
       },
       {
         path: 'wallet',
-        loadChildren: () =>
-          import('./features/wallet/wallet.routes').then((m) => m.WALLET_ROUTES),
+        loadChildren: () => import('./features/wallet/wallet.routes').then((m) => m.WALLET_ROUTES),
       },
       {
         path: 'wallet-admin',
-        canActivate: [roleGuard(['ADMIN', 'SUPER_ADMIN'])],
+        canActivate: [roleGuard(['SUPER_ADMIN'])],
         loadChildren: () =>
-          import('./features/wallet-admin/wallet-admin.routes').then(
-            (m) => m.WALLET_ADMIN_ROUTES,
-          ),
+          import('./features/wallet-admin/wallet-admin.routes').then((m) => m.WALLET_ADMIN_ROUTES),
       },
       {
         path: 'storage',
@@ -86,8 +83,7 @@ export const routes: Routes = [
       },
       {
         path: 'orders',
-        loadChildren: () =>
-          import('./features/orders/orders.routes').then((m) => m.ORDERS_ROUTES),
+        loadChildren: () => import('./features/orders/orders.routes').then((m) => m.ORDERS_ROUTES),
       },
       {
         path: 'professionals',

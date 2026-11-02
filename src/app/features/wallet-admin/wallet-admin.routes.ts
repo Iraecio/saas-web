@@ -3,13 +3,12 @@ import { Routes } from '@angular/router';
 export const WALLET_ADMIN_ROUTES: Routes = [
   {
     path: '',
-    redirectTo: 'wallets',
+    loadComponent: () => import('./pages/overview/overview').then((m) => m.WalletOverviewPage),
     pathMatch: 'full',
   },
   {
     path: 'wallets',
-    loadComponent: () =>
-      import('./pages/wallets/wallets').then((m) => m.WalletsListPage),
+    loadComponent: () => import('./pages/wallets/wallets').then((m) => m.WalletsListPage),
   },
   {
     path: 'wallets/:userId',
@@ -18,18 +17,15 @@ export const WALLET_ADMIN_ROUTES: Routes = [
   },
   {
     path: 'credits',
-    loadComponent: () =>
-      import('./pages/credits/credits').then((m) => m.CreditsSearchPage),
+    loadComponent: () => import('./pages/credits/credits').then((m) => m.CreditsSearchPage),
   },
   {
     path: 'disputes',
-    loadComponent: () =>
-      import('./pages/disputes/disputes').then((m) => m.DisputesAdminPage),
+    loadComponent: () => import('./pages/disputes/disputes').then((m) => m.DisputesAdminPage),
   },
   {
     path: 'refunds',
-    loadComponent: () =>
-      import('./pages/refunds/refunds').then((m) => m.RefundsAdminPage),
+    loadComponent: () => import('./pages/refunds/refunds').then((m) => m.RefundsAdminPage),
   },
   {
     path: 'reconciliation',
@@ -38,13 +34,11 @@ export const WALLET_ADMIN_ROUTES: Routes = [
   },
   {
     path: 'audit',
-    loadComponent: () =>
-      import('./pages/audit-log/audit-log').then((m) => m.AuditLogPage),
+    loadComponent: () => import('./pages/audit-log/audit-log').then((m) => m.AuditLogPage),
   },
   {
     path: 'analytics',
-    loadComponent: () =>
-      import('./pages/analytics/analytics').then((m) => m.AnalyticsPage),
+    loadComponent: () => import('./pages/analytics/analytics').then((m) => m.AnalyticsPage),
   },
   {
     path: 'issue-credits',

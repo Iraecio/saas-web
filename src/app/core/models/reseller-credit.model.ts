@@ -10,13 +10,61 @@ export interface ResellerPricing {
   id?: string;
   unitPriceCents: number;
   allowDirectPurchase: boolean;
+  version?: number;
+  updatedAt?: string;
   packages: CreditPackage[];
 }
 export interface CreditPackage {
   id: string;
+  name?: string | null;
   creditAmount: number;
   priceCents: number;
   isActive: boolean;
+  version?: number;
+  updatedAt?: string;
+}
+export interface PricingOverview {
+  config: ResellerPricing | null;
+  platformCost: PlatformCreditPrice & { available: boolean; version?: string };
+  activePackageCount: number;
+  margin: { unitCents: number; percent: number | null } | null;
+  generatedAt: string;
+}
+export interface PricingPreview {
+  previewId: string;
+  before: ResellerPricing | null;
+  after: { unitPriceCents: number; allowDirectPurchase: boolean };
+  cost: PlatformCreditPrice;
+  margin: { unitCents: number; percent: number | null };
+  warnings: string[];
+  expiresAt: string;
+}
+export interface PackageQuery {
+  q: string;
+  status: 'all' | 'active' | 'inactive';
+  sort: 'name' | 'creditAmount' | 'priceCents' | 'updatedAt';
+  direction: 'asc' | 'desc';
+  page: number;
+  pageSize: 10 | 25 | 50;
+}
+export interface PackagePage {
+  items: CreditPackage[];
+  meta: { page: number; pageSize: number; total: number; totalPages: number };
+  queryFingerprint: string;
+}
+export interface PricingHistoryEvent {
+  id: string;
+  targetType: string;
+  targetId?: string;
+  action: string;
+  before?: unknown;
+  after?: unknown;
+  reason?: string;
+  createdAt: string;
+}
+export interface PricingHistoryPage {
+  items: PricingHistoryEvent[];
+  meta: { page: number; pageSize: number; total: number; totalPages: number };
 }
 export interface CreditPurchase {
   id: string;

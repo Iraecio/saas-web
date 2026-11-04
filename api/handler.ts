@@ -1,6 +1,27 @@
-import { VercelRequest, VercelResponse } from '@vercel/node';
+/// <reference types="node" />
 
-export default async (req: VercelRequest, res: VercelResponse) => {
-  const { reqHandler } = await import('../dist/saas-web/server/server.mjs');
+import type { IncomingMessage, ServerResponse } from 'node:http';
+
+export type SsrRequestHandler = (
+  req: IncomingMessage,
+  res: ServerResponse,
+) => unknown | Promise<unknown>;
+
+export type SsrHandlerLoader = () => Promise<{
+  reqHandler: SsrRequestHandler;
+}>;
+
+const serverBundlePath = '../dist/saas-web/server/server.mjs';
+
+const loadSsrHandler: SsrHandlerLoader = () => import(serverBundlePath);
+
+export async function handleVercelRequest(
+  req: IncomingMessage,
+  res: ServerResponse,
+  loadHandler: SsrHandlerLoader = loadSsrHandler,
+) {
+  const { reqHandler } = await loadHandler();
   return reqHandler(req, res);
-};
+}
+
+export default handleVercelRequest;

@@ -32,7 +32,9 @@ type Row = Record<string, unknown>;
               </th>
             }
             @if (showActions()) {
-              <th class="table-cell text-right text-xs font-medium uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
+              <th
+                class="table-cell text-right text-xs font-medium uppercase tracking-wide text-neutral-500 dark:text-neutral-400"
+              >
                 Ações
               </th>
             }
@@ -40,7 +42,9 @@ type Row = Record<string, unknown>;
         </thead>
         <tbody>
           @for (row of pagedRows(); track trackKey(row); let i = $index) {
-            <tr class="border-b border-neutral-100 transition-colors hover:bg-neutral-50 dark:border-neutral-800 dark:hover:bg-neutral-800/50">
+            <tr
+              class="border-b border-neutral-100 transition-colors hover:bg-neutral-50 dark:border-neutral-800 dark:hover:bg-neutral-800/50"
+            >
               @for (col of columns(); track col.key) {
                 <td class="table-cell">
                   {{ col.format ? col.format(row[col.key], row) : row[col.key] }}
@@ -83,18 +87,10 @@ type Row = Record<string, unknown>;
           Página {{ page() }} de {{ totalPages() }} — {{ sortedRows().length }} itens
         </p>
         <div class="flex gap-2">
-          <button
-            class="btn-secondary"
-            [disabled]="page() === 1"
-            (click)="previousPage()"
-          >
+          <button class="btn-secondary" [disabled]="page() === 1" (click)="previousPage()">
             Anterior
           </button>
-          <button
-            class="btn-secondary"
-            [disabled]="page() === totalPages()"
-            (click)="nextPage()"
-          >
+          <button class="btn-secondary" [disabled]="page() === totalPages()" (click)="nextPage()">
             Próxima
           </button>
         </div>

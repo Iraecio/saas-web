@@ -23,13 +23,20 @@ import { RefundRequest, RefundStatus } from '../../../../core/models/wallet.mode
           <h1 class="text-3xl font-bold text-neutral-900 dark:text-white">Reembolsos</h1>
           <p class="mt-1 text-sm text-neutral-500">Suas solicitações de reembolso</p>
         </div>
-        <a routerLink="../" class="text-sm text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors">← Voltar</a>
+        <a
+          routerLink="../"
+          class="text-sm text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors"
+          >← Voltar</a
+        >
       </header>
 
       <!-- Filtros -->
       <div>
-        <select [value]="statusFilter()" (change)="onStatusChange($event)"
-          class="form-input text-sm py-1.5 px-3 w-auto">
+        <select
+          [value]="statusFilter()"
+          (change)="onStatusChange($event)"
+          class="form-input text-sm py-1.5 px-3 w-auto"
+        >
           <option value="">Todos os status</option>
           <option value="REQUESTED">Solicitado</option>
           <option value="APPROVED">Aprovado</option>
@@ -41,39 +48,70 @@ import { RefundRequest, RefundStatus } from '../../../../core/models/wallet.mode
       </div>
 
       <!-- Tabela -->
-      <section class="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 overflow-hidden">
+      <section
+        class="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 overflow-hidden"
+      >
         @if (loading()) {
           <div class="flex justify-center py-12">
-            <div class="w-6 h-6 border-2 border-neutral-400 border-t-transparent rounded-full animate-spin"></div>
+            <div
+              class="w-6 h-6 border-2 border-neutral-400 border-t-transparent rounded-full animate-spin"
+            ></div>
           </div>
         } @else if (refunds().length === 0) {
           <p class="text-neutral-500 text-sm text-center py-12">Nenhum reembolso encontrado.</p>
         } @else {
           <table class="w-full text-sm">
-            <thead class="bg-neutral-50 dark:bg-neutral-800 border-b border-neutral-200 dark:border-neutral-700">
+            <thead
+              class="bg-neutral-50 dark:bg-neutral-800 border-b border-neutral-200 dark:border-neutral-700"
+            >
               <tr>
-                <th class="text-left px-6 py-3 text-xs font-medium text-neutral-500 uppercase tracking-wider">Crédito</th>
-                <th class="text-left px-6 py-3 text-xs font-medium text-neutral-500 uppercase tracking-wider">Motivo</th>
-                <th class="text-left px-6 py-3 text-xs font-medium text-neutral-500 uppercase tracking-wider">Status</th>
-                <th class="text-left px-6 py-3 text-xs font-medium text-neutral-500 uppercase tracking-wider">Data</th>
+                <th
+                  class="text-left px-6 py-3 text-xs font-medium text-neutral-500 uppercase tracking-wider"
+                >
+                  Crédito
+                </th>
+                <th
+                  class="text-left px-6 py-3 text-xs font-medium text-neutral-500 uppercase tracking-wider"
+                >
+                  Motivo
+                </th>
+                <th
+                  class="text-left px-6 py-3 text-xs font-medium text-neutral-500 uppercase tracking-wider"
+                >
+                  Status
+                </th>
+                <th
+                  class="text-left px-6 py-3 text-xs font-medium text-neutral-500 uppercase tracking-wider"
+                >
+                  Data
+                </th>
               </tr>
             </thead>
             <tbody class="divide-y divide-neutral-200 dark:divide-neutral-800">
               @for (refund of refunds(); track refund.id) {
                 <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors">
                   <td class="px-6 py-4">
-                    <a [routerLink]="['/admin/wallet/credits', refund.creditId]"
-                      class="font-mono text-xs text-primary-600 hover:underline">
-                      {{ refund.creditId | slice:0:8 }}…
+                    <a
+                      [routerLink]="['/admin/wallet/credits', refund.creditId]"
+                      class="font-mono text-xs text-primary-600 hover:underline"
+                    >
+                      {{ refund.creditId | slice: 0 : 8 }}…
                     </a>
                   </td>
-                  <td class="px-6 py-4 text-neutral-700 dark:text-neutral-300 max-w-xs truncate">{{ refund.reason }}</td>
+                  <td class="px-6 py-4 text-neutral-700 dark:text-neutral-300 max-w-xs truncate">
+                    {{ refund.reason }}
+                  </td>
                   <td class="px-6 py-4">
-                    <span class="text-xs px-2 py-0.5 rounded-full font-medium" [class]="statusBadge(refund.status)">
+                    <span
+                      class="text-xs px-2 py-0.5 rounded-full font-medium"
+                      [class]="statusBadge(refund.status)"
+                    >
                       {{ statusLabel(refund.status) }}
                     </span>
                   </td>
-                  <td class="px-6 py-4 text-neutral-500 text-xs">{{ refund.createdAt | date:'dd/MM/yyyy' }}</td>
+                  <td class="px-6 py-4 text-neutral-500 text-xs">
+                    {{ refund.createdAt | date: 'dd/MM/yyyy' }}
+                  </td>
                 </tr>
               }
             </tbody>
@@ -106,7 +144,10 @@ export class RefundsListPage implements OnInit {
       .listRefunds({ status: this.statusFilter() || undefined })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (r) => { this.refunds.set(r); this.loading.set(false); },
+        next: (r) => {
+          this.refunds.set(r);
+          this.loading.set(false);
+        },
         error: () => this.loading.set(false),
       });
   }
@@ -125,8 +166,12 @@ export class RefundsListPage implements OnInit {
 
   statusLabel(status: RefundStatus): string {
     const map: Record<RefundStatus, string> = {
-      REQUESTED: 'Solicitado', APPROVED: 'Aprovado', PROCESSING: 'Processando',
-      COMPLETED: 'Concluído', REJECTED: 'Rejeitado', CANCELLED: 'Cancelado',
+      REQUESTED: 'Solicitado',
+      APPROVED: 'Aprovado',
+      PROCESSING: 'Processando',
+      COMPLETED: 'Concluído',
+      REJECTED: 'Rejeitado',
+      CANCELLED: 'Cancelado',
     };
     return map[status] ?? status;
   }

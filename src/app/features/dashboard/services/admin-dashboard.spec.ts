@@ -10,7 +10,14 @@ describe('AdminDashboardService', () => {
   let service: AdminDashboardService;
   let http: HttpTestingController;
   beforeEach(() => {
-    TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting(), ApiService, AdminDashboardService] });
+    TestBed.configureTestingModule({
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        ApiService,
+        AdminDashboardService,
+      ],
+    });
     service = TestBed.inject(AdminDashboardService);
     http = TestBed.inject(HttpTestingController);
   });

@@ -10,6 +10,8 @@
 /node_modules
 npm-debug.log
 yarn-error.log
+*.log
+.env*
 
 # IDEs and editors
 .idea/
@@ -42,6 +44,8 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+*.tmp
+*.swp
 
 # Claude Code local settings
 .claude/settings.local.json

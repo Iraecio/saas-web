@@ -15,8 +15,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-      const canRefresh =
-        error.status === 401 && !shouldSkip(req) && auth.refreshToken() !== null;
+      const canRefresh = error.status === 401 && !shouldSkip(req) && auth.refreshToken() !== null;
 
       if (canRefresh) {
         if (!refreshInFlight) {
@@ -35,9 +34,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
           });
         }
 
-        return refreshInFlight.pipe(
-          switchMap((newToken) => next(attachToken(req, newToken))),
-        );
+        return refreshInFlight.pipe(switchMap((newToken) => next(attachToken(req, newToken))));
       }
 
       if (error.status === 401) {

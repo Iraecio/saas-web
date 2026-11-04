@@ -28,12 +28,22 @@ import { CustomDomain } from '../../../../core/models/custom-domain.model';
       <!-- Modal de instruções DNS -->
       @if (dnsInstructions()) {
         <div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-          <div class="bg-neutral-900 rounded-2xl border border-white/20 p-6 max-w-lg w-full space-y-4">
+          <div
+            class="bg-neutral-900 rounded-2xl border border-white/20 p-6 max-w-lg w-full space-y-4"
+          >
             <h3 class="text-lg font-bold text-white">✓ Domínio registrado!</h3>
-            <p class="text-sm text-neutral-400">Configure o DNS do seu domínio conforme as instruções:</p>
-            <div class="bg-neutral-800 rounded-lg p-4 font-mono text-sm text-green-400 whitespace-pre-wrap break-all">{{ dnsInstructions() }}</div>
-            <button (click)="dnsInstructions.set(undefined)"
-              class="w-full px-4 py-2 bg-white text-neutral-900 rounded-lg font-medium hover:bg-neutral-100 transition-colors">
+            <p class="text-sm text-neutral-400">
+              Configure o DNS do seu domínio conforme as instruções:
+            </p>
+            <div
+              class="bg-neutral-800 rounded-lg p-4 font-mono text-sm text-green-400 whitespace-pre-wrap break-all"
+            >
+              {{ dnsInstructions() }}
+            </div>
+            <button
+              (click)="dnsInstructions.set(undefined)"
+              class="w-full px-4 py-2 bg-white text-neutral-900 rounded-lg font-medium hover:bg-neutral-100 transition-colors"
+            >
               Entendido
             </button>
           </div>
@@ -41,12 +51,18 @@ import { CustomDomain } from '../../../../core/models/custom-domain.model';
       }
 
       <!-- Lista de domínios -->
-      <section class="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 p-6">
-        <h2 class="text-lg font-semibold mb-4 text-neutral-900 dark:text-white">Domínios registrados</h2>
+      <section
+        class="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 p-6"
+      >
+        <h2 class="text-lg font-semibold mb-4 text-neutral-900 dark:text-white">
+          Domínios registrados
+        </h2>
 
         @if (loading()) {
           <div class="flex justify-center py-8">
-            <div class="w-5 h-5 border-2 border-neutral-400 border-t-transparent rounded-full animate-spin"></div>
+            <div
+              class="w-5 h-5 border-2 border-neutral-400 border-t-transparent rounded-full animate-spin"
+            ></div>
           </div>
         } @else if (domains().length === 0) {
           <p class="text-neutral-500 text-sm py-4 text-center">Nenhum domínio registrado ainda.</p>
@@ -55,19 +71,29 @@ import { CustomDomain } from '../../../../core/models/custom-domain.model';
             @for (domain of domains(); track domain.id) {
               <div class="py-3 flex items-center justify-between">
                 <div>
-                  <span class="font-mono text-sm text-neutral-900 dark:text-white">{{ domain.domain }}</span>
+                  <span class="font-mono text-sm text-neutral-900 dark:text-white">{{
+                    domain.domain
+                  }}</span>
                   <div class="flex items-center gap-2 mt-0.5">
-                    <span [class]="domain.isActive
-                      ? 'text-xs text-green-600 dark:text-green-400'
-                      : 'text-xs text-neutral-500'">
+                    <span
+                      [class]="
+                        domain.isActive
+                          ? 'text-xs text-green-600 dark:text-green-400'
+                          : 'text-xs text-neutral-500'
+                      "
+                    >
                       {{ domain.isActive ? '● Ativo' : '○ Inativo' }}
                     </span>
-                    <span class="text-xs text-neutral-400">desde {{ domain.createdAt | date:'dd/MM/yyyy' }}</span>
+                    <span class="text-xs text-neutral-400"
+                      >desde {{ domain.createdAt | date: 'dd/MM/yyyy' }}</span
+                    >
                   </div>
                 </div>
                 @if (domain.isActive) {
-                  <button (click)="deactivate(domain)"
-                    class="text-xs text-red-500 hover:text-red-700 px-2 py-1 rounded hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+                  <button
+                    (click)="deactivate(domain)"
+                    class="text-xs text-red-500 hover:text-red-700 px-2 py-1 rounded hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                  >
                     Desativar
                   </button>
                 }
@@ -78,14 +104,24 @@ import { CustomDomain } from '../../../../core/models/custom-domain.model';
       </section>
 
       <!-- Formulário de registro -->
-      <section class="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 p-6">
-        <h2 class="text-lg font-semibold mb-4 text-neutral-900 dark:text-white">Registrar novo domínio</h2>
+      <section
+        class="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 p-6"
+      >
+        <h2 class="text-lg font-semibold mb-4 text-neutral-900 dark:text-white">
+          Registrar novo domínio
+        </h2>
 
         <form [formGroup]="form" (ngSubmit)="register()" class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">Domínio</label>
-            <input type="text" formControlName="domain" placeholder="meudominio.com.br"
-              class="form-input w-full font-mono" />
+            <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1"
+              >Domínio</label
+            >
+            <input
+              type="text"
+              formControlName="domain"
+              placeholder="meudominio.com.br"
+              class="form-input w-full font-mono"
+            />
             @if (form.get('domain')?.invalid && form.get('domain')?.touched) {
               <p class="text-xs text-red-400 mt-1">Domínio é obrigatório</p>
             }
@@ -96,8 +132,11 @@ import { CustomDomain } from '../../../../core/models/custom-domain.model';
           }
 
           <div class="flex justify-end">
-            <button type="submit" [disabled]="form.invalid || registering()"
-              class="px-4 py-2 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50 transition-opacity">
+            <button
+              type="submit"
+              [disabled]="form.invalid || registering()"
+              class="px-4 py-2 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50 transition-opacity"
+            >
               {{ registering() ? 'Registrando...' : 'Registrar domínio' }}
             </button>
           </div>
@@ -127,19 +166,23 @@ export class CustomDomainsListComponent implements OnInit {
 
   ngOnInit(): void {
     this.resellerId =
-      this.route.snapshot.paramMap.get('resellerId') ??
-      this.appState.user()?.resellerId ??
-      '';
+      this.route.snapshot.paramMap.get('resellerId') ?? this.appState.user()?.resellerId ?? '';
     this.loadDomains();
   }
 
   private loadDomains(): void {
-    if (!this.resellerId) { this.loading.set(false); return; }
+    if (!this.resellerId) {
+      this.loading.set(false);
+      return;
+    }
     this.domainService
       .listDomains(this.resellerId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (d) => { this.domains.set(d); this.loading.set(false); },
+        next: (d) => {
+          this.domains.set(d);
+          this.loading.set(false);
+        },
         error: () => this.loading.set(false),
       });
   }

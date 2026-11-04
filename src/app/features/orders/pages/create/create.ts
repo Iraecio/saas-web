@@ -11,17 +11,17 @@ import { DecimalPipe } from '@angular/common';
 import { HttpEventType } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
-  Check,
-  FileText,
-  LoaderCircle,
-  Mic2,
-  Music2,
-  Paperclip,
-  Send,
-  UserRound,
-  X,
-  LucideAngularModule,
-} from 'lucide-angular';
+  LucideCheck,
+  LucideFileText,
+  LucideLoaderCircle,
+  LucideMic2,
+  LucideMusic2,
+  LucidePaperclip,
+  LucideSend,
+  LucideUserRound,
+  LucideX,
+  LucideDynamicIcon,
+} from '@lucide/angular';
 import { NotificationService } from '../../../../core/services/notification';
 import { OrderService } from '../../services/order';
 import { ProfessionalService } from '../../../professionals/services/professional';
@@ -39,7 +39,7 @@ import { PronunciationService } from '../../../pronunciations/services/pronuncia
 @Component({
   selector: 'app-order-create',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DecimalPipe, LucideAngularModule],
+  imports: [DecimalPipe, LucideDynamicIcon],
   template: `
     <div class="mx-auto max-w-3xl space-y-6 p-5 lg:p-8">
       <header class="border-b border-border pb-6">
@@ -67,14 +67,14 @@ import { PronunciationService } from '../../../pronunciations/services/pronuncia
           >
             <span
               class="flex size-10 items-center justify-center rounded-md bg-surface-subtle text-brand"
-              ><lucide-icon [img]="Mic2" class="size-5"
-            /></span>
+              ><svg [lucideIcon]="LucideMic2" class="size-5"></svg
+            ></span>
             <span class="flex-1"
               ><strong class="block text-sm text-foreground">Locução</strong
               ><span class="text-xs text-muted">Voz para seu conteúdo</span></span
             >
             @if (orderType() === 'VOICE') {
-              <lucide-icon [img]="Check" class="size-5 text-brand" />
+              <svg [lucideIcon]="LucideCheck" class="size-5 text-brand"></svg>
             }
           </button>
           <button
@@ -87,14 +87,14 @@ import { PronunciationService } from '../../../pronunciations/services/pronuncia
           >
             <span
               class="flex size-10 items-center justify-center rounded-md bg-surface-subtle text-brand"
-              ><lucide-icon [img]="Music2" class="size-5"
-            /></span>
+              ><svg [lucideIcon]="LucideMusic2" class="size-5"></svg
+            ></span>
             <span class="flex-1"
               ><strong class="block text-sm text-foreground">Produção</strong
               ><span class="text-xs text-muted">Edição e produção de áudio</span></span
             >
             @if (orderType() === 'PRODUCTION') {
-              <lucide-icon [img]="Check" class="size-5 text-brand" />
+              <svg [lucideIcon]="LucideCheck" class="size-5 text-brand"></svg>
             }
           </button>
         </div>
@@ -103,11 +103,12 @@ import { PronunciationService } from '../../../pronunciations/services/pronuncia
       <!-- 2. Profissional -->
       <section class="card space-y-3">
         <label class="form-label flex items-center gap-2"
-          ><lucide-icon [img]="UserRound" class="size-4 text-brand" />2. Profissional</label
+          ><svg [lucideIcon]="LucideUserRound" class="size-4 text-brand"></svg>2.
+          Profissional</label
         >
         @if (loadingProfessionals()) {
           <p class="flex items-center gap-2 rounded-md bg-surface-subtle p-3 text-sm text-muted">
-            <lucide-icon [img]="LoaderCircle" class="size-4 animate-spin" />Carregando
+            <svg [lucideIcon]="LucideLoaderCircle" class="size-4 animate-spin"></svg>Carregando
             profissionais...
           </p>
         } @else if (professionals().length === 0) {
@@ -180,7 +181,7 @@ import { PronunciationService } from '../../../pronunciations/services/pronuncia
       @if (selectedProfessional()) {
         <section class="card space-y-3">
           <label class="form-label flex items-center gap-2"
-            ><lucide-icon [img]="FileText" class="size-4 text-brand" />3.
+            ><svg [lucideIcon]="LucideFileText" class="size-4 text-brand"></svg>3.
             {{ orderType() === 'VOICE' ? 'Texto para locução' : 'Instruções de produção' }}</label
           >
           <textarea
@@ -353,7 +354,7 @@ import { PronunciationService } from '../../../pronunciations/services/pronuncia
 
         <section class="card space-y-3">
           <label for="reference-file" class="form-label flex items-center gap-2"
-            ><lucide-icon [img]="Paperclip" class="size-4 text-brand" />Anexo de referência
+            ><svg [lucideIcon]="LucidePaperclip" class="size-4 text-brand"></svg>Anexo de referência
             (opcional)</label
           >
           <p class="text-sm text-muted">
@@ -393,7 +394,7 @@ import { PronunciationService } from '../../../pronunciations/services/pronuncia
           class="btn-secondary inline-flex min-h-11 items-center justify-center gap-2 rounded-md px-5 py-2.5 text-sm font-semibold"
           (click)="cancel()"
         >
-          <lucide-icon [img]="X" class="size-4" />Cancelar
+          <svg [lucideIcon]="LucideX" class="size-4"></svg>Cancelar
         </button>
         <button
           type="button"
@@ -401,26 +402,27 @@ import { PronunciationService } from '../../../pronunciations/services/pronuncia
           [disabled]="!canSubmit() || submitting()"
           (click)="submit()"
         >
-          <lucide-icon
-            [img]="submitting() ? LoaderCircle : Send"
+          <svg
+            [lucideIcon]="submitting() ? LucideLoaderCircle : LucideSend"
             class="size-4"
             [class.animate-spin]="submitting()"
-          />{{ submitting() ? 'Criando pedido...' : 'Criar pedido' }}
+          ></svg
+          >{{ submitting() ? 'Criando pedido...' : 'Criar pedido' }}
         </button>
       </div>
     </div>
   `,
 })
 export class OrderCreatePage {
-  protected readonly Check = Check;
-  protected readonly FileText = FileText;
-  protected readonly LoaderCircle = LoaderCircle;
-  protected readonly Mic2 = Mic2;
-  protected readonly Music2 = Music2;
-  protected readonly Paperclip = Paperclip;
-  protected readonly Send = Send;
-  protected readonly UserRound = UserRound;
-  protected readonly X = X;
+  protected readonly LucideCheck = LucideCheck;
+  protected readonly LucideFileText = LucideFileText;
+  protected readonly LucideLoaderCircle = LucideLoaderCircle;
+  protected readonly LucideMic2 = LucideMic2;
+  protected readonly LucideMusic2 = LucideMusic2;
+  protected readonly LucidePaperclip = LucidePaperclip;
+  protected readonly LucideSend = LucideSend;
+  protected readonly LucideUserRound = LucideUserRound;
+  protected readonly LucideX = LucideX;
   private readonly orders = inject(OrderService);
   private readonly professionalSvc = inject(ProfessionalService);
   private readonly catalog = inject(ServiceCatalogService);

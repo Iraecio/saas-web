@@ -24,7 +24,11 @@ import { RefundRequest, RefundStatus } from '../../../../core/models/wallet.mode
       </header>
 
       <!-- Filtro -->
-      <select [value]="statusFilter()" (change)="onStatusChange($event)" class="form-input text-sm w-auto">
+      <select
+        [value]="statusFilter()"
+        (change)="onStatusChange($event)"
+        class="form-input text-sm w-auto"
+      >
         <option value="">Todos os status</option>
         <option value="REQUESTED">Solicitado</option>
         <option value="APPROVED">Aprovado</option>
@@ -37,34 +41,72 @@ import { RefundRequest, RefundStatus } from '../../../../core/models/wallet.mode
       <!-- Modal ação -->
       @if (actionModal()) {
         <div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-          <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 p-6 max-w-md w-full space-y-4">
+          <div
+            class="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 p-6 max-w-md w-full space-y-4"
+          >
             <h3 class="text-lg font-bold text-neutral-900 dark:text-white">
               {{ actionModal()!.action === 'approve' ? 'Aprovar Reembolso' : 'Rejeitar Reembolso' }}
             </h3>
             <form [formGroup]="actionForm" (ngSubmit)="submitAction()" class="space-y-4">
               @if (actionModal()!.action === 'approve') {
                 <div>
-                  <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">Observações (opcional)</label>
-                  <textarea formControlName="field" rows="3" class="form-input w-full text-sm"
-                    placeholder="Adicione observações sobre a aprovação..."></textarea>
+                  <label
+                    class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1"
+                    >Observações (opcional)</label
+                  >
+                  <textarea
+                    formControlName="field"
+                    rows="3"
+                    class="form-input w-full text-sm"
+                    placeholder="Adicione observações sobre a aprovação..."
+                  ></textarea>
                 </div>
               } @else {
                 <div>
-                  <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">Motivo da rejeição *</label>
-                  <textarea formControlName="field" rows="3" class="form-input w-full text-sm"
-                    placeholder="Informe o motivo da rejeição..." required></textarea>
+                  <label
+                    class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1"
+                    >Motivo da rejeição *</label
+                  >
+                  <textarea
+                    formControlName="field"
+                    rows="3"
+                    class="form-input w-full text-sm"
+                    placeholder="Informe o motivo da rejeição..."
+                    required
+                  ></textarea>
                 </div>
               }
               @if (actionError()) {
                 <p class="text-sm text-red-500">{{ actionError() }}</p>
               }
               <div class="flex justify-end gap-3">
-                <button type="button" (click)="actionModal.set(null)"
-                  class="px-4 py-2 text-sm text-neutral-600 dark:text-neutral-400">Cancelar</button>
-                <button type="submit" [disabled]="acting() || (actionModal()!.action === 'reject' && !actionForm.getRawValue().field)"
+                <button
+                  type="button"
+                  (click)="actionModal.set(null)"
+                  class="px-4 py-2 text-sm text-neutral-600 dark:text-neutral-400"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  [disabled]="
+                    acting() ||
+                    (actionModal()!.action === 'reject' && !actionForm.getRawValue().field)
+                  "
                   class="px-4 py-2 text-sm rounded-lg font-medium disabled:opacity-50 transition-opacity"
-                  [class]="actionModal()!.action === 'approve' ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-red-600 text-white hover:bg-red-700'">
-                  {{ acting() ? 'Processando...' : (actionModal()!.action === 'approve' ? 'Aprovar' : 'Rejeitar') }}
+                  [class]="
+                    actionModal()!.action === 'approve'
+                      ? 'bg-green-600 text-white hover:bg-green-700'
+                      : 'bg-red-600 text-white hover:bg-red-700'
+                  "
+                >
+                  {{
+                    acting()
+                      ? 'Processando...'
+                      : actionModal()!.action === 'approve'
+                        ? 'Aprovar'
+                        : 'Rejeitar'
+                  }}
                 </button>
               </div>
             </form>
@@ -73,44 +115,79 @@ import { RefundRequest, RefundStatus } from '../../../../core/models/wallet.mode
       }
 
       <!-- Tabela -->
-      <section class="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 overflow-hidden">
+      <section
+        class="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 overflow-hidden"
+      >
         @if (loading()) {
           <div class="flex justify-center py-12">
-            <div class="w-6 h-6 border-2 border-neutral-400 border-t-transparent rounded-full animate-spin"></div>
+            <div
+              class="w-6 h-6 border-2 border-neutral-400 border-t-transparent rounded-full animate-spin"
+            ></div>
           </div>
         } @else if (refunds().length === 0) {
           <p class="text-sm text-neutral-500 text-center py-12">Nenhum reembolso encontrado.</p>
         } @else {
           <table class="w-full text-sm">
-            <thead class="bg-neutral-50 dark:bg-neutral-800 border-b border-neutral-200 dark:border-neutral-700">
+            <thead
+              class="bg-neutral-50 dark:bg-neutral-800 border-b border-neutral-200 dark:border-neutral-700"
+            >
               <tr>
-                <th class="text-left px-4 py-3 text-xs font-medium text-neutral-500 uppercase">Crédito</th>
-                <th class="text-left px-4 py-3 text-xs font-medium text-neutral-500 uppercase">Usuário</th>
-                <th class="text-left px-4 py-3 text-xs font-medium text-neutral-500 uppercase">Motivo</th>
-                <th class="text-left px-4 py-3 text-xs font-medium text-neutral-500 uppercase">Status</th>
-                <th class="text-left px-4 py-3 text-xs font-medium text-neutral-500 uppercase">Data</th>
+                <th class="text-left px-4 py-3 text-xs font-medium text-neutral-500 uppercase">
+                  Crédito
+                </th>
+                <th class="text-left px-4 py-3 text-xs font-medium text-neutral-500 uppercase">
+                  Usuário
+                </th>
+                <th class="text-left px-4 py-3 text-xs font-medium text-neutral-500 uppercase">
+                  Motivo
+                </th>
+                <th class="text-left px-4 py-3 text-xs font-medium text-neutral-500 uppercase">
+                  Status
+                </th>
+                <th class="text-left px-4 py-3 text-xs font-medium text-neutral-500 uppercase">
+                  Data
+                </th>
                 <th class="px-4 py-3"></th>
               </tr>
             </thead>
             <tbody class="divide-y divide-neutral-200 dark:divide-neutral-800">
               @for (refund of refunds(); track refund.id) {
                 <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800/50">
-                  <td class="px-4 py-3 font-mono text-xs text-neutral-500">{{ refund.creditId | slice:0:8 }}…</td>
-                  <td class="px-4 py-3 font-mono text-xs text-neutral-500">{{ refund.requestedBy | slice:0:8 }}…</td>
-                  <td class="px-4 py-3 text-neutral-700 dark:text-neutral-300 max-w-xs truncate">{{ refund.reason }}</td>
+                  <td class="px-4 py-3 font-mono text-xs text-neutral-500">
+                    {{ refund.creditId | slice: 0 : 8 }}…
+                  </td>
+                  <td class="px-4 py-3 font-mono text-xs text-neutral-500">
+                    {{ refund.requestedBy | slice: 0 : 8 }}…
+                  </td>
+                  <td class="px-4 py-3 text-neutral-700 dark:text-neutral-300 max-w-xs truncate">
+                    {{ refund.reason }}
+                  </td>
                   <td class="px-4 py-3">
-                    <span class="text-xs px-2 py-0.5 rounded-full font-medium" [class]="statusBadge(refund.status)">
+                    <span
+                      class="text-xs px-2 py-0.5 rounded-full font-medium"
+                      [class]="statusBadge(refund.status)"
+                    >
                       {{ refund.status }}
                     </span>
                   </td>
-                  <td class="px-4 py-3 text-neutral-500 text-xs">{{ refund.createdAt | date:'dd/MM/yyyy' }}</td>
+                  <td class="px-4 py-3 text-neutral-500 text-xs">
+                    {{ refund.createdAt | date: 'dd/MM/yyyy' }}
+                  </td>
                   <td class="px-4 py-3">
                     @if (refund.status === 'REQUESTED') {
                       <div class="flex items-center gap-2">
-                        <button (click)="openAction(refund, 'approve')"
-                          class="text-xs text-green-600 hover:text-green-800 font-medium">Aprovar</button>
-                        <button (click)="openAction(refund, 'reject')"
-                          class="text-xs text-red-500 hover:text-red-700 font-medium">Rejeitar</button>
+                        <button
+                          (click)="openAction(refund, 'approve')"
+                          class="text-xs text-green-600 hover:text-green-800 font-medium"
+                        >
+                          Aprovar
+                        </button>
+                        <button
+                          (click)="openAction(refund, 'reject')"
+                          class="text-xs text-red-500 hover:text-red-700 font-medium"
+                        >
+                          Rejeitar
+                        </button>
                       </div>
                     }
                   </td>
@@ -131,7 +208,9 @@ export class RefundsAdminPage implements OnInit {
   readonly refunds = signal<RefundRequest[]>([]);
   readonly loading = signal(true);
   readonly statusFilter = signal('');
-  readonly actionModal = signal<{ refund: RefundRequest; action: 'approve' | 'reject' } | null>(null);
+  readonly actionModal = signal<{ refund: RefundRequest; action: 'approve' | 'reject' } | null>(
+    null,
+  );
   readonly acting = signal(false);
   readonly actionError = signal<string | undefined>(undefined);
 
@@ -183,7 +262,10 @@ export class RefundsAdminPage implements OnInit {
       .listAllRefunds({ status: this.statusFilter() || undefined })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (r) => { this.refunds.set(r); this.loading.set(false); },
+        next: (r) => {
+          this.refunds.set(r);
+          this.loading.set(false);
+        },
         error: () => this.loading.set(false),
       });
   }

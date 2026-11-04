@@ -7,7 +7,11 @@ import { AdminDashboardSummary } from '../../../core/models/admin-dashboard.mode
 export class AdminDashboardService {
   private readonly api = inject(ApiService);
 
-  getSummary(params?: { from?: string; to?: string; timezone?: string }): Observable<AdminDashboardSummary> {
+  getSummary(params?: {
+    from?: string;
+    to?: string;
+    timezone?: string;
+  }): Observable<AdminDashboardSummary> {
     const query: Record<string, string> = {};
     if (params?.from) query['from'] = params.from;
     if (params?.to) query['to'] = params.to;

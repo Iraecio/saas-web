@@ -10,18 +10,23 @@ export class ResellerService {
 
   list(): Observable<Reseller[]> {
     return this.api.get<any[]>('/admin/revendedores').pipe(
-      map((items) => items.map((item) => ({
-        id: item.id,
-        ownerId: item.ownerId,
-        name: item.companyName || item.owner?.name || 'Revenda sem nome',
-        email: item.owner?.email || '',
-        phone: item.phone || undefined,
-        status: item.isActive ? 'active' : 'inactive',
-        timezone: item.timezone,
-        maxUsers: item.maxUsers,
-        createdAt: item.createdAt,
-        updatedAt: item.updatedAt,
-      } as Reseller))),
+      map((items) =>
+        items.map(
+          (item) =>
+            ({
+              id: item.id,
+              ownerId: item.ownerId,
+              name: item.companyName || item.owner?.name || 'Revenda sem nome',
+              email: item.owner?.email || '',
+              phone: item.phone || undefined,
+              status: item.isActive ? 'active' : 'inactive',
+              timezone: item.timezone,
+              maxUsers: item.maxUsers,
+              createdAt: item.createdAt,
+              updatedAt: item.updatedAt,
+            }) as Reseller,
+        ),
+      ),
     );
   }
 

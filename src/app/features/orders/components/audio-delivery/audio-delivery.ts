@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  input,
+  output,
+  signal,
+} from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { NotificationService } from '../../../../core/services/notification';
 import { DeliverDto, OrderDelivery } from '../../../../core/models/order.model';
@@ -23,21 +31,45 @@ const MAX_FILE_BYTES = 100 * 1024 * 1024;
           @if (d.deliveryNotes) {
             <p class="mt-2 text-sm text-neutral-600 dark:text-neutral-400">{{ d.deliveryNotes }}</p>
           }
-          <a [href]="d.audioUrl" download class="mt-2 inline-block text-xs text-blue-600 hover:underline dark:text-blue-400">Baixar áudio</a>
+          <a
+            [href]="d.audioUrl"
+            download
+            class="mt-2 inline-block text-xs text-blue-600 hover:underline dark:text-blue-400"
+            >Baixar áudio</a
+          >
         </div>
       }
 
       <!-- Formulário de entrega / re-entrega -->
       @if (showUpload()) {
         <div class="space-y-2 rounded-lg border border-neutral-200 p-4 dark:border-neutral-800">
-          <p class="text-sm font-medium">{{ isRedelivery() ? 'Re-entregar áudio' : 'Entregar áudio' }}</p>
-          <input type="file" accept="audio/*,.mp3,.wav,.ogg,.m4a,.flac" class="form-input" (change)="onFile($any($event.target).files)" />
+          <p class="text-sm font-medium">
+            {{ isRedelivery() ? 'Re-entregar áudio' : 'Entregar áudio' }}
+          </p>
+          <input
+            type="file"
+            accept="audio/*,.mp3,.wav,.ogg,.m4a,.flac"
+            class="form-input"
+            (change)="onFile($any($event.target).files)"
+          />
           @if (file()) {
             <p class="text-xs text-neutral-500">{{ file()!.name }}</p>
           }
-          <textarea class="form-input" rows="2" placeholder="Notas da entrega (opcional)" [value]="notes()" (input)="notes.set($any($event.target).value)"></textarea>
+          <textarea
+            class="form-input"
+            rows="2"
+            placeholder="Notas da entrega (opcional)"
+            [value]="notes()"
+            (input)="notes.set($any($event.target).value)"
+          ></textarea>
           @if (isRedelivery()) {
-            <textarea class="form-input" rows="2" placeholder="Motivo do reenvio (obrigatório)" [value]="redeliveryReason()" (input)="redeliveryReason.set($any($event.target).value)"></textarea>
+            <textarea
+              class="form-input"
+              rows="2"
+              placeholder="Motivo do reenvio (obrigatório)"
+              [value]="redeliveryReason()"
+              (input)="redeliveryReason.set($any($event.target).value)"
+            ></textarea>
           }
           @if (progress() !== null) {
             <div class="h-2 w-full overflow-hidden rounded-full bg-neutral-200 dark:bg-neutral-800">
@@ -45,7 +77,12 @@ const MAX_FILE_BYTES = 100 * 1024 * 1024;
             </div>
           }
           <div class="flex gap-2">
-            <button type="button" class="btn-primary" [disabled]="!canSubmit() || submitting()" (click)="submit()">
+            <button
+              type="button"
+              class="btn-primary"
+              [disabled]="!canSubmit() || submitting()"
+              (click)="submit()"
+            >
               {{ submitting() ? 'Enviando...' : 'Enviar' }}
             </button>
             <button type="button" class="btn-secondary" (click)="cancel.emit()">Fechar</button>

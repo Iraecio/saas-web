@@ -16,39 +16,61 @@ import { ProfileService } from '../../services/my-profile';
       </header>
 
       <!-- Dados gerais -->
-      <section class="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 p-6">
-        <h2 class="text-lg font-semibold text-neutral-900 dark:text-white mb-4">Informações gerais</h2>
+      <section
+        class="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 p-6"
+      >
+        <h2 class="text-lg font-semibold text-neutral-900 dark:text-white mb-4">
+          Informações gerais
+        </h2>
 
         <form [formGroup]="form" (ngSubmit)="save()" class="space-y-4">
           <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">Nome</label>
+              <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1"
+                >Nome</label
+              >
               <input type="text" formControlName="name" class="form-input w-full" />
             </div>
             <div>
-              <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">Email</label>
-              <input type="email" [value]="user()?.email ?? ''" disabled class="form-input w-full opacity-50 cursor-not-allowed" />
+              <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1"
+                >Email</label
+              >
+              <input
+                type="email"
+                [value]="user()?.email ?? ''"
+                disabled
+                class="form-input w-full opacity-50 cursor-not-allowed"
+              />
             </div>
             <div>
-              <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">Departamento</label>
+              <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1"
+                >Departamento</label
+              >
               <input type="text" formControlName="department" class="form-input w-full" />
             </div>
             <div>
-              <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">Cargo</label>
+              <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1"
+                >Cargo</label
+              >
               <input type="text" formControlName="jobTitle" class="form-input w-full" />
             </div>
           </div>
 
           @if (saveSuccess()) {
-            <p class="text-sm text-green-600 dark:text-green-400">✓ Perfil atualizado com sucesso</p>
+            <p class="text-sm text-green-600 dark:text-green-400">
+              ✓ Perfil atualizado com sucesso
+            </p>
           }
           @if (saveError()) {
             <p class="text-sm text-red-500">{{ saveError() }}</p>
           }
 
           <div class="flex justify-end">
-            <button type="submit" [disabled]="saving()"
-              class="px-4 py-2 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50 transition-opacity">
+            <button
+              type="submit"
+              [disabled]="saving()"
+              class="px-4 py-2 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50 transition-opacity"
+            >
               {{ saving() ? 'Salvando...' : 'Salvar alterações' }}
             </button>
           </div>
@@ -56,13 +78,18 @@ import { ProfileService } from '../../services/my-profile';
       </section>
 
       <!-- Papel -->
-      <section class="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 p-6">
-        <h2 class="text-lg font-semibold text-neutral-900 dark:text-white mb-2">Papel na plataforma</h2>
-        <span class="inline-block px-3 py-1 bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 rounded-full text-sm font-mono">
+      <section
+        class="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 p-6"
+      >
+        <h2 class="text-lg font-semibold text-neutral-900 dark:text-white mb-2">
+          Papel na plataforma
+        </h2>
+        <span
+          class="inline-block px-3 py-1 bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 rounded-full text-sm font-mono"
+        >
           {{ user()?.role ?? '—' }}
         </span>
       </section>
-
     </div>
   `,
 })
@@ -92,7 +119,11 @@ export class ProfileOverviewComponent {
 
     const { name, department, jobTitle } = this.form.getRawValue();
     this.profileService
-      .updateMe({ name: name || undefined, department: department || undefined, jobTitle: jobTitle || undefined })
+      .updateMe({
+        name: name || undefined,
+        department: department || undefined,
+        jobTitle: jobTitle || undefined,
+      })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (updated) => {

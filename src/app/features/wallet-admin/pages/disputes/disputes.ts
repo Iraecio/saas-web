@@ -24,7 +24,11 @@ import { Dispute, DisputeStatus } from '../../../../core/models/wallet.model';
       </header>
 
       <!-- Filtro de status -->
-      <select [value]="statusFilter()" (change)="onStatusChange($event)" class="form-input text-sm w-auto">
+      <select
+        [value]="statusFilter()"
+        (change)="onStatusChange($event)"
+        class="form-input text-sm w-auto"
+      >
         <option value="">Todos os status</option>
         <option value="OPENED">Aberta</option>
         <option value="INVESTIGATING">Investigando</option>
@@ -35,11 +39,15 @@ import { Dispute, DisputeStatus } from '../../../../core/models/wallet.model';
       <!-- Dialog de atualização -->
       @if (editingDispute()) {
         <div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-          <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 p-6 max-w-lg w-full space-y-4">
+          <div
+            class="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 p-6 max-w-lg w-full space-y-4"
+          >
             <h3 class="text-lg font-bold text-neutral-900 dark:text-white">Atualizar Disputa</h3>
             <form [formGroup]="updateForm" (ngSubmit)="submitUpdate()" class="space-y-4">
               <div>
-                <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">Status</label>
+                <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1"
+                  >Status</label
+                >
                 <select formControlName="status" class="form-input w-full text-sm">
                   <option value="OPENED">Aberta</option>
                   <option value="INVESTIGATING">Investigando</option>
@@ -48,25 +56,43 @@ import { Dispute, DisputeStatus } from '../../../../core/models/wallet.model';
                 </select>
               </div>
               <div>
-                <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">Notas de investigação</label>
-                <textarea formControlName="investigationNotes" rows="3" class="form-input w-full text-sm"
-                  placeholder="Adicione notas sobre a investigação..."></textarea>
+                <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1"
+                  >Notas de investigação</label
+                >
+                <textarea
+                  formControlName="investigationNotes"
+                  rows="3"
+                  class="form-input w-full text-sm"
+                  placeholder="Adicione notas sobre a investigação..."
+                ></textarea>
               </div>
               <div>
-                <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">Resolução</label>
-                <textarea formControlName="resolution" rows="2" class="form-input w-full text-sm"
-                  placeholder="Descreva a resolução (se aplicável)..."></textarea>
+                <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1"
+                  >Resolução</label
+                >
+                <textarea
+                  formControlName="resolution"
+                  rows="2"
+                  class="form-input w-full text-sm"
+                  placeholder="Descreva a resolução (se aplicável)..."
+                ></textarea>
               </div>
               @if (updateError()) {
                 <p class="text-sm text-red-500">{{ updateError() }}</p>
               }
               <div class="flex justify-end gap-3">
-                <button type="button" (click)="editingDispute.set(null)"
-                  class="px-4 py-2 text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white">
+                <button
+                  type="button"
+                  (click)="editingDispute.set(null)"
+                  class="px-4 py-2 text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
+                >
                   Cancelar
                 </button>
-                <button type="submit" [disabled]="updating()"
-                  class="px-4 py-2 text-sm bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-lg font-medium disabled:opacity-50 hover:opacity-90 transition-opacity">
+                <button
+                  type="submit"
+                  [disabled]="updating()"
+                  class="px-4 py-2 text-sm bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-lg font-medium disabled:opacity-50 hover:opacity-90 transition-opacity"
+                >
                   {{ updating() ? 'Salvando...' : 'Salvar' }}
                 </button>
               </div>
@@ -76,38 +102,65 @@ import { Dispute, DisputeStatus } from '../../../../core/models/wallet.model';
       }
 
       <!-- Tabela -->
-      <section class="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 overflow-hidden">
+      <section
+        class="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 overflow-hidden"
+      >
         @if (loading()) {
           <div class="flex justify-center py-12">
-            <div class="w-6 h-6 border-2 border-neutral-400 border-t-transparent rounded-full animate-spin"></div>
+            <div
+              class="w-6 h-6 border-2 border-neutral-400 border-t-transparent rounded-full animate-spin"
+            ></div>
           </div>
         } @else if (disputes().length === 0) {
           <p class="text-sm text-neutral-500 text-center py-12">Nenhuma disputa encontrada.</p>
         } @else {
           <table class="w-full text-sm">
-            <thead class="bg-neutral-50 dark:bg-neutral-800 border-b border-neutral-200 dark:border-neutral-700">
+            <thead
+              class="bg-neutral-50 dark:bg-neutral-800 border-b border-neutral-200 dark:border-neutral-700"
+            >
               <tr>
-                <th class="text-left px-4 py-3 text-xs font-medium text-neutral-500 uppercase">Crédito</th>
-                <th class="text-left px-4 py-3 text-xs font-medium text-neutral-500 uppercase">Motivo</th>
-                <th class="text-left px-4 py-3 text-xs font-medium text-neutral-500 uppercase">Status</th>
-                <th class="text-left px-4 py-3 text-xs font-medium text-neutral-500 uppercase">Data</th>
+                <th class="text-left px-4 py-3 text-xs font-medium text-neutral-500 uppercase">
+                  Crédito
+                </th>
+                <th class="text-left px-4 py-3 text-xs font-medium text-neutral-500 uppercase">
+                  Motivo
+                </th>
+                <th class="text-left px-4 py-3 text-xs font-medium text-neutral-500 uppercase">
+                  Status
+                </th>
+                <th class="text-left px-4 py-3 text-xs font-medium text-neutral-500 uppercase">
+                  Data
+                </th>
                 <th class="px-4 py-3"></th>
               </tr>
             </thead>
             <tbody class="divide-y divide-neutral-200 dark:divide-neutral-800">
               @for (dispute of disputes(); track dispute.id) {
                 <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800/50">
-                  <td class="px-4 py-3 font-mono text-xs text-neutral-500">{{ dispute.creditId | slice:0:8 }}…</td>
-                  <td class="px-4 py-3 text-neutral-700 dark:text-neutral-300 max-w-xs truncate">{{ dispute.reason }}</td>
+                  <td class="px-4 py-3 font-mono text-xs text-neutral-500">
+                    {{ dispute.creditId | slice: 0 : 8 }}…
+                  </td>
+                  <td class="px-4 py-3 text-neutral-700 dark:text-neutral-300 max-w-xs truncate">
+                    {{ dispute.reason }}
+                  </td>
                   <td class="px-4 py-3">
-                    <span class="text-xs px-2 py-0.5 rounded-full font-medium" [class]="statusBadge(dispute.status)">
+                    <span
+                      class="text-xs px-2 py-0.5 rounded-full font-medium"
+                      [class]="statusBadge(dispute.status)"
+                    >
                       {{ dispute.status }}
                     </span>
                   </td>
-                  <td class="px-4 py-3 text-neutral-500 text-xs">{{ dispute.createdAt | date:'dd/MM/yyyy' }}</td>
+                  <td class="px-4 py-3 text-neutral-500 text-xs">
+                    {{ dispute.createdAt | date: 'dd/MM/yyyy' }}
+                  </td>
                   <td class="px-4 py-3 text-right">
-                    <button (click)="openEdit(dispute)"
-                      class="text-xs text-primary-600 hover:underline">Atualizar</button>
+                    <button
+                      (click)="openEdit(dispute)"
+                      class="text-xs text-primary-600 hover:underline"
+                    >
+                      Atualizar
+                    </button>
                   </td>
                 </tr>
               }
@@ -171,9 +224,7 @@ export class DisputesAdminPage implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (updated) => {
-          this.disputes.update((d) =>
-            d.map((x) => (x.id === updated.id ? updated : x)),
-          );
+          this.disputes.update((d) => d.map((x) => (x.id === updated.id ? updated : x)));
           this.updating.set(false);
           this.editingDispute.set(null);
         },
@@ -190,7 +241,10 @@ export class DisputesAdminPage implements OnInit {
       .listDisputes({ status: this.statusFilter() || undefined })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (d) => { this.disputes.set(d); this.loading.set(false); },
+        next: (d) => {
+          this.disputes.set(d);
+          this.loading.set(false);
+        },
         error: () => this.loading.set(false),
       });
   }

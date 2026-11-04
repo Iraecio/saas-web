@@ -52,7 +52,11 @@ export class WalletService {
     return this.api.post<void>(`/wallet/refunds/${creditId}`, dto);
   }
 
-  listRefunds(params?: { status?: string; offset?: number; limit?: number }): Observable<RefundRequest[]> {
+  listRefunds(params?: {
+    status?: string;
+    offset?: number;
+    limit?: number;
+  }): Observable<RefundRequest[]> {
     const query = new URLSearchParams();
     if (params?.status) query.set('status', params.status);
     if (params?.offset !== undefined) query.set('offset', String(params.offset));

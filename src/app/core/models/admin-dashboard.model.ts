@@ -20,7 +20,20 @@ export interface AdminDashboardSummary {
     pendingWithdrawals: number;
     pendingCreditPurchases: number;
   };
-  recentOrders: Array<{ id: string; status: string; createdAt: string; client: { name?: string | null; email: string }; lineItems: Array<{ id: string; itemType: string; status: string; creditCost: number }> }>;
-  pendingActions: Array<{ id: string; type: string; priority: 'HIGH' | 'MEDIUM' | 'LOW'; title: string; createdAt: string; targetPath: string }>;
+  recentOrders: Array<{
+    id: string;
+    status: string;
+    createdAt: string;
+    client: { name?: string | null; email: string };
+    lineItems: Array<{ id: string; itemType: string; status: string; creditCost: number }>;
+  }>;
+  pendingActions: Array<{
+    id: string;
+    type: string;
+    priority: 'HIGH' | 'MEDIUM' | 'LOW';
+    title: string;
+    createdAt: string;
+    targetPath: string;
+  }>;
   generatedAt: string;
 }

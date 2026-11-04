@@ -25,9 +25,18 @@ import { Credit, CreditStatus } from '../../../../core/models/wallet.model';
 
       <!-- Filtros -->
       <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <input type="text" [value]="filters.userId" (input)="onInput($event, 'userId')"
-          placeholder="User ID" class="form-input text-sm" />
-        <select [value]="filters.status" (change)="onSelect($event, 'status')" class="form-input text-sm">
+        <input
+          type="text"
+          [value]="filters.userId"
+          (input)="onInput($event, 'userId')"
+          placeholder="User ID"
+          class="form-input text-sm"
+        />
+        <select
+          [value]="filters.status"
+          (change)="onSelect($event, 'status')"
+          class="form-input text-sm"
+        >
           <option value="">Todos os status</option>
           <option value="AVAILABLE">Disponível</option>
           <option value="FROZEN">Congelado</option>
@@ -36,14 +45,22 @@ import { Credit, CreditStatus } from '../../../../core/models/wallet.model';
           <option value="REFUNDED">Reembolsado</option>
           <option value="EXPIRED">Expirado</option>
         </select>
-        <select [value]="filters.type" (change)="onSelect($event, 'type')" class="form-input text-sm">
+        <select
+          [value]="filters.type"
+          (change)="onSelect($event, 'type')"
+          class="form-input text-sm"
+        >
           <option value="">Todos os tipos</option>
           <option value="PAID">Pago</option>
           <option value="PROMOTIONAL">Promocional</option>
           <option value="EARNED">Ganho</option>
           <option value="BONUS">Bônus</option>
         </select>
-        <select [value]="filters.originType" (change)="onSelect($event, 'originType')" class="form-input text-sm">
+        <select
+          [value]="filters.originType"
+          (change)="onSelect($event, 'originType')"
+          class="form-input text-sm"
+        >
           <option value="">Todas as origens</option>
           <option value="PURCHASE">Compra</option>
           <option value="SERVICE_PAYMENT">Serviço</option>
@@ -52,57 +69,99 @@ import { Credit, CreditStatus } from '../../../../core/models/wallet.model';
           <option value="BONUS">Bônus</option>
         </select>
       </div>
-      <button (click)="search()" class="px-4 py-2 text-sm bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-lg font-medium hover:opacity-90 transition-opacity">
+      <button
+        (click)="search()"
+        class="px-4 py-2 text-sm bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-lg font-medium hover:opacity-90 transition-opacity"
+      >
         Buscar
       </button>
 
       <!-- Resultados -->
-      <section class="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 overflow-hidden">
+      <section
+        class="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 overflow-hidden"
+      >
         @if (loading()) {
           <div class="flex justify-center py-12">
-            <div class="w-6 h-6 border-2 border-neutral-400 border-t-transparent rounded-full animate-spin"></div>
+            <div
+              class="w-6 h-6 border-2 border-neutral-400 border-t-transparent rounded-full animate-spin"
+            ></div>
           </div>
         } @else if (credits().length === 0) {
           <p class="text-sm text-neutral-500 text-center py-12">Nenhum crédito encontrado.</p>
         } @else {
           <table class="w-full text-sm">
-            <thead class="bg-neutral-50 dark:bg-neutral-800 border-b border-neutral-200 dark:border-neutral-700">
+            <thead
+              class="bg-neutral-50 dark:bg-neutral-800 border-b border-neutral-200 dark:border-neutral-700"
+            >
               <tr>
-                <th class="text-left px-4 py-3 text-xs font-medium text-neutral-500 uppercase">ID</th>
-                <th class="text-left px-4 py-3 text-xs font-medium text-neutral-500 uppercase">Valor</th>
-                <th class="text-left px-4 py-3 text-xs font-medium text-neutral-500 uppercase">Tipo</th>
-                <th class="text-left px-4 py-3 text-xs font-medium text-neutral-500 uppercase">Origem</th>
-                <th class="text-left px-4 py-3 text-xs font-medium text-neutral-500 uppercase">Status</th>
-                <th class="text-left px-4 py-3 text-xs font-medium text-neutral-500 uppercase">Criado em</th>
+                <th class="text-left px-4 py-3 text-xs font-medium text-neutral-500 uppercase">
+                  ID
+                </th>
+                <th class="text-left px-4 py-3 text-xs font-medium text-neutral-500 uppercase">
+                  Valor
+                </th>
+                <th class="text-left px-4 py-3 text-xs font-medium text-neutral-500 uppercase">
+                  Tipo
+                </th>
+                <th class="text-left px-4 py-3 text-xs font-medium text-neutral-500 uppercase">
+                  Origem
+                </th>
+                <th class="text-left px-4 py-3 text-xs font-medium text-neutral-500 uppercase">
+                  Status
+                </th>
+                <th class="text-left px-4 py-3 text-xs font-medium text-neutral-500 uppercase">
+                  Criado em
+                </th>
               </tr>
             </thead>
             <tbody class="divide-y divide-neutral-200 dark:divide-neutral-800">
               @for (credit of credits(); track credit.id) {
                 <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800/50">
-                  <td class="px-4 py-3 font-mono text-xs text-neutral-500">{{ credit.id | slice:0:8 }}…</td>
-                  <td class="px-4 py-3 font-semibold text-neutral-900 dark:text-white">{{ credit.valueCents / 100 | number:'1.2-2' }}</td>
-                  <td class="px-4 py-3 text-neutral-700 dark:text-neutral-300">{{ credit.type }}</td>
-                  <td class="px-4 py-3 text-neutral-700 dark:text-neutral-300">{{ credit.originType }}</td>
+                  <td class="px-4 py-3 font-mono text-xs text-neutral-500">
+                    {{ credit.id | slice: 0 : 8 }}…
+                  </td>
+                  <td class="px-4 py-3 font-semibold text-neutral-900 dark:text-white">
+                    {{ credit.valueCents / 100 | number: '1.2-2' }}
+                  </td>
+                  <td class="px-4 py-3 text-neutral-700 dark:text-neutral-300">
+                    {{ credit.type }}
+                  </td>
+                  <td class="px-4 py-3 text-neutral-700 dark:text-neutral-300">
+                    {{ credit.originType }}
+                  </td>
                   <td class="px-4 py-3">
-                    <span class="text-xs px-2 py-0.5 rounded-full font-medium" [class]="statusBadge(credit.status)">
+                    <span
+                      class="text-xs px-2 py-0.5 rounded-full font-medium"
+                      [class]="statusBadge(credit.status)"
+                    >
                       {{ credit.status }}
                     </span>
                   </td>
-                  <td class="px-4 py-3 text-neutral-500 text-xs">{{ credit.issuedAt | date:'dd/MM/yyyy' }}</td>
+                  <td class="px-4 py-3 text-neutral-500 text-xs">
+                    {{ credit.issuedAt | date: 'dd/MM/yyyy' }}
+                  </td>
                 </tr>
               }
             </tbody>
           </table>
 
           <!-- Paginação -->
-          <div class="flex items-center justify-between px-4 py-4 border-t border-neutral-200 dark:border-neutral-800">
-            <button (click)="prevPage()" [disabled]="currentPage() === 1"
-              class="text-sm px-3 py-1.5 rounded-lg border border-neutral-200 dark:border-neutral-700 disabled:opacity-40 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors">
+          <div
+            class="flex items-center justify-between px-4 py-4 border-t border-neutral-200 dark:border-neutral-800"
+          >
+            <button
+              (click)="prevPage()"
+              [disabled]="currentPage() === 1"
+              class="text-sm px-3 py-1.5 rounded-lg border border-neutral-200 dark:border-neutral-700 disabled:opacity-40 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
+            >
               ← Anterior
             </button>
             <span class="text-sm text-neutral-500">Página {{ currentPage() }}</span>
-            <button (click)="nextPage()" [disabled]="credits().length < pageSize"
-              class="text-sm px-3 py-1.5 rounded-lg border border-neutral-200 dark:border-neutral-700 disabled:opacity-40 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors">
+            <button
+              (click)="nextPage()"
+              [disabled]="credits().length < pageSize"
+              class="text-sm px-3 py-1.5 rounded-lg border border-neutral-200 dark:border-neutral-700 disabled:opacity-40 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
+            >
               Próxima →
             </button>
           </div>
@@ -171,7 +230,10 @@ export class CreditsSearchPage implements OnInit {
       })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (c) => { this.credits.set(c); this.loading.set(false); },
+        next: (c) => {
+          this.credits.set(c);
+          this.loading.set(false);
+        },
         error: () => this.loading.set(false),
       });
   }

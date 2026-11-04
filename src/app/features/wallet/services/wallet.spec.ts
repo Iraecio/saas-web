@@ -10,7 +10,9 @@ describe('WalletService contracts', () => {
   let service: WalletService;
   let http: HttpTestingController;
   beforeEach(() => {
-    TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting(), ApiService, WalletService] });
+    TestBed.configureTestingModule({
+      providers: [provideHttpClient(), provideHttpClientTesting(), ApiService, WalletService],
+    });
     service = TestBed.inject(WalletService);
     http = TestBed.inject(HttpTestingController);
   });

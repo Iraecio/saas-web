@@ -2,7 +2,14 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
-import { Bell, Check, Plus, Search, Trash2, LucideAngularModule } from 'lucide-angular';
+import {
+  LucideBell,
+  LucideCheck,
+  LucidePlus,
+  LucideSearch,
+  LucideTrash2,
+  LucideDynamicIcon,
+} from '@lucide/angular';
 import { UiBadgeComponent } from '../../../../shared/ui/badge/ui-badge';
 import { UiButtonComponent } from '../../../../shared/ui/button/ui-button';
 import { UiCardComponent } from '../../../../shared/ui/card/ui-card';
@@ -11,7 +18,7 @@ import { ConfirmDialogComponent } from '../../../../shared/ui/dialog/confirm-dia
 @Component({
   selector: 'app-ui-kit',
   imports: [
-    LucideAngularModule,
+    LucideDynamicIcon,
     MatFormField,
     MatInput,
     MatLabel,
@@ -34,7 +41,8 @@ import { ConfirmDialogComponent } from '../../../../shared/ui/dialog/confirm-dia
           </p>
         </div>
         <ui-badge tone="success"
-          ><lucide-icon [img]="Check" class="mr-1 size-3" />Angular Material + Tailwind</ui-badge
+          ><svg [lucideIcon]="LucideCheck" class="mr-1 size-3"></svg>Angular Material +
+          Tailwind</ui-badge
         >
       </header>
 
@@ -58,15 +66,15 @@ import { ConfirmDialogComponent } from '../../../../shared/ui/dialog/confirm-dia
         description="Hierarquia previsível para comandos primários e auxiliares."
       >
         <div class="flex flex-wrap gap-3">
-          <ui-button><lucide-icon [img]="Plus" class="size-4" />Criar pedido</ui-button>
+          <ui-button><svg [lucideIcon]="LucidePlus" class="size-4"></svg>Criar pedido</ui-button>
           <ui-button variant="secondary"
-            ><lucide-icon [img]="Search" class="size-4" />Pesquisar</ui-button
+            ><svg [lucideIcon]="LucideSearch" class="size-4"></svg>Pesquisar</ui-button
           >
           <ui-button variant="ghost"
-            ><lucide-icon [img]="Bell" class="size-4" />Notificações</ui-button
+            ><svg [lucideIcon]="LucideBell" class="size-4"></svg>Notificações</ui-button
           >
           <ui-button variant="destructive" (click)="openDialog()"
-            ><lucide-icon [img]="Trash2" class="size-4" />Excluir</ui-button
+            ><svg [lucideIcon]="LucideTrash2" class="size-4"></svg>Excluir</ui-button
           >
           <ui-button [loading]="true">Processando</ui-button>
         </div>
@@ -100,11 +108,11 @@ import { ConfirmDialogComponent } from '../../../../shared/ui/dialog/confirm-dia
 })
 export class UiKitComponent {
   private readonly dialog = inject(MatDialog);
-  protected readonly Plus = Plus;
-  protected readonly Search = Search;
-  protected readonly Bell = Bell;
-  protected readonly Trash2 = Trash2;
-  protected readonly Check = Check;
+  protected readonly LucidePlus = LucidePlus;
+  protected readonly LucideSearch = LucideSearch;
+  protected readonly LucideBell = LucideBell;
+  protected readonly LucideTrash2 = LucideTrash2;
+  protected readonly LucideCheck = LucideCheck;
   protected readonly colors = [
     { name: 'Ação', token: '--ui-primary', value: 'var(--ui-primary)' },
     { name: 'Confirmação', token: '--ui-accent', value: 'var(--ui-accent)' },

@@ -3,13 +3,11 @@ import { Routes } from '@angular/router';
 export const WALLET_ROUTES: Routes = [
   {
     path: '',
-    loadComponent: () =>
-      import('./pages/balance/balance').then((m) => m.WalletBalancePage),
+    loadComponent: () => import('./pages/balance/balance').then((m) => m.WalletBalancePage),
   },
   {
     path: 'credits',
-    loadComponent: () =>
-      import('./pages/credits/credits').then((m) => m.CreditsListPage),
+    loadComponent: () => import('./pages/credits/credits').then((m) => m.CreditsListPage),
   },
   {
     path: 'credits/:id',
@@ -18,7 +16,6 @@ export const WALLET_ROUTES: Routes = [
   },
   {
     path: 'refunds',
-    loadComponent: () =>
-      import('./pages/refunds/refunds').then((m) => m.RefundsListPage),
+    loadComponent: () => import('./pages/refunds/refunds').then((m) => m.RefundsListPage),
   },
 ];

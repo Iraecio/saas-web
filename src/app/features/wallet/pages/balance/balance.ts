@@ -10,34 +10,34 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import {
-  ArrowDownLeft,
-  ArrowRight,
-  ArrowUpRight,
-  Bell,
-  CircleDollarSign,
-  Clock3,
-  History,
-  LockKeyhole,
-  LucideAngularModule,
-  RefreshCw,
-  RotateCcw,
-  ShieldCheck,
-  Sparkles,
-  WalletCards,
-} from 'lucide-angular';
+  LucideArrowDownLeft,
+  LucideArrowRight,
+  LucideArrowUpRight,
+  LucideBell,
+  LucideCircleDollarSign,
+  LucideClock3,
+  LucideHistory,
+  LucideLockKeyhole,
+  LucideDynamicIcon,
+  LucideRefreshCw,
+  LucideRotateCcw,
+  LucideShieldCheck,
+  LucideSparkles,
+  LucideWalletCards,
+} from '@lucide/angular';
 import { Wallet, WalletNotification } from '../../../../core/models/wallet.model';
 import { WalletService } from '../../services/wallet';
 
 @Component({
   selector: 'app-wallet-balance',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, DatePipe, DecimalPipe, LucideAngularModule],
+  imports: [RouterLink, DatePipe, DecimalPipe, LucideDynamicIcon],
   template: `
     <main class="mx-auto max-w-6xl space-y-6 p-4 sm:p-6 lg:p-8">
       <header class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <div class="mb-2 flex items-center gap-2 text-sm font-semibold text-brand">
-            <lucide-icon [img]="WalletCards" class="size-4" />
+            <svg [lucideIcon]="LucideWalletCards" class="size-4"></svg>
             Área financeira
           </div>
           <h1 class="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
@@ -54,11 +54,11 @@ import { WalletService } from '../../services/wallet';
           [disabled]="loadingWallet() || loadingNotifications()"
           (click)="reload()"
         >
-          <lucide-icon
-            [img]="RefreshCw"
+          <svg
+            [lucideIcon]="LucideRefreshCw"
             class="size-4"
             [class.animate-spin]="loadingWallet() || loadingNotifications()"
-          />
+          ></svg>
           Atualizar
         </button>
       </header>
@@ -100,7 +100,7 @@ import { WalletService } from '../../services/wallet';
                 <span
                   class="flex size-11 items-center justify-center rounded-2xl bg-white/15 backdrop-blur"
                 >
-                  <lucide-icon [img]="CircleDollarSign" class="size-6" />
+                  <svg [lucideIcon]="LucideCircleDollarSign" class="size-6"></svg>
                 </span>
                 <div>
                   <p class="text-sm font-medium text-white/70">Saldo disponível</p>
@@ -110,7 +110,7 @@ import { WalletService } from '../../services/wallet';
               <span
                 class="flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-medium text-white/90 backdrop-blur"
               >
-                <lucide-icon [img]="ShieldCheck" class="size-3.5" />
+                <svg [lucideIcon]="LucideShieldCheck" class="size-3.5"></svg>
                 Saldo protegido
               </span>
             </div>
@@ -124,7 +124,7 @@ import { WalletService } from '../../services/wallet';
               </div>
               <div class="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-white/65">
                 <span class="flex items-center gap-1.5">
-                  <lucide-icon [img]="LockKeyhole" class="size-4" />
+                  <svg [lucideIcon]="LucideLockKeyhole" class="size-4"></svg>
                   {{ currentWallet.frozenCredits | number: '1.0-0' }} reservados
                 </span>
                 <span class="hidden size-1 rounded-full bg-white/30 sm:block"></span>
@@ -139,7 +139,7 @@ import { WalletService } from '../../services/wallet';
             <span
               class="summary-icon bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400"
             >
-              <lucide-icon [img]="ArrowDownLeft" class="size-5" />
+              <svg [lucideIcon]="LucideArrowDownLeft" class="size-5"></svg>
             </span>
             <div>
               <p class="text-sm text-muted">Total recebido</p>
@@ -154,7 +154,7 @@ import { WalletService } from '../../services/wallet';
             <span
               class="summary-icon bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400"
             >
-              <lucide-icon [img]="ArrowUpRight" class="size-5" />
+              <svg [lucideIcon]="LucideArrowUpRight" class="size-5"></svg>
             </span>
             <div>
               <p class="text-sm text-muted">Total utilizado</p>
@@ -169,7 +169,7 @@ import { WalletService } from '../../services/wallet';
             <span
               class="summary-icon bg-violet-50 text-violet-600 dark:bg-violet-950/40 dark:text-violet-400"
             >
-              <lucide-icon [img]="RotateCcw" class="size-5" />
+              <svg [lucideIcon]="LucideRotateCcw" class="size-5"></svg>
             </span>
             <div>
               <p class="text-sm text-muted">Total reembolsado</p>
@@ -192,7 +192,7 @@ import { WalletService } from '../../services/wallet';
             <span
               class="flex size-9 items-center justify-center rounded-xl bg-surface-subtle text-muted"
             >
-              <lucide-icon [img]="Bell" class="size-4.5" />
+              <svg [lucideIcon]="LucideBell" class="size-4.5"></svg>
             </span>
           </div>
 
@@ -213,7 +213,7 @@ import { WalletService } from '../../services/wallet';
               <span
                 class="flex size-12 items-center justify-center rounded-2xl bg-red-50 text-red-500 dark:bg-red-950/30"
               >
-                <lucide-icon [img]="Bell" class="size-5" />
+                <svg [lucideIcon]="LucideBell" class="size-5"></svg>
               </span>
               <p class="mt-3 font-medium text-foreground">Não foi possível carregar os avisos</p>
               <button type="button" class="btn-link mt-2 text-sm" (click)="loadNotifications()">
@@ -225,7 +225,7 @@ import { WalletService } from '../../services/wallet';
               <span
                 class="flex size-14 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400"
               >
-                <lucide-icon [img]="Sparkles" class="size-6" />
+                <svg [lucideIcon]="LucideSparkles" class="size-6"></svg>
               </span>
               <p class="mt-4 font-semibold text-foreground">Tudo certo por aqui</p>
               <p class="mt-1 max-w-sm text-sm text-muted">
@@ -242,7 +242,7 @@ import { WalletService } from '../../services/wallet';
                     class="notification-icon"
                     [class]="notificationIconClass(notification.type)"
                   >
-                    <lucide-icon [img]="notificationIcon(notification.type)" class="size-4.5" />
+                    <svg [lucideIcon]="notificationIcon(notification.type)" class="size-4.5"></svg>
                   </span>
                   <div class="min-w-0 flex-1">
                     <div
@@ -274,32 +274,32 @@ import { WalletService } from '../../services/wallet';
             <span
               class="action-icon bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400"
             >
-              <lucide-icon [img]="History" class="size-5" />
+              <svg [lucideIcon]="LucideHistory" class="size-5"></svg>
             </span>
             <div class="min-w-0 flex-1">
               <p class="font-semibold text-foreground">Histórico de créditos</p>
               <p class="mt-0.5 text-sm text-muted">Consulte todas as movimentações</p>
             </div>
-            <lucide-icon
-              [img]="ArrowRight"
+            <svg
+              [lucideIcon]="LucideArrowRight"
               class="size-4 text-muted transition-transform group-hover:translate-x-1 group-hover:text-brand"
-            />
+            ></svg>
           </a>
 
           <a routerLink="../refunds" class="action-card group">
             <span
               class="action-icon bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400"
             >
-              <lucide-icon [img]="RotateCcw" class="size-5" />
+              <svg [lucideIcon]="LucideRotateCcw" class="size-5"></svg>
             </span>
             <div class="min-w-0 flex-1">
               <p class="font-semibold text-foreground">Meus reembolsos</p>
               <p class="mt-0.5 text-sm text-muted">Acompanhe suas solicitações</p>
             </div>
-            <lucide-icon
-              [img]="ArrowRight"
+            <svg
+              [lucideIcon]="LucideArrowRight"
               class="size-4 text-muted transition-transform group-hover:translate-x-1 group-hover:text-brand"
-            />
+            ></svg>
           </a>
 
           @if (wallet(); as currentWallet) {
@@ -308,10 +308,10 @@ import { WalletService } from '../../services/wallet';
                 class="rounded-2xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-900/50 dark:bg-amber-950/20"
               >
                 <div class="flex gap-3">
-                  <lucide-icon
-                    [img]="Clock3"
+                  <svg
+                    [lucideIcon]="LucideClock3"
                     class="mt-0.5 size-5 shrink-0 text-amber-600 dark:text-amber-400"
-                  />
+                  ></svg>
                   <div>
                     <p class="text-sm font-semibold text-amber-900 dark:text-amber-200">
                       Créditos expirados
@@ -427,19 +427,19 @@ export class WalletBalancePage implements OnInit {
   readonly walletError = signal(false);
   readonly notificationsError = signal(false);
 
-  readonly ArrowDownLeft = ArrowDownLeft;
-  readonly ArrowRight = ArrowRight;
-  readonly ArrowUpRight = ArrowUpRight;
-  readonly Bell = Bell;
-  readonly CircleDollarSign = CircleDollarSign;
-  readonly Clock3 = Clock3;
-  readonly History = History;
-  readonly LockKeyhole = LockKeyhole;
-  readonly RefreshCw = RefreshCw;
-  readonly RotateCcw = RotateCcw;
-  readonly ShieldCheck = ShieldCheck;
-  readonly Sparkles = Sparkles;
-  readonly WalletCards = WalletCards;
+  readonly LucideArrowDownLeft = LucideArrowDownLeft;
+  readonly LucideArrowRight = LucideArrowRight;
+  readonly LucideArrowUpRight = LucideArrowUpRight;
+  readonly LucideBell = LucideBell;
+  readonly LucideCircleDollarSign = LucideCircleDollarSign;
+  readonly LucideClock3 = LucideClock3;
+  readonly LucideHistory = LucideHistory;
+  readonly LucideLockKeyhole = LucideLockKeyhole;
+  readonly LucideRefreshCw = LucideRefreshCw;
+  readonly LucideRotateCcw = LucideRotateCcw;
+  readonly LucideShieldCheck = LucideShieldCheck;
+  readonly LucideSparkles = LucideSparkles;
+  readonly LucideWalletCards = LucideWalletCards;
 
   ngOnInit(): void {
     this.reload();
@@ -488,12 +488,12 @@ export class WalletBalancePage implements OnInit {
 
   notificationIcon(type: WalletNotification['type']) {
     const icons = {
-      EXPIRING_SOON: Clock3,
-      FROZEN: LockKeyhole,
-      DISPUTE_UPDATE: ShieldCheck,
-      REFUND_UPDATE: RotateCcw,
+      EXPIRING_SOON: LucideClock3,
+      FROZEN: LucideLockKeyhole,
+      DISPUTE_UPDATE: LucideShieldCheck,
+      REFUND_UPDATE: LucideRotateCcw,
     };
-    return icons[type] ?? Bell;
+    return icons[type] ?? LucideBell;
   }
 
   notificationLabel(type: WalletNotification['type']): string {

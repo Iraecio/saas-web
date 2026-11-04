@@ -19,7 +19,9 @@ export class ProfileService {
     return this.api.get<User>('/users/me');
   }
 
-  updateMe(dto: Partial<Pick<User, 'name' | 'avatarUrl' | 'department' | 'jobTitle'>>): Observable<User> {
+  updateMe(
+    dto: Partial<Pick<User, 'name' | 'avatarUrl' | 'department' | 'jobTitle'>>,
+  ): Observable<User> {
     return this.api.put<User>('/users/me', dto);
   }
 
@@ -35,7 +37,10 @@ export class ProfileService {
     return this.api.get<ProducerProfile>(`/users/${userId}/producer-profile`);
   }
 
-  updateProducerProfile(userId: string, dto: UpdateProducerProfileDto): Observable<ProducerProfile> {
+  updateProducerProfile(
+    userId: string,
+    dto: UpdateProducerProfileDto,
+  ): Observable<ProducerProfile> {
     return this.api.patch<ProducerProfile>(`/users/${userId}/producer-profile`, dto);
   }
 

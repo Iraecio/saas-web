@@ -5,7 +5,12 @@ import { Observable, throwError } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { isPlatformBrowser } from '@angular/common';
 import { environment } from '../../../../environments/environment';
-import { StorageBucket, UploadResponse, SignedUrlResponse, DeleteFileDto } from '../../../core/models/storage.model';
+import {
+  StorageBucket,
+  UploadResponse,
+  SignedUrlResponse,
+  DeleteFileDto,
+} from '../../../core/models/storage.model';
 
 export interface UploadProgress {
   progress: number;
@@ -19,11 +24,7 @@ export class StorageService {
   private readonly platformId = inject(PLATFORM_ID);
   private readonly baseUrl = environment.apiUrl;
 
-  uploadFile(
-    file: File,
-    bucket: StorageBucket,
-    folder?: string,
-  ): Observable<UploadProgress> {
+  uploadFile(file: File, bucket: StorageBucket, folder?: string): Observable<UploadProgress> {
     if (!isPlatformBrowser(this.platformId)) {
       return throwError(() => new Error('File upload is not supported on the server'));
     }
@@ -68,7 +69,9 @@ export class StorageService {
       .post<SignedUrlResponse>(`${this.baseUrl}/storage/signed-url`, body)
       .pipe(
         catchError((err: HttpErrorResponse) =>
-          throwError(() => new Error(err.error?.message ?? err.message ?? 'Failed to get signed URL')),
+          throwError(
+            () => new Error(err.error?.message ?? err.message ?? 'Failed to get signed URL'),
+          ),
         ),
       );
   }

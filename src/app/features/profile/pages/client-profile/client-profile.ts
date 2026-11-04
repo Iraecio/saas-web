@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  inject,
+  signal,
+  OnInit,
+} from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AppStateService } from '../../../../core/services/app-state';
@@ -17,37 +24,64 @@ import { ProfileService } from '../../services/my-profile';
 
       @if (loading()) {
         <div class="flex justify-center py-12">
-          <div class="w-6 h-6 border-2 border-neutral-400 border-t-transparent rounded-full animate-spin"></div>
+          <div
+            class="w-6 h-6 border-2 border-neutral-400 border-t-transparent rounded-full animate-spin"
+          ></div>
         </div>
       } @else {
-        <section class="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 p-6">
+        <section
+          class="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 p-6"
+        >
           <form [formGroup]="form" (ngSubmit)="save()" class="space-y-5">
             <div>
-              <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">Nome da empresa</label>
-              <input type="text" formControlName="companyName" placeholder="Empresa LTDA"
-                class="form-input w-full" />
+              <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1"
+                >Nome da empresa</label
+              >
+              <input
+                type="text"
+                formControlName="companyName"
+                placeholder="Empresa LTDA"
+                class="form-input w-full"
+              />
             </div>
             <div>
-              <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">Telefone</label>
-              <input type="tel" formControlName="phone" placeholder="(11) 99999-9999"
-                class="form-input w-full" />
+              <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1"
+                >Telefone</label
+              >
+              <input
+                type="tel"
+                formControlName="phone"
+                placeholder="(11) 99999-9999"
+                class="form-input w-full"
+              />
             </div>
             <div>
-              <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">Endereço</label>
-              <input type="text" formControlName="address" placeholder="Rua, Número, Cidade"
-                class="form-input w-full" />
+              <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1"
+                >Endereço</label
+              >
+              <input
+                type="text"
+                formControlName="address"
+                placeholder="Rua, Número, Cidade"
+                class="form-input w-full"
+              />
             </div>
 
             @if (saveSuccess()) {
-              <p class="text-sm text-green-600 dark:text-green-400">✓ Perfil de cliente atualizado</p>
+              <p class="text-sm text-green-600 dark:text-green-400">
+                ✓ Perfil de cliente atualizado
+              </p>
             }
             @if (saveError()) {
               <p class="text-sm text-red-500">{{ saveError() }}</p>
             }
 
             <div class="flex justify-end">
-              <button type="submit" [disabled]="saving()"
-                class="px-4 py-2 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50 transition-opacity">
+              <button
+                type="submit"
+                [disabled]="saving()"
+                class="px-4 py-2 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50 transition-opacity"
+              >
                 {{ saving() ? 'Salvando...' : 'Salvar' }}
               </button>
             </div>
@@ -76,7 +110,10 @@ export class ClientProfilePageComponent implements OnInit {
 
   ngOnInit(): void {
     const userId = this.appState.user()?.id;
-    if (!userId) { this.loading.set(false); return; }
+    if (!userId) {
+      this.loading.set(false);
+      return;
+    }
 
     this.profileService
       .getClientProfile(userId)

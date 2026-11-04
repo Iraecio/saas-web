@@ -85,7 +85,7 @@ import { OrderPronunciation } from '../../../../core/models/pronunciation.model'
           <dl class="mt-4 grid grid-cols-2 gap-3 text-sm">
             <div>
               <dt class="text-neutral-500">Créditos</dt>
-              <dd>{{ selectedItem()?.creditCost | number }}</dd>
+              <dd>{{ $safeNavigationMigration(selectedItem()?.creditCost) | number }}</dd>
             </div>
             <div>
               <dt class="text-neutral-500">Revisões</dt>
@@ -95,7 +95,9 @@ import { OrderPronunciation } from '../../../../core/models/pronunciation.model'
               <dt class="text-neutral-500">Prazo</dt>
               <dd>
                 {{
-                  selectedItem()?.deadlineAt ? (selectedItem()?.deadlineAt | date: 'short') : '—'
+                  selectedItem()?.deadlineAt
+                    ? ($safeNavigationMigration(selectedItem()?.deadlineAt) | date: 'short')
+                    : '—'
                 }}
               </dd>
             </div>
@@ -170,7 +172,7 @@ import { OrderPronunciation } from '../../../../core/models/pronunciation.model'
         >
           <h2 class="mb-2 text-lg font-semibold">Entrega</h2>
           <app-audio-delivery
-            [current]="selectedItem()?.currentDelivery"
+            [current]="$safeNavigationMigration(selectedItem()?.currentDelivery)"
             [showUpload]="showDeliveryUpload()"
             [isRedelivery]="selectedItem()?.status === 'REVIEW'"
             [progress]="uploadProgress()"

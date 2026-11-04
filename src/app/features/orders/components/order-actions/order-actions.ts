@@ -22,7 +22,13 @@ const LABELS: Record<OrderAction, string> = {
 };
 
 // Ações que exigem um texto obrigatório antes de confirmar.
-const TEXT_REQUIRED: OrderAction[] = ['refuse', 'request-brief-revision', 'request-revision', 'dispute', 'resolve'];
+const TEXT_REQUIRED: OrderAction[] = [
+  'refuse',
+  'request-brief-revision',
+  'request-revision',
+  'dispute',
+  'resolve',
+];
 
 @Component({
   selector: 'app-order-actions',
@@ -46,7 +52,11 @@ const TEXT_REQUIRED: OrderAction[] = ['refuse', 'request-brief-revision', 'reque
         <p class="text-sm font-medium">{{ labelFor(a) }}</p>
 
         @if (a === 'resolve') {
-          <select class="form-input" [value]="decision()" (change)="decision.set($any($event.target).value)">
+          <select
+            class="form-input"
+            [value]="decision()"
+            (change)="decision.set($any($event.target).value)"
+          >
             <option value="FAVOR_CLIENT">A favor do cliente</option>
             <option value="FAVOR_PROFESSIONAL">A favor do profissional</option>
           </select>
@@ -61,7 +71,9 @@ const TEXT_REQUIRED: OrderAction[] = ['refuse', 'request-brief-revision', 'reque
         ></textarea>
 
         <div class="flex gap-2">
-          <button type="button" class="btn-primary" [disabled]="!canConfirm()" (click)="confirm()">Confirmar</button>
+          <button type="button" class="btn-primary" [disabled]="!canConfirm()" (click)="confirm()">
+            Confirmar
+          </button>
           <button type="button" class="btn-secondary" (click)="close()">Cancelar</button>
         </div>
       </div>

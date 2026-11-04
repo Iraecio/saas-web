@@ -21,7 +21,9 @@ export class AppStateService {
 
   readonly isAuthenticated = computed(() => this.userSignal() !== null);
   readonly userRole = computed(() => this.userSignal()?.role ?? null);
-  readonly userName = computed(() => this.userSignal()?.name ?? this.userSignal()?.email ?? 'Usuário');
+  readonly userName = computed(
+    () => this.userSignal()?.name ?? this.userSignal()?.email ?? 'Usuário',
+  );
   readonly isAdmin = computed(() => {
     const role = this.userSignal()?.role;
     return role === 'ADMIN' || role === 'SUPER_ADMIN';

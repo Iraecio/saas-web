@@ -12,14 +12,14 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
 import {
-  Bell,
-  ChevronDown,
-  CircleDollarSign,
-  LogOut,
-  Settings,
-  WalletCards,
-  LucideAngularModule,
-} from 'lucide-angular';
+  LucideBell,
+  LucideChevronDown,
+  LucideCircleDollarSign,
+  LucideLogOut,
+  LucideSettings,
+  LucideWalletCards,
+  LucideDynamicIcon,
+} from '@lucide/angular';
 import { WalletNotification } from '../../../core/models/wallet.model';
 import { AppStateService } from '../../../core/services/app-state';
 import { AuthService } from '../../../core/services/auth';
@@ -28,7 +28,7 @@ import { WalletService } from '../../../features/wallet/services/wallet';
 @Component({
   selector: 'app-header',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DatePipe, DecimalPipe, LucideAngularModule, RouterLink],
+  imports: [DatePipe, DecimalPipe, LucideDynamicIcon, RouterLink],
   template: `
     <header
       class="flex h-16 items-center justify-between border-b border-border bg-surface px-4 text-foreground sm:px-6"
@@ -49,7 +49,7 @@ import { WalletService } from '../../../features/wallet/services/wallet';
             class="flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-sm font-semibold text-amber-700 hover:bg-amber-50 dark:text-amber-300 dark:hover:bg-amber-900/20"
             aria-label="Abrir minha carteira"
           >
-            <lucide-icon [img]="CircleDollarSign" class="size-5" />
+            <svg [lucideIcon]="LucideCircleDollarSign" class="size-5"></svg>
             @if (loadingWallet()) {
               <span class="h-4 w-8 animate-pulse rounded bg-neutral-200 dark:bg-neutral-700"></span>
             } @else {
@@ -66,7 +66,7 @@ import { WalletService } from '../../../features/wallet/services/wallet';
               [attr.aria-expanded]="notificationsOpen()"
               aria-label="Notificações"
             >
-              <lucide-icon [img]="Bell" class="size-5" />
+              <svg [lucideIcon]="LucideBell" class="size-5"></svg>
               @if (notifications().length) {
                 <span
                   class="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white"
@@ -149,7 +149,7 @@ import { WalletService } from '../../../features/wallet/services/wallet';
               >
                 {{ (user.name || user.email)[0].toUpperCase() }}
               </div>
-              <lucide-icon [img]="ChevronDown" class="size-4 text-neutral-500" />
+              <svg [lucideIcon]="LucideChevronDown" class="size-4 text-neutral-500"></svg>
             </button>
 
             @if (userMenuOpen()) {
@@ -158,11 +158,11 @@ import { WalletService } from '../../../features/wallet/services/wallet';
                 (click)="$event.stopPropagation()"
               >
                 <a routerLink="/admin/settings" class="menu-item" (click)="userMenuOpen.set(false)">
-                  <lucide-icon [img]="Settings" class="size-4" />
+                  <svg [lucideIcon]="LucideSettings" class="size-4"></svg>
                   Configuração
                 </a>
                 <a routerLink="/admin/wallet" class="menu-item" (click)="userMenuOpen.set(false)">
-                  <lucide-icon [img]="WalletCards" class="size-4" />
+                  <svg [lucideIcon]="LucideWalletCards" class="size-4"></svg>
                   Minha Carteira
                 </a>
                 <button
@@ -171,7 +171,7 @@ import { WalletService } from '../../../features/wallet/services/wallet';
                   [disabled]="loggingOut()"
                   (click)="handleLogout()"
                 >
-                  <lucide-icon [img]="LogOut" class="size-4" />
+                  <svg [lucideIcon]="LucideLogOut" class="size-4"></svg>
                   {{ loggingOut() ? 'Saindo...' : 'Sair' }}
                 </button>
               </div>
@@ -215,12 +215,12 @@ export class HeaderComponent implements OnInit {
   protected readonly loadingWallet = signal(false);
   protected readonly loadingNotifications = signal(false);
 
-  protected readonly Bell = Bell;
-  protected readonly ChevronDown = ChevronDown;
-  protected readonly CircleDollarSign = CircleDollarSign;
-  protected readonly LogOut = LogOut;
-  protected readonly Settings = Settings;
-  protected readonly WalletCards = WalletCards;
+  protected readonly LucideBell = LucideBell;
+  protected readonly LucideChevronDown = LucideChevronDown;
+  protected readonly LucideCircleDollarSign = LucideCircleDollarSign;
+  protected readonly LucideLogOut = LucideLogOut;
+  protected readonly LucideSettings = LucideSettings;
+  protected readonly LucideWalletCards = LucideWalletCards;
 
   ngOnInit(): void {
     if (!this.isClient()) return;

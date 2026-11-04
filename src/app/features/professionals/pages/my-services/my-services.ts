@@ -11,24 +11,24 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import {
-  ArrowRight,
-  BadgeDollarSign,
-  Check,
-  ChevronDown,
-  ChevronUp,
-  CircleAlert,
-  Clock3,
-  History,
-  LoaderCircle,
-  LucideAngularModule,
-  MessageSquareText,
-  Mic2,
-  Power,
-  RefreshCw,
-  Send,
-  SlidersHorizontal,
-  X,
-} from 'lucide-angular';
+  LucideArrowRight,
+  LucideBadgeDollarSign,
+  LucideCheck,
+  LucideChevronDown,
+  LucideChevronUp,
+  LucideCircleAlert,
+  LucideClock3,
+  LucideHistory,
+  LucideLoaderCircle,
+  LucideDynamicIcon,
+  LucideMessageSquareText,
+  LucideMic2,
+  LucidePower,
+  LucideRefreshCw,
+  LucideSend,
+  LucideSlidersHorizontal,
+  LucideX,
+} from '@lucide/angular';
 import {
   NegotiationStatus,
   ProfessionalOffering,
@@ -41,13 +41,13 @@ import { ProfessionalService } from '../../services/professional';
 @Component({
   selector: 'app-my-services',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CurrencyPipe, DatePipe, FormsModule, LucideAngularModule],
+  imports: [CurrencyPipe, DatePipe, FormsModule, LucideDynamicIcon],
   template: `
     <main class="mx-auto max-w-6xl space-y-6 p-4 sm:p-6 lg:p-8">
       <header class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <div class="mb-2 flex items-center gap-2 text-sm font-semibold text-brand">
-            <lucide-icon [img]="Mic2" class="size-4" />
+            <svg [lucideIcon]="LucideMic2" class="size-4"></svg>
             Painel do locutor
           </div>
           <h1 class="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
@@ -63,7 +63,7 @@ import { ProfessionalService } from '../../services/professional';
           [disabled]="loading()"
           (click)="loadOfferings()"
         >
-          <lucide-icon [img]="RefreshCw" class="size-4" [class.animate-spin]="loading()" />
+          <svg [lucideIcon]="LucideRefreshCw" class="size-4" [class.animate-spin]="loading()"></svg>
           Atualizar
         </button>
       </header>
@@ -73,7 +73,7 @@ import { ProfessionalService } from '../../services/professional';
           <span
             class="summary-icon bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400"
           >
-            <lucide-icon [img]="SlidersHorizontal" class="size-5" />
+            <svg [lucideIcon]="LucideSlidersHorizontal" class="size-5"></svg>
           </span>
           <div>
             <p class="text-sm text-muted">Serviços disponíveis</p>
@@ -84,7 +84,7 @@ import { ProfessionalService } from '../../services/professional';
           <span
             class="summary-icon bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400"
           >
-            <lucide-icon [img]="Power" class="size-5" />
+            <svg [lucideIcon]="LucidePower" class="size-5"></svg>
           </span>
           <div>
             <p class="text-sm text-muted">Serviços ativos</p>
@@ -95,7 +95,7 @@ import { ProfessionalService } from '../../services/professional';
           <span
             class="summary-icon bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400"
           >
-            <lucide-icon [img]="Clock3" class="size-5" />
+            <svg [lucideIcon]="LucideClock3" class="size-5"></svg>
           </span>
           <div>
             <p class="text-sm text-muted">Em negociação</p>
@@ -108,10 +108,10 @@ import { ProfessionalService } from '../../services/professional';
         class="rounded-2xl border border-blue-200 bg-blue-50/80 p-4 dark:border-blue-900/60 dark:bg-blue-950/20"
       >
         <div class="flex gap-3">
-          <lucide-icon
-            [img]="CircleAlert"
+          <svg
+            [lucideIcon]="LucideCircleAlert"
             class="mt-0.5 size-5 shrink-0 text-blue-600 dark:text-blue-400"
-          />
+          ></svg>
           <div class="text-sm">
             <p class="font-semibold text-blue-900 dark:text-blue-200">
               Como funciona a negociação?
@@ -153,7 +153,7 @@ import { ProfessionalService } from '../../services/professional';
       } @else if (loadError()) {
         <section class="empty-state" role="alert">
           <span class="empty-icon bg-red-50 text-red-500 dark:bg-red-950/30">
-            <lucide-icon [img]="CircleAlert" class="size-6" />
+            <svg [lucideIcon]="LucideCircleAlert" class="size-6"></svg>
           </span>
           <h2 class="mt-4 font-semibold text-foreground">
             Não foi possível carregar seus serviços
@@ -166,7 +166,7 @@ import { ProfessionalService } from '../../services/professional';
       } @else if (!filteredOfferings().length) {
         <section class="empty-state">
           <span class="empty-icon bg-blue-50 text-blue-600 dark:bg-blue-950/30 dark:text-blue-400">
-            <lucide-icon [img]="Mic2" class="size-6" />
+            <svg [lucideIcon]="LucideMic2" class="size-6"></svg>
           </span>
           <h2 class="mt-4 font-semibold text-foreground">Nenhum serviço encontrado</h2>
           <p class="mt-1 max-w-md text-sm text-muted">
@@ -188,7 +188,7 @@ import { ProfessionalService } from '../../services/professional';
                   <span
                     class="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-violet-50 text-violet-600 dark:bg-violet-950/40 dark:text-violet-400"
                   >
-                    <lucide-icon [img]="Mic2" class="size-5" />
+                    <svg [lucideIcon]="LucideMic2" class="size-5"></svg>
                   </span>
                   <span
                     class="status-badge"
@@ -244,7 +244,7 @@ import { ProfessionalService } from '../../services/professional';
                     "
                     (click)="openProposal(offering)"
                   >
-                    <lucide-icon [img]="BadgeDollarSign" class="size-4" />
+                    <svg [lucideIcon]="LucideBadgeDollarSign" class="size-4"></svg>
                     Renegociar
                   </button>
                   <button
@@ -254,9 +254,9 @@ import { ProfessionalService } from '../../services/professional';
                     (click)="toggleOffering(offering)"
                   >
                     @if (togglingId() === offering.serviceId) {
-                      <lucide-icon [img]="LoaderCircle" class="size-4 animate-spin" />
+                      <svg [lucideIcon]="LucideLoaderCircle" class="size-4 animate-spin"></svg>
                     } @else {
-                      <lucide-icon [img]="Power" class="size-4" />
+                      <svg [lucideIcon]="LucidePower" class="size-4"></svg>
                     }
                     {{ offering.active ? 'Desativar' : 'Ativar' }}
                   </button>
@@ -269,20 +269,22 @@ import { ProfessionalService } from '../../services/professional';
                 (click)="toggleHistory(offering)"
               >
                 <span class="flex items-center gap-2">
-                  <lucide-icon [img]="History" class="size-4" />
+                  <svg [lucideIcon]="LucideHistory" class="size-4"></svg>
                   Histórico de negociação
                 </span>
-                <lucide-icon
-                  [img]="expandedServiceId() === offering.serviceId ? ChevronUp : ChevronDown"
+                <svg
+                  [lucideIcon]="
+                    expandedServiceId() === offering.serviceId ? LucideChevronUp : LucideChevronDown
+                  "
                   class="size-4"
-                />
+                ></svg>
               </button>
 
               @if (expandedServiceId() === offering.serviceId) {
                 <div class="border-t border-border bg-surface-subtle/60 p-5 sm:p-6">
                   @if (historyLoadingId() === offering.serviceId) {
                     <div class="flex items-center justify-center gap-2 py-6 text-sm text-muted">
-                      <lucide-icon [img]="LoaderCircle" class="size-4 animate-spin" />
+                      <svg [lucideIcon]="LucideLoaderCircle" class="size-4 animate-spin"></svg>
                       Carregando histórico...
                     </div>
                   } @else if (historyError()[offering.serviceId]) {
@@ -342,7 +344,7 @@ import { ProfessionalService } from '../../services/professional';
                                 [disabled]="decidingId() === negotiation.id"
                                 (click)="decide(offering, negotiation, 'accept')"
                               >
-                                <lucide-icon [img]="Check" class="size-3.5" /> Aceitar
+                                <svg [lucideIcon]="LucideCheck" class="size-3.5"></svg> Aceitar
                                 contraproposta
                               </button>
                               <button
@@ -351,7 +353,7 @@ import { ProfessionalService } from '../../services/professional';
                                 [disabled]="decidingId() === negotiation.id"
                                 (click)="decide(offering, negotiation, 'reject')"
                               >
-                                <lucide-icon [img]="X" class="size-3.5" /> Recusar
+                                <svg [lucideIcon]="LucideX" class="size-3.5"></svg> Recusar
                               </button>
                             </div>
                           }
@@ -382,7 +384,7 @@ import { ProfessionalService } from '../../services/professional';
           <div class="flex items-start justify-between border-b border-border p-5 sm:p-6">
             <div>
               <div class="mb-2 flex items-center gap-2 text-sm font-semibold text-brand">
-                <lucide-icon [img]="MessageSquareText" class="size-4" /> Nova proposta
+                <svg [lucideIcon]="LucideMessageSquareText" class="size-4"></svg> Nova proposta
               </div>
               <h2 id="proposal-title" class="text-xl font-bold text-foreground">
                 Renegociar valor
@@ -390,7 +392,7 @@ import { ProfessionalService } from '../../services/professional';
               <p class="mt-1 text-sm text-muted">{{ service.serviceName }}</p>
             </div>
             <button type="button" class="btn-icon" aria-label="Fechar" (click)="closeProposal()">
-              <lucide-icon [img]="X" class="size-5" />
+              <svg [lucideIcon]="LucideX" class="size-5"></svg>
             </button>
           </div>
 
@@ -462,9 +464,10 @@ import { ProfessionalService } from '../../services/professional';
                 (click)="submitProposal()"
               >
                 @if (submittingProposal()) {
-                  <lucide-icon [img]="LoaderCircle" class="size-4 animate-spin" /> Enviando...
+                  <svg [lucideIcon]="LucideLoaderCircle" class="size-4 animate-spin"></svg>
+                  Enviando...
                 } @else {
-                  <lucide-icon [img]="Send" class="size-4" /> Enviar proposta
+                  <svg [lucideIcon]="LucideSend" class="size-4"></svg> Enviar proposta
                 }
               </button>
             </div>
@@ -587,22 +590,22 @@ export class MyServicesPage implements OnInit {
     { label: 'Inativos', value: 'INACTIVE' as const },
   ];
 
-  readonly ArrowRight = ArrowRight;
-  readonly BadgeDollarSign = BadgeDollarSign;
-  readonly Check = Check;
-  readonly ChevronDown = ChevronDown;
-  readonly ChevronUp = ChevronUp;
-  readonly CircleAlert = CircleAlert;
-  readonly Clock3 = Clock3;
-  readonly History = History;
-  readonly LoaderCircle = LoaderCircle;
-  readonly MessageSquareText = MessageSquareText;
-  readonly Mic2 = Mic2;
-  readonly Power = Power;
-  readonly RefreshCw = RefreshCw;
-  readonly Send = Send;
-  readonly SlidersHorizontal = SlidersHorizontal;
-  readonly X = X;
+  readonly LucideArrowRight = LucideArrowRight;
+  readonly LucideBadgeDollarSign = LucideBadgeDollarSign;
+  readonly LucideCheck = LucideCheck;
+  readonly LucideChevronDown = LucideChevronDown;
+  readonly LucideChevronUp = LucideChevronUp;
+  readonly LucideCircleAlert = LucideCircleAlert;
+  readonly LucideClock3 = LucideClock3;
+  readonly LucideHistory = LucideHistory;
+  readonly LucideLoaderCircle = LucideLoaderCircle;
+  readonly LucideMessageSquareText = LucideMessageSquareText;
+  readonly LucideMic2 = LucideMic2;
+  readonly LucidePower = LucidePower;
+  readonly LucideRefreshCw = LucideRefreshCw;
+  readonly LucideSend = LucideSend;
+  readonly LucideSlidersHorizontal = LucideSlidersHorizontal;
+  readonly LucideX = LucideX;
 
   ngOnInit(): void {
     this.loadOfferings();

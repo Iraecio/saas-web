@@ -20,7 +20,11 @@ import { UserPermission } from '../../../../core/models/user.model';
   template: `
     <div class="p-6 max-w-3xl mx-auto space-y-6">
       <header class="flex items-center gap-4">
-        <a [routerLink]="['../../', userId()]" class="text-neutral-500 hover:text-white transition-colors">← Voltar</a>
+        <a
+          [routerLink]="['../../', userId()]"
+          class="text-neutral-500 hover:text-white transition-colors"
+          >← Voltar</a
+        >
         <div>
           <h1 class="text-3xl font-bold text-neutral-900 dark:text-white">Permissões do usuário</h1>
           <p class="text-sm text-neutral-500 mt-1">ID: {{ userId() }}</p>
@@ -28,12 +32,18 @@ import { UserPermission } from '../../../../core/models/user.model';
       </header>
 
       <!-- Lista de permissões ativas -->
-      <section class="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 p-6">
-        <h2 class="text-lg font-semibold text-neutral-900 dark:text-white mb-4">Permissões ativas</h2>
+      <section
+        class="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 p-6"
+      >
+        <h2 class="text-lg font-semibold text-neutral-900 dark:text-white mb-4">
+          Permissões ativas
+        </h2>
 
         @if (loading()) {
           <div class="flex justify-center py-8">
-            <div class="w-5 h-5 border-2 border-neutral-400 border-t-transparent rounded-full animate-spin"></div>
+            <div
+              class="w-5 h-5 border-2 border-neutral-400 border-t-transparent rounded-full animate-spin"
+            ></div>
           </div>
         } @else if (permissions().length === 0) {
           <p class="text-neutral-500 text-sm py-4 text-center">Nenhuma permissão concedida.</p>
@@ -42,14 +52,20 @@ import { UserPermission } from '../../../../core/models/user.model';
             @for (perm of permissions(); track perm.id) {
               <div class="py-3 flex items-center justify-between">
                 <div>
-                  <span class="font-mono text-sm text-neutral-900 dark:text-white">{{ perm.permissionName }}</span>
+                  <span class="font-mono text-sm text-neutral-900 dark:text-white">{{
+                    perm.permissionName
+                  }}</span>
                   <p class="text-xs text-neutral-500 mt-0.5">
-                    Concedida em {{ perm.grantedAt | date:'dd/MM/yyyy' }}
-                    @if (perm.expiresAt) { · Expira {{ perm.expiresAt | date:'dd/MM/yyyy' }} }
+                    Concedida em {{ perm.grantedAt | date: 'dd/MM/yyyy' }}
+                    @if (perm.expiresAt) {
+                      · Expira {{ perm.expiresAt | date: 'dd/MM/yyyy' }}
+                    }
                   </p>
                 </div>
-                <button (click)="revoke(perm.permissionName)"
-                  class="text-xs text-red-500 hover:text-red-700 transition-colors px-2 py-1 rounded hover:bg-red-50 dark:hover:bg-red-900/20">
+                <button
+                  (click)="revoke(perm.permissionName)"
+                  class="text-xs text-red-500 hover:text-red-700 transition-colors px-2 py-1 rounded hover:bg-red-50 dark:hover:bg-red-900/20"
+                >
                   Revogar
                 </button>
               </div>
@@ -59,17 +75,24 @@ import { UserPermission } from '../../../../core/models/user.model';
       </section>
 
       <!-- Formulário para conceder permissão -->
-      <section class="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 p-6">
-        <h2 class="text-lg font-semibold text-neutral-900 dark:text-white mb-4">Conceder permissão</h2>
+      <section
+        class="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 p-6"
+      >
+        <h2 class="text-lg font-semibold text-neutral-900 dark:text-white mb-4">
+          Conceder permissão
+        </h2>
 
         <form [formGroup]="form" (ngSubmit)="grant()" class="space-y-4">
           <div>
             <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">
               Nome da permissão
             </label>
-            <input type="text" formControlName="permissionName"
+            <input
+              type="text"
+              formControlName="permissionName"
               placeholder="ex: manage_clients, can_access_billing"
-              class="form-input w-full font-mono text-sm" />
+              class="form-input w-full font-mono text-sm"
+            />
           </div>
           <div>
             <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">
@@ -82,12 +105,17 @@ import { UserPermission } from '../../../../core/models/user.model';
             <p class="text-sm text-red-500">{{ grantError() }}</p>
           }
           @if (grantSuccess()) {
-            <p class="text-sm text-green-600 dark:text-green-400">✓ Permissão concedida com sucesso</p>
+            <p class="text-sm text-green-600 dark:text-green-400">
+              ✓ Permissão concedida com sucesso
+            </p>
           }
 
           <div class="flex justify-end">
-            <button type="submit" [disabled]="form.invalid || granting()"
-              class="px-4 py-2 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50 transition-opacity">
+            <button
+              type="submit"
+              [disabled]="form.invalid || granting()"
+              class="px-4 py-2 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50 transition-opacity"
+            >
               {{ granting() ? 'Concedendo...' : 'Conceder permissão' }}
             </button>
           </div>

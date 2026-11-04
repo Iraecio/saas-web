@@ -22,7 +22,9 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
           }
         </div>
         @if (icon()) {
-          <div class="rounded-md border border-neutral-200 bg-white p-2 text-xl dark:border-neutral-800 dark:bg-neutral-900">
+          <div
+            class="rounded-md border border-neutral-200 bg-white p-2 text-xl dark:border-neutral-800 dark:bg-neutral-900"
+          >
             {{ icon() }}
           </div>
         }

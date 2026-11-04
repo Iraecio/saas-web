@@ -38,18 +38,19 @@ vercel deploy
 
 No dashboard do Vercel:
 1. Vá para Settings → Environment Variables
-2. Adicione quaisquer variáveis necessárias (se houver)
+2. Configure `NG_ALLOWED_HOSTS` com os hosts públicos aceitos, separados por vírgula e sem protocolo (por exemplo, `app.exemplo.com,saas-web.vercel.app`)
+3. Adicione as demais variáveis exigidas pela aplicação
 
 ## Configuração Detalhada
 
 ### Build
 - **Comando**: `npm run build`
 - **Output Directory**: `dist/saas-web/browser`
-- **Node.js Version**: 20.x (configurado no vercel.json)
+- **Node.js Version**: 22.22.3 ou 24.15.0, conforme a matriz de compatibilidade do Angular 22
 
 ### Serverless Function
 - **Handler**: `api/handler.ts`
-- **Runtime**: Node.js 20.x
+- **Runtime**: Node.js compatível com Angular 22
 - **Max Duration**: 60 segundos
 
 ### Rewrite Rules
@@ -71,6 +72,7 @@ Após o deploy:
 ### Aplicação não renderiza
 - Verifique se `api/handler.ts` está importando corretamente
 - Confirme se `dist/saas-web/server/server.mjs` foi gerado
+- Confirme se `NG_ALLOWED_HOSTS` contém o domínio recebido no cabeçalho `Host`
 
 ### Performance
 - Use `vercel analytics` para monitorar performance

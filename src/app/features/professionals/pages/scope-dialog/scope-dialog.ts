@@ -7,25 +7,35 @@ import { ServiceScope } from '../../../../core/models/service.model';
   selector: 'app-scope-dialog',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" (click)="close.emit()">
-      <div class="w-full max-w-md space-y-4 rounded-xl bg-white p-6 dark:bg-neutral-900" (click)="$event.stopPropagation()">
+    <div
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+      (click)="close.emit()"
+    >
+      <div
+        class="w-full max-w-md space-y-4 rounded-xl bg-white p-6 dark:bg-neutral-900"
+        (click)="$event.stopPropagation()"
+      >
         <h2 class="text-lg font-semibold text-neutral-900 dark:text-white">
           Definir escopo — {{ professional().name }}
         </h2>
 
         @if (isAdmin()) {
           <p class="text-sm text-neutral-500">
-            Como administrador, você classifica este profissional como <strong>Global</strong> (da plataforma).
+            Como administrador, você classifica este profissional como <strong>Global</strong> (da
+            plataforma).
           </p>
         } @else {
           <p class="text-sm text-neutral-500">
-            Como revenda, você vincula este profissional como <strong>Particular</strong> da sua rede.
+            Como revenda, você vincula este profissional como <strong>Particular</strong> da sua
+            rede.
           </p>
         }
 
         <div class="flex gap-2">
           <button type="button" class="btn-primary" [disabled]="saving()" (click)="confirm()">
-            {{ saving() ? 'Salvando...' : (isAdmin() ? 'Tornar Global' : 'Vincular à minha revenda') }}
+            {{
+              saving() ? 'Salvando...' : isAdmin() ? 'Tornar Global' : 'Vincular à minha revenda'
+            }}
           </button>
           <button type="button" class="btn-secondary" (click)="close.emit()">Cancelar</button>
         </div>

@@ -24,13 +24,20 @@ import { DatePipe, DecimalPipe, TitleCasePipe } from '@angular/common';
           <h1 class="text-3xl font-bold text-neutral-900 dark:text-white">Créditos</h1>
           <p class="mt-1 text-sm text-neutral-500">Histórico de créditos da sua carteira</p>
         </div>
-        <a routerLink="../" class="text-sm text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors">← Voltar</a>
+        <a
+          routerLink="../"
+          class="text-sm text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors"
+          >← Voltar</a
+        >
       </header>
 
       <!-- Filtros -->
       <div class="flex gap-3 flex-wrap">
-        <select [value]="statusFilter()" (change)="onStatusChange($event)"
-          class="form-input text-sm py-1.5 px-3 w-auto">
+        <select
+          [value]="statusFilter()"
+          (change)="onStatusChange($event)"
+          class="form-input text-sm py-1.5 px-3 w-auto"
+        >
           <option value="">Todos os status</option>
           <option value="AVAILABLE">Disponível</option>
           <option value="FROZEN">Congelado</option>
@@ -40,8 +47,11 @@ import { DatePipe, DecimalPipe, TitleCasePipe } from '@angular/common';
           <option value="EXPIRED">Expirado</option>
         </select>
 
-        <select [value]="typeFilter()" (change)="onTypeChange($event)"
-          class="form-input text-sm py-1.5 px-3 w-auto">
+        <select
+          [value]="typeFilter()"
+          (change)="onTypeChange($event)"
+          class="form-input text-sm py-1.5 px-3 w-auto"
+        >
           <option value="">Todos os tipos</option>
           <option value="PAID">Pago</option>
           <option value="PROMOTIONAL">Promocional</option>
@@ -51,20 +61,29 @@ import { DatePipe, DecimalPipe, TitleCasePipe } from '@angular/common';
       </div>
 
       <!-- Lista -->
-      <section class="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 overflow-hidden">
+      <section
+        class="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 overflow-hidden"
+      >
         @if (loading()) {
           <div class="flex justify-center py-12">
-            <div class="w-6 h-6 border-2 border-neutral-400 border-t-transparent rounded-full animate-spin"></div>
+            <div
+              class="w-6 h-6 border-2 border-neutral-400 border-t-transparent rounded-full animate-spin"
+            ></div>
           </div>
         } @else if (credits().length === 0) {
           <p class="text-neutral-500 text-sm text-center py-12">Nenhum crédito encontrado.</p>
         } @else {
           <div class="divide-y divide-neutral-200 dark:divide-neutral-800">
             @for (credit of credits(); track credit.id) {
-              <a [routerLink]="[credit.id]" class="flex items-center justify-between px-6 py-4 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors">
+              <a
+                [routerLink]="[credit.id]"
+                class="flex items-center justify-between px-6 py-4 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors"
+              >
                 <div class="flex items-center gap-4">
-                  <div class="w-10 h-10 rounded-full flex items-center justify-center text-lg"
-                    [class]="creditIconBg(credit.status)">
+                  <div
+                    class="w-10 h-10 rounded-full flex items-center justify-center text-lg"
+                    [class]="creditIconBg(credit.status)"
+                  >
                     {{ creditIcon(credit.type) }}
                   </div>
                   <div>
@@ -72,16 +91,21 @@ import { DatePipe, DecimalPipe, TitleCasePipe } from '@angular/common';
                       {{ credit.type | titlecase }} · {{ credit.originType | titlecase }}
                     </p>
                     <p class="text-xs text-neutral-500 mt-0.5">
-                      {{ credit.issuedAt | date:'dd/MM/yyyy' }}
-                      @if (credit.expiresAt) { · Expira {{ credit.expiresAt | date:'dd/MM/yyyy' }} }
+                      {{ credit.issuedAt | date: 'dd/MM/yyyy' }}
+                      @if (credit.expiresAt) {
+                        · Expira {{ credit.expiresAt | date: 'dd/MM/yyyy' }}
+                      }
                     </p>
                   </div>
                 </div>
                 <div class="flex items-center gap-3">
                   <span class="text-sm font-semibold" [class]="amountClass(credit.status)">
-                    {{ credit.valueCents / 100 | number:'1.2-2' }}
+                    {{ credit.valueCents / 100 | number: '1.2-2' }}
                   </span>
-                  <span class="text-xs px-2 py-0.5 rounded-full font-medium" [class]="statusBadgeClass(credit.status)">
+                  <span
+                    class="text-xs px-2 py-0.5 rounded-full font-medium"
+                    [class]="statusBadgeClass(credit.status)"
+                  >
                     {{ statusLabel(credit.status) }}
                   </span>
                 </div>
@@ -91,8 +115,11 @@ import { DatePipe, DecimalPipe, TitleCasePipe } from '@angular/common';
 
           @if (hasMore()) {
             <div class="px-6 py-4 border-t border-neutral-200 dark:border-neutral-800 text-center">
-              <button (click)="loadMore()" [disabled]="loadingMore()"
-                class="px-4 py-2 text-sm bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-700 disabled:opacity-50 transition-colors">
+              <button
+                (click)="loadMore()"
+                [disabled]="loadingMore()"
+                class="px-4 py-2 text-sm bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-700 disabled:opacity-50 transition-colors"
+              >
                 {{ loadingMore() ? 'Carregando...' : 'Carregar mais' }}
               </button>
             </div>
@@ -174,7 +201,10 @@ export class CreditsListPage implements OnInit {
 
   creditIcon(type: CreditType): string {
     const map: Record<CreditType, string> = {
-      PAID: '💳', PROMOTIONAL: '🎁', EARNED: '⭐', BONUS: '🎉',
+      PAID: '💳',
+      PROMOTIONAL: '🎁',
+      EARNED: '⭐',
+      BONUS: '🎉',
     };
     return map[type] ?? '💰';
   }
@@ -193,7 +223,8 @@ export class CreditsListPage implements OnInit {
 
   amountClass(status: CreditStatus): string {
     if (status === 'AVAILABLE') return 'text-green-600 dark:text-green-400';
-    if (status === 'SPENT' || status === 'EXPIRED' || status === 'CANCELLED') return 'text-neutral-400';
+    if (status === 'SPENT' || status === 'EXPIRED' || status === 'CANCELLED')
+      return 'text-neutral-400';
     return 'text-neutral-900 dark:text-white';
   }
 
@@ -211,8 +242,12 @@ export class CreditsListPage implements OnInit {
 
   statusLabel(status: CreditStatus): string {
     const map: Record<CreditStatus, string> = {
-      AVAILABLE: 'Disponível', FROZEN: 'Congelado', SPENT: 'Gasto',
-      CANCELLED: 'Cancelado', REFUNDED: 'Reembolsado', EXPIRED: 'Expirado',
+      AVAILABLE: 'Disponível',
+      FROZEN: 'Congelado',
+      SPENT: 'Gasto',
+      CANCELLED: 'Cancelado',
+      REFUNDED: 'Reembolsado',
+      EXPIRED: 'Expirado',
     };
     return map[status] ?? status;
   }

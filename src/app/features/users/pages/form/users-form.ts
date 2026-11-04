@@ -42,11 +42,22 @@ import { CardComponent } from '../../../../shared/components/card/card';
 
           @if (userId()) {
             <div class="pt-2 border-t border-neutral-200 dark:border-neutral-700">
-              <a [routerLink]="['..', userId(), 'permissions']"
-                class="inline-flex items-center gap-1.5 text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 transition-colors">
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.955 11.955 0 01 3 10.5c0 5.539 3.582 10.28 8.55 11.84a.75.75 0 00.45 0c4.968-1.56 8.55-6.301 8.55-11.84 0-1.592-.304-3.116-.855-4.514L12 5.964z" />
+              <a
+                [routerLink]="['..', userId(), 'permissions']"
+                class="inline-flex items-center gap-1.5 text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 transition-colors"
+              >
+                <svg
+                  class="w-4 h-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.955 11.955 0 01 3 10.5c0 5.539 3.582 10.28 8.55 11.84a.75.75 0 00.45 0c4.968-1.56 8.55-6.301 8.55-11.84 0-1.592-.304-3.116-.855-4.514L12 5.964z"
+                  />
                 </svg>
                 Gerenciar Permissões
               </a>

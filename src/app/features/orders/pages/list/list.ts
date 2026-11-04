@@ -32,13 +32,21 @@ import { Order, OrderStatus, OrderType } from '../../../../core/models/order.mod
       </header>
 
       <div class="flex flex-col gap-3 sm:flex-row">
-        <select class="form-input sm:w-56" [value]="statusFilter()" (change)="onStatus($any($event.target).value)">
+        <select
+          class="form-input sm:w-56"
+          [value]="statusFilter()"
+          (change)="onStatus($any($event.target).value)"
+        >
           <option value="">Todos os status</option>
           @for (s of statusOptions; track s) {
             <option [value]="s">{{ label(s) }}</option>
           }
         </select>
-        <select class="form-input sm:w-48" [value]="typeFilter()" (change)="onType($any($event.target).value)">
+        <select
+          class="form-input sm:w-48"
+          [value]="typeFilter()"
+          (change)="onType($any($event.target).value)"
+        >
           <option value="">Todos os tipos</option>
           <option value="VOICE">Locução</option>
           <option value="PRODUCTION">Produção</option>
@@ -47,7 +55,9 @@ import { Order, OrderStatus, OrderType } from '../../../../core/models/order.mod
 
       @if (loading()) {
         <div class="flex justify-center py-12">
-          <div class="w-6 h-6 border-2 border-neutral-400 border-t-transparent rounded-full animate-spin"></div>
+          <div
+            class="w-6 h-6 border-2 border-neutral-400 border-t-transparent rounded-full animate-spin"
+          ></div>
         </div>
       } @else if (orders().length === 0) {
         <p class="py-12 text-center text-sm text-neutral-500">Nenhum pedido encontrado.</p>
@@ -67,17 +77,25 @@ import { Order, OrderStatus, OrderType } from '../../../../core/models/order.mod
             <tbody class="divide-y divide-neutral-200 dark:divide-neutral-800">
               @for (o of orders(); track o.id) {
                 <tr class="bg-white dark:bg-neutral-950">
-                  <td class="px-4 py-3 font-mono text-xs text-neutral-600 dark:text-neutral-400">{{ o.id.slice(0, 8) }}</td>
+                  <td class="px-4 py-3 font-mono text-xs text-neutral-600 dark:text-neutral-400">
+                    {{ o.id.slice(0, 8) }}
+                  </td>
                   <td class="px-4 py-3">{{ o.lineItems.length }} item(ns)</td>
                   <td class="px-4 py-3 text-right">{{ totalCredits(o) }}</td>
                   <td class="px-4 py-3">{{ o.createdAt | date: 'short' }}</td>
                   <td class="px-4 py-3 text-center">
-                    <span class="inline-flex rounded-full bg-neutral-100 px-2 py-0.5 text-xs text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300">
+                    <span
+                      class="inline-flex rounded-full bg-neutral-100 px-2 py-0.5 text-xs text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300"
+                    >
                       {{ label(o.status) }}
                     </span>
                   </td>
                   <td class="px-4 py-3 text-right">
-                    <a [routerLink]="['../orders', o.id]" class="text-xs text-blue-600 hover:underline dark:text-blue-400">Detalhes</a>
+                    <a
+                      [routerLink]="['../orders', o.id]"
+                      class="text-xs text-blue-600 hover:underline dark:text-blue-400"
+                      >Detalhes</a
+                    >
                   </td>
                 </tr>
               }

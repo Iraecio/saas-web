@@ -12,18 +12,18 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import {
-  ChevronLeft,
-  ChevronRight,
-  Edit3,
-  LoaderCircle,
-  RefreshCw,
-  Search,
-  ShieldCheck,
-  UserRoundX,
-  Users,
-  X,
-  LucideAngularModule,
-} from 'lucide-angular';
+  LucideChevronLeft,
+  LucideChevronRight,
+  LucideEdit3,
+  LucideLoaderCircle,
+  LucideRefreshCw,
+  LucideSearch,
+  LucideShieldCheck,
+  LucideUserRoundX,
+  LucideUsers,
+  LucideX,
+  LucideDynamicIcon,
+} from '@lucide/angular';
 import { filter, switchMap } from 'rxjs';
 import { UserRole } from '../../../../core/models/user.model';
 import { AppStateService } from '../../../../core/services/app-state';
@@ -46,7 +46,7 @@ const ROLE_LABELS: Record<UserRole, string> = {
 @Component({
   selector: 'app-users-list',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DatePipe, LucideAngularModule],
+  imports: [DatePipe, LucideDynamicIcon],
   template: `
     <main class="mx-auto max-w-[1500px] space-y-5 p-4 sm:p-6 lg:p-8">
       <header
@@ -56,7 +56,7 @@ const ROLE_LABELS: Record<UserRole, string> = {
           <div
             class="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.14em] text-brand"
           >
-            <lucide-icon [img]="ShieldCheck" class="size-4" /> Administração da plataforma
+            <svg [lucideIcon]="LucideShieldCheck" class="size-4"></svg> Administração da plataforma
           </div>
           <h1 class="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">Usuários</h1>
           <p class="mt-1 max-w-2xl text-sm leading-6 text-muted">
@@ -70,7 +70,7 @@ const ROLE_LABELS: Record<UserRole, string> = {
           [disabled]="loading()"
           (click)="reload()"
         >
-          <lucide-icon [img]="RefreshCw" class="size-4" [class.animate-spin]="loading()" />
+          <svg [lucideIcon]="LucideRefreshCw" class="size-4" [class.animate-spin]="loading()"></svg>
           Atualizar
         </button>
       </header>
@@ -85,8 +85,8 @@ const ROLE_LABELS: Record<UserRole, string> = {
               <p class="mt-1 text-2xl font-bold tabular-nums text-foreground">{{ total() }}</p>
             </div>
             <span class="flex size-10 items-center justify-center rounded-lg bg-brand/10 text-brand"
-              ><lucide-icon [img]="Users" class="size-5"
-            /></span>
+              ><svg [lucideIcon]="LucideUsers" class="size-5"></svg
+            ></span>
           </div>
         </article>
         <article class="rounded-lg border border-border bg-surface p-4 shadow-sm">
@@ -122,10 +122,10 @@ const ROLE_LABELS: Record<UserRole, string> = {
             <div class="grid gap-3 sm:grid-cols-[minmax(240px,1fr)_220px] lg:w-[580px]">
               <label class="relative block"
                 ><span class="sr-only">Buscar nesta página</span>
-                <lucide-icon
-                  [img]="Search"
+                <svg
+                  [lucideIcon]="LucideSearch"
                   class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted"
-                />
+                ></svg>
                 <input
                   type="search"
                   class="form-input h-11 pl-10 pr-10"
@@ -140,7 +140,7 @@ const ROLE_LABELS: Record<UserRole, string> = {
                     aria-label="Limpar busca"
                     (click)="search.set('')"
                   >
-                    <lucide-icon [img]="X" class="size-4" />
+                    <svg [lucideIcon]="LucideX" class="size-4"></svg>
                   </button>
                 }
               </label>
@@ -168,7 +168,7 @@ const ROLE_LABELS: Record<UserRole, string> = {
             <p class="font-semibold text-danger">Não foi possível carregar os usuários</p>
             <p class="mt-1 text-sm text-muted">{{ error() }}</p>
             <button type="button" class="btn-secondary mt-4" (click)="reload()">
-              <lucide-icon [img]="RefreshCw" class="size-4" /> Tentar novamente
+              <svg [lucideIcon]="LucideRefreshCw" class="size-4"></svg> Tentar novamente
             </button>
           </div>
         } @else if (loading()) {
@@ -176,15 +176,15 @@ const ROLE_LABELS: Record<UserRole, string> = {
             class="flex min-h-72 flex-col items-center justify-center gap-3 text-muted"
             aria-live="polite"
           >
-            <lucide-icon [img]="LoaderCircle" class="size-7 animate-spin text-brand" />
+            <svg [lucideIcon]="LucideLoaderCircle" class="size-7 animate-spin text-brand"></svg>
             <p class="text-sm">Carregando usuários…</p>
           </div>
         } @else if (!visibleUsers().length) {
           <div class="flex min-h-72 flex-col items-center justify-center px-5 text-center">
             <span
               class="flex size-12 items-center justify-center rounded-full bg-surface-subtle text-muted"
-              ><lucide-icon [img]="Users" class="size-6"
-            /></span>
+              ><svg [lucideIcon]="LucideUsers" class="size-6"></svg
+            ></span>
             <h3 class="mt-4 font-semibold text-foreground">Nenhum usuário encontrado</h3>
             <p class="mt-1 max-w-sm text-sm text-muted">
               {{
@@ -300,7 +300,7 @@ const ROLE_LABELS: Record<UserRole, string> = {
                           title="Editar usuário"
                           (click)="edit(user)"
                         >
-                          <lucide-icon [img]="Edit3" class="size-4" />
+                          <svg [lucideIcon]="LucideEdit3" class="size-4"></svg>
                         </button>
                         @if (canDeactivate(user)) {
                           <button
@@ -310,7 +310,7 @@ const ROLE_LABELS: Record<UserRole, string> = {
                             title="Desativar usuário"
                             (click)="deactivate(user)"
                           >
-                            <lucide-icon [img]="UserRoundX" class="size-4" />
+                            <svg [lucideIcon]="LucideUserRoundX" class="size-4"></svg>
                           </button>
                         }
                       </div>
@@ -372,11 +372,11 @@ const ROLE_LABELS: Record<UserRole, string> = {
                 </dl>
                 <div class="mt-4 flex gap-2">
                   <button type="button" class="btn-secondary flex-1" (click)="edit(user)">
-                    <lucide-icon [img]="Edit3" class="size-4" /> Editar
+                    <svg [lucideIcon]="LucideEdit3" class="size-4"></svg> Editar
                   </button>
                   @if (canDeactivate(user)) {
                     <button type="button" class="btn-ghost text-danger" (click)="deactivate(user)">
-                      <lucide-icon [img]="UserRoundX" class="size-4" /> Desativar
+                      <svg [lucideIcon]="LucideUserRoundX" class="size-4"></svg> Desativar
                     </button>
                   }
                 </div>
@@ -399,7 +399,7 @@ const ROLE_LABELS: Record<UserRole, string> = {
                 [disabled]="page() <= 1"
                 (click)="goToPage(page() - 1)"
               >
-                <lucide-icon [img]="ChevronLeft" class="size-4" />
+                <svg [lucideIcon]="LucideChevronLeft" class="size-4"></svg>
                 <span class="hidden sm:inline">Anterior</span></button
               ><span class="min-w-20 text-center text-xs font-semibold text-muted"
                 >{{ page() }} / {{ totalPages() }}</span
@@ -410,7 +410,7 @@ const ROLE_LABELS: Record<UserRole, string> = {
                 (click)="goToPage(page() + 1)"
               >
                 <span class="hidden sm:inline">Próxima</span>
-                <lucide-icon [img]="ChevronRight" class="size-4" />
+                <svg [lucideIcon]="LucideChevronRight" class="size-4"></svg>
               </button>
             </div>
           </footer>
@@ -428,16 +428,16 @@ export class UsersListComponent {
   private readonly resellerService = inject(ResellerService);
   private readonly destroyRef = inject(DestroyRef);
 
-  readonly Search = Search;
-  readonly RefreshCw = RefreshCw;
-  readonly Users = Users;
-  readonly ShieldCheck = ShieldCheck;
-  readonly LoaderCircle = LoaderCircle;
-  readonly X = X;
-  readonly ChevronLeft = ChevronLeft;
-  readonly ChevronRight = ChevronRight;
-  readonly Edit3 = Edit3;
-  readonly UserRoundX = UserRoundX;
+  readonly LucideSearch = LucideSearch;
+  readonly LucideRefreshCw = LucideRefreshCw;
+  readonly LucideUsers = LucideUsers;
+  readonly LucideShieldCheck = LucideShieldCheck;
+  readonly LucideLoaderCircle = LucideLoaderCircle;
+  readonly LucideX = LucideX;
+  readonly LucideChevronLeft = LucideChevronLeft;
+  readonly LucideChevronRight = LucideChevronRight;
+  readonly LucideEdit3 = LucideEdit3;
+  readonly LucideUserRoundX = LucideUserRoundX;
   readonly roles: UserRole[] = [
     'SUPER_ADMIN',
     'ADMIN',

@@ -19,27 +19,47 @@ import { CreditType, CreditOriginType } from '../../../../core/models/wallet.mod
   template: `
     <div class="p-6 max-w-2xl mx-auto space-y-6">
       <header>
-        <h1 class="text-3xl font-bold text-neutral-900 dark:text-white">Emitir / Cancelar Créditos</h1>
+        <h1 class="text-3xl font-bold text-neutral-900 dark:text-white">
+          Emitir / Cancelar Créditos
+        </h1>
         <p class="mt-1 text-sm text-neutral-500">Exclusivo para SUPER_ADMIN</p>
       </header>
 
       <!-- Emitir créditos -->
-      <section class="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 p-6">
+      <section
+        class="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 p-6"
+      >
         <h2 class="text-lg font-semibold mb-4 text-neutral-900 dark:text-white">Emitir Créditos</h2>
 
         <form [formGroup]="issueForm" (ngSubmit)="issueCredits()" class="space-y-4">
           <div class="grid grid-cols-2 gap-4">
             <div class="col-span-2">
-              <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">User ID *</label>
-              <input type="text" formControlName="userId" class="form-input w-full font-mono text-sm"
-                placeholder="UUID do usuário" />
+              <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1"
+                >User ID *</label
+              >
+              <input
+                type="text"
+                formControlName="userId"
+                class="form-input w-full font-mono text-sm"
+                placeholder="UUID do usuário"
+              />
             </div>
             <div>
-              <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">Quantidade *</label>
-              <input type="number" formControlName="amount" min="1" step="1" class="form-input w-full" />
+              <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1"
+                >Quantidade *</label
+              >
+              <input
+                type="number"
+                formControlName="amount"
+                min="1"
+                step="1"
+                class="form-input w-full"
+              />
             </div>
             <div>
-              <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">Tipo *</label>
+              <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1"
+                >Tipo *</label
+              >
               <select formControlName="type" class="form-input w-full text-sm">
                 <option value="PAID">Pago</option>
                 <option value="PROMOTIONAL">Promocional</option>
@@ -48,7 +68,9 @@ import { CreditType, CreditOriginType } from '../../../../core/models/wallet.mod
               </select>
             </div>
             <div>
-              <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">Origem *</label>
+              <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1"
+                >Origem *</label
+              >
               <select formControlName="originType" class="form-input w-full text-sm">
                 <option value="PURCHASE">Compra</option>
                 <option value="SERVICE_PAYMENT">Serviço</option>
@@ -58,21 +80,51 @@ import { CreditType, CreditOriginType } from '../../../../core/models/wallet.mod
               </select>
             </div>
             <div>
-              <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">Valor unitário (centavos) *</label>
-              <input type="number" formControlName="valueCents" min="1" step="1" class="form-input w-full" />
+              <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1"
+                >Valor unitário (centavos) *</label
+              >
+              <input
+                type="number"
+                formControlName="valueCents"
+                min="1"
+                step="1"
+                class="form-input w-full"
+              />
             </div>
             <div>
-              <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">Custo unitário (centavos) *</label>
-              <input type="number" formControlName="costCents" min="0" step="1" class="form-input w-full" />
+              <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1"
+                >Custo unitário (centavos) *</label
+              >
+              <input
+                type="number"
+                formControlName="costCents"
+                min="0"
+                step="1"
+                class="form-input w-full"
+              />
             </div>
             <div>
-              <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">Validade (dias)</label>
-              <input type="number" formControlName="expiresInDays" min="1" max="365" class="form-input w-full" />
+              <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1"
+                >Validade (dias)</label
+              >
+              <input
+                type="number"
+                formControlName="expiresInDays"
+                min="1"
+                max="365"
+                class="form-input w-full"
+              />
             </div>
             <div class="col-span-2">
-              <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">Observação</label>
-              <textarea formControlName="note" rows="2" class="form-input w-full text-sm"
-                placeholder="Motivo da emissão..."></textarea>
+              <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1"
+                >Observação</label
+              >
+              <textarea
+                formControlName="note"
+                rows="2"
+                class="form-input w-full text-sm"
+                placeholder="Motivo da emissão..."
+              ></textarea>
             </div>
           </div>
 
@@ -84,8 +136,11 @@ import { CreditType, CreditOriginType } from '../../../../core/models/wallet.mod
           }
 
           <div class="flex justify-end">
-            <button type="submit" [disabled]="issueForm.invalid || issuingCredits()"
-              class="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50 transition-colors">
+            <button
+              type="submit"
+              [disabled]="issueForm.invalid || issuingCredits()"
+              class="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50 transition-colors"
+            >
               {{ issuingCredits() ? 'Emitindo...' : 'Emitir Crédito' }}
             </button>
           </div>
@@ -93,19 +148,35 @@ import { CreditType, CreditOriginType } from '../../../../core/models/wallet.mod
       </section>
 
       <!-- Cancelar crédito -->
-      <section class="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 p-6">
-        <h2 class="text-lg font-semibold mb-4 text-neutral-900 dark:text-white">Cancelar Crédito</h2>
+      <section
+        class="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 p-6"
+      >
+        <h2 class="text-lg font-semibold mb-4 text-neutral-900 dark:text-white">
+          Cancelar Crédito
+        </h2>
 
         <form [formGroup]="cancelForm" (ngSubmit)="cancelCredit()" class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">Credit ID *</label>
-            <input type="text" formControlName="creditId" class="form-input w-full font-mono text-sm"
-              placeholder="UUID do crédito a cancelar" />
+            <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1"
+              >Credit ID *</label
+            >
+            <input
+              type="text"
+              formControlName="creditId"
+              class="form-input w-full font-mono text-sm"
+              placeholder="UUID do crédito a cancelar"
+            />
           </div>
           <div>
-            <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">Motivo</label>
-            <input type="text" formControlName="reason" class="form-input w-full text-sm"
-              placeholder="Motivo do cancelamento..." />
+            <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1"
+              >Motivo</label
+            >
+            <input
+              type="text"
+              formControlName="reason"
+              class="form-input w-full text-sm"
+              placeholder="Motivo do cancelamento..."
+            />
           </div>
 
           @if (cancelSuccess()) {
@@ -116,8 +187,11 @@ import { CreditType, CreditOriginType } from '../../../../core/models/wallet.mod
           }
 
           <div class="flex justify-end">
-            <button type="submit" [disabled]="cancelForm.invalid || cancelingCredit()"
-              class="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 disabled:opacity-50 transition-colors">
+            <button
+              type="submit"
+              [disabled]="cancelForm.invalid || cancelingCredit()"
+              class="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 disabled:opacity-50 transition-colors"
+            >
               {{ cancelingCredit() ? 'Cancelando...' : 'Cancelar Crédito' }}
             </button>
           </div>
@@ -168,7 +242,8 @@ export class IssueCreditsPage implements OnInit {
     this.issueSuccess.set(false);
     this.issueError.set(undefined);
 
-    const { userId, amount, valueCents, costCents, type, originType, expiresInDays, note } = this.issueForm.getRawValue();
+    const { userId, amount, valueCents, costCents, type, originType, expiresInDays, note } =
+      this.issueForm.getRawValue();
     this.walletAdminService
       .issueCredits({
         toUserId: userId,
@@ -185,7 +260,14 @@ export class IssueCreditsPage implements OnInit {
         next: () => {
           this.issuingCredits.set(false);
           this.issueSuccess.set(true);
-          this.issueForm.reset({ type: 'PAID', originType: 'PURCHASE', amount: 1, valueCents: 1, costCents: 0, expiresInDays: 0 });
+          this.issueForm.reset({
+            type: 'PAID',
+            originType: 'PURCHASE',
+            amount: 1,
+            valueCents: 1,
+            costCents: 0,
+            expiresInDays: 0,
+          });
           setTimeout(() => this.issueSuccess.set(false), 4000);
         },
         error: (err: Error) => {

@@ -11,10 +11,7 @@ import { AppStateService } from '../../../../core/services/app-state';
 import { NotificationService } from '../../../../core/services/notification';
 import { ProfessionalService } from '../../services/professional';
 import { ScopeDialogComponent } from '../scope-dialog/scope-dialog';
-import {
-  Professional,
-  SetScopeDto,
-} from '../../../../core/models/professional.model';
+import { Professional, SetScopeDto } from '../../../../core/models/professional.model';
 import { ServiceScope } from '../../../../core/models/service.model';
 
 type Tab = 'voice-actors' | 'producers';
@@ -56,7 +53,11 @@ type Tab = 'voice-actors' | 'producers';
           </button>
         </div>
 
-        <select class="form-input sm:w-48" [value]="scopeFilter()" (change)="onScope($any($event.target).value)">
+        <select
+          class="form-input sm:w-48"
+          [value]="scopeFilter()"
+          (change)="onScope($any($event.target).value)"
+        >
           <option value="">Todos os escopos</option>
           <option value="GLOBAL">Global</option>
           <option value="PARTICULAR">Particular</option>
@@ -65,7 +66,9 @@ type Tab = 'voice-actors' | 'producers';
 
       @if (loading()) {
         <div class="flex justify-center py-12">
-          <div class="w-6 h-6 border-2 border-neutral-400 border-t-transparent rounded-full animate-spin"></div>
+          <div
+            class="w-6 h-6 border-2 border-neutral-400 border-t-transparent rounded-full animate-spin"
+          ></div>
         </div>
       } @else if (professionals().length === 0) {
         <p class="py-12 text-center text-sm text-neutral-500">Nenhum profissional encontrado.</p>
@@ -83,12 +86,19 @@ type Tab = 'voice-actors' | 'producers';
             <tbody class="divide-y divide-neutral-200 dark:divide-neutral-800">
               @for (p of professionals(); track p.id) {
                 <tr class="bg-white dark:bg-neutral-950">
-                  <td class="px-4 py-3 font-medium text-neutral-900 dark:text-white">{{ p.name }}</td>
+                  <td class="px-4 py-3 font-medium text-neutral-900 dark:text-white">
+                    {{ p.name }}
+                  </td>
                   <td class="px-4 py-3">{{ p.scope === 'GLOBAL' ? 'Global' : 'Particular' }}</td>
                   <td class="px-4 py-3">{{ p.verificationStatus ?? '—' }}</td>
                   <td class="px-4 py-3 text-right">
                     @if (canSetScope()) {
-                      <button class="text-xs text-blue-600 hover:underline dark:text-blue-400" (click)="openDialog(p)">Definir escopo</button>
+                      <button
+                        class="text-xs text-blue-600 hover:underline dark:text-blue-400"
+                        (click)="openDialog(p)"
+                      >
+                        Definir escopo
+                      </button>
                     }
                   </td>
                 </tr>
@@ -176,7 +186,9 @@ export class ProfessionalsListPage {
       error: (err) => {
         this.saving.set(false);
         // 409 = profissional com pedidos ativos; a API rejeita a alteração.
-        this.notify.error(err.message ?? 'Não foi possível alterar o escopo (pode haver pedidos ativos).');
+        this.notify.error(
+          err.message ?? 'Não foi possível alterar o escopo (pode haver pedidos ativos).',
+        );
       },
     });
   }

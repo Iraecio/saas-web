@@ -1,10 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  DestroyRef,
-  inject,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NotificationService } from '../../../../core/services/notification';
@@ -23,7 +17,11 @@ import { WithdrawalRequest, WithdrawalStatus } from '../../../../core/models/wit
         <p class="mt-1 text-sm text-neutral-500">Processe e confirme pagamentos de saque</p>
       </header>
 
-      <select class="form-input sm:w-56" [value]="statusFilter()" (change)="onStatus($any($event.target).value)">
+      <select
+        class="form-input sm:w-56"
+        [value]="statusFilter()"
+        (change)="onStatus($any($event.target).value)"
+      >
         <option value="">Todos os status</option>
         <option value="PENDING">Pendente</option>
         <option value="PROCESSING">Processando</option>
@@ -33,41 +31,92 @@ import { WithdrawalRequest, WithdrawalStatus } from '../../../../core/models/wit
 
       @if (loading()) {
         <div class="flex justify-center py-12">
-          <div class="w-6 h-6 border-2 border-neutral-400 border-t-transparent rounded-full animate-spin"></div>
+          <div
+            class="w-6 h-6 border-2 border-neutral-400 border-t-transparent rounded-full animate-spin"
+          ></div>
         </div>
       } @else if (withdrawals().length === 0) {
         <p class="py-12 text-center text-sm text-neutral-500">Nenhum saque encontrado.</p>
       } @else {
         <ul class="space-y-2">
           @for (w of withdrawals(); track w.id) {
-            <li class="rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-950">
+            <li
+              class="rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-950"
+            >
               <div class="flex items-center justify-between">
                 <div>
-                  <span class="text-sm font-medium">{{ w.creditAmount }} créditos — R$ {{ (w.amountCents / 100) | number: '1.2-2' }}</span>
-                  <p class="text-xs text-neutral-500">{{ w.requestedAt | date: 'short' }} · {{ statusLabel(w.status) }}</p>
+                  <span class="text-sm font-medium"
+                    >{{ w.creditAmount }} créditos — R$
+                    {{ w.amountCents / 100 | number: '1.2-2' }}</span
+                  >
+                  <p class="text-xs text-neutral-500">
+                    {{ w.requestedAt | date: 'short' }} · {{ statusLabel(w.status) }}
+                  </p>
                 </div>
                 <div class="flex gap-2">
                   @if (w.status === 'PENDING') {
-                    <button class="rounded-md border border-neutral-300 px-3 py-1.5 text-sm hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800" (click)="process(w)">Processar</button>
-                    <button class="rounded-md border border-neutral-300 px-3 py-1.5 text-sm hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800" (click)="openReject(w)">Rejeitar</button>
+                    <button
+                      class="rounded-md border border-neutral-300 px-3 py-1.5 text-sm hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
+                      (click)="process(w)"
+                    >
+                      Processar
+                    </button>
+                    <button
+                      class="rounded-md border border-neutral-300 px-3 py-1.5 text-sm hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
+                      (click)="openReject(w)"
+                    >
+                      Rejeitar
+                    </button>
                   }
                   @if (w.status === 'PROCESSING') {
-                    <button class="rounded-md border border-neutral-300 px-3 py-1.5 text-sm hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800" (click)="openComplete(w)">Confirmar pagamento</button>
-                    <button class="rounded-md border border-neutral-300 px-3 py-1.5 text-sm hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800" (click)="openReject(w)">Rejeitar</button>
+                    <button
+                      class="rounded-md border border-neutral-300 px-3 py-1.5 text-sm hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
+                      (click)="openComplete(w)"
+                    >
+                      Confirmar pagamento
+                    </button>
+                    <button
+                      class="rounded-md border border-neutral-300 px-3 py-1.5 text-sm hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
+                      (click)="openReject(w)"
+                    >
+                      Rejeitar
+                    </button>
                   }
                 </div>
               </div>
 
               @if (completeTarget() === w.id) {
                 <div class="mt-3 flex gap-2">
-                  <input class="form-input flex-1" placeholder="Referência do pagamento (PIX, TED...)" [value]="paymentRef()" (input)="paymentRef.set($any($event.target).value)" />
-                  <button class="btn-primary" [disabled]="!paymentRef().trim()" (click)="complete(w)">Confirmar</button>
+                  <input
+                    class="form-input flex-1"
+                    placeholder="Referência do pagamento (PIX, TED...)"
+                    [value]="paymentRef()"
+                    (input)="paymentRef.set($any($event.target).value)"
+                  />
+                  <button
+                    class="btn-primary"
+                    [disabled]="!paymentRef().trim()"
+                    (click)="complete(w)"
+                  >
+                    Confirmar
+                  </button>
                 </div>
               }
               @if (rejectTarget() === w.id) {
                 <div class="mt-3 flex gap-2">
-                  <input class="form-input flex-1" placeholder="Motivo da rejeição" [value]="rejectReason()" (input)="rejectReason.set($any($event.target).value)" />
-                  <button class="btn-primary" [disabled]="!rejectReason().trim()" (click)="reject(w)">Rejeitar</button>
+                  <input
+                    class="form-input flex-1"
+                    placeholder="Motivo da rejeição"
+                    [value]="rejectReason()"
+                    (input)="rejectReason.set($any($event.target).value)"
+                  />
+                  <button
+                    class="btn-primary"
+                    [disabled]="!rejectReason().trim()"
+                    (click)="reject(w)"
+                  >
+                    Rejeitar
+                  </button>
                 </div>
               }
             </li>

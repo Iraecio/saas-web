@@ -21,21 +21,19 @@ type Tab = 'voice-actors' | 'producers';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [ScopeDialogComponent],
   template: `
-    <div class="p-6 max-w-5xl mx-auto space-y-6">
-      <header>
-        <h1 class="text-3xl font-bold text-neutral-900 dark:text-white">Profissionais</h1>
-        <p class="mt-1 text-sm text-neutral-500">Locutores e produtores disponíveis</p>
+    <main class="kuber-page max-w-5xl space-y-5">
+      <header class="kuber-page-header">
+        <h1>Profissionais</h1>
+        <p class="mt-1 text-sm text-muted">Locutores e produtores disponíveis</p>
       </header>
 
-      <div class="flex flex-wrap gap-3">
+      <section class="kuber-table-toolbar flex flex-wrap gap-3 rounded-lg border border-border">
         <div class="flex rounded-lg border border-neutral-200 dark:border-neutral-800">
           <button
             type="button"
             class="px-4 py-2 text-sm"
-            [class.bg-neutral-900]="tab() === 'voice-actors'"
+            [class.bg-brand]="tab() === 'voice-actors'"
             [class.text-white]="tab() === 'voice-actors'"
-            [class.dark:bg-white]="tab() === 'voice-actors'"
-            [class.dark:text-neutral-900]="tab() === 'voice-actors'"
             (click)="setTab('voice-actors')"
           >
             Locutores
@@ -43,10 +41,8 @@ type Tab = 'voice-actors' | 'producers';
           <button
             type="button"
             class="px-4 py-2 text-sm"
-            [class.bg-neutral-900]="tab() === 'producers'"
+            [class.bg-brand]="tab() === 'producers'"
             [class.text-white]="tab() === 'producers'"
-            [class.dark:bg-white]="tab() === 'producers'"
-            [class.dark:text-neutral-900]="tab() === 'producers'"
             (click)="setTab('producers')"
           >
             Produtores
@@ -62,7 +58,7 @@ type Tab = 'voice-actors' | 'producers';
           <option value="GLOBAL">Global</option>
           <option value="PARTICULAR">Particular</option>
         </select>
-      </div>
+      </section>
 
       @if (loading()) {
         <div class="flex justify-center py-12">
@@ -71,9 +67,9 @@ type Tab = 'voice-actors' | 'producers';
           ></div>
         </div>
       } @else if (professionals().length === 0) {
-        <p class="py-12 text-center text-sm text-neutral-500">Nenhum profissional encontrado.</p>
+        <div class="kuber-empty-state">Nenhum profissional encontrado.</div>
       } @else {
-        <div class="overflow-x-auto rounded-xl border border-neutral-200 dark:border-neutral-800">
+        <div class="kuber-table-shell overflow-x-auto">
           <table class="w-full text-sm">
             <thead class="bg-neutral-50 dark:bg-neutral-900 text-left text-neutral-500">
               <tr>
@@ -107,7 +103,7 @@ type Tab = 'voice-actors' | 'producers';
           </table>
         </div>
       }
-    </div>
+    </main>
 
     @if (dialogTarget(); as target) {
       <app-scope-dialog

@@ -31,11 +31,11 @@ import { WalletService } from '../../../features/wallet/services/wallet';
   imports: [DatePipe, DecimalPipe, LucideDynamicIcon, RouterLink],
   template: `
     <header
-      class="flex h-16 items-center justify-between border-b border-border bg-surface px-4 text-foreground sm:px-6"
+      class="relative z-20 flex h-[var(--ui-header-height)] shrink-0 items-center justify-between border-b border-brand-hover bg-brand px-4 text-white shadow-[0_2px_12px_rgb(0_50_110/22%)] sm:px-6"
     >
       <button
         type="button"
-        class="rounded-lg p-2 text-neutral-600 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-700"
+        class="inline-flex size-10 items-center justify-center rounded-md text-white/85 transition-colors hover:bg-white/12 hover:text-white"
         (click)="toggleSidebar.emit()"
         aria-label="Alternar sidebar"
       >
@@ -46,7 +46,7 @@ import { WalletService } from '../../../features/wallet/services/wallet';
         @if (isClient()) {
           <a
             routerLink="/admin/wallet"
-            class="flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-sm font-semibold text-amber-700 hover:bg-amber-50 dark:text-amber-300 dark:hover:bg-amber-900/20"
+            class="flex min-h-10 items-center gap-1.5 rounded-md bg-white/12 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-white/18"
             aria-label="Abrir minha carteira"
           >
             <svg [lucideIcon]="LucideCircleDollarSign" class="size-5"></svg>
@@ -54,14 +54,14 @@ import { WalletService } from '../../../features/wallet/services/wallet';
               <span class="h-4 w-8 animate-pulse rounded bg-neutral-200 dark:bg-neutral-700"></span>
             } @else {
               <span>{{ availableCredits() | number: '1.0-0' }}</span>
-              <span class="hidden font-normal text-neutral-500 sm:inline">créditos</span>
+              <span class="hidden font-normal text-white/70 sm:inline">créditos</span>
             }
           </a>
 
           <div class="relative">
             <button
               type="button"
-              class="relative rounded-lg p-2 text-neutral-600 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-700"
+              class="relative inline-flex size-10 items-center justify-center rounded-md text-white/85 transition-colors hover:bg-white/12 hover:text-white"
               (click)="toggleNotifications($event)"
               [attr.aria-expanded]="notificationsOpen()"
               aria-label="Notificações"
@@ -78,11 +78,11 @@ import { WalletService } from '../../../features/wallet/services/wallet';
 
             @if (notificationsOpen()) {
               <div
-                class="absolute right-0 z-50 mt-2 w-80 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-xl dark:border-neutral-700 dark:bg-neutral-800"
+                class="kuber-popover absolute right-0 z-50 mt-2 w-80 max-w-[calc(100vw-2rem)]"
                 (click)="$event.stopPropagation()"
               >
-                <div class="border-b border-neutral-200 px-4 py-3 dark:border-neutral-700">
-                  <p class="font-semibold text-neutral-900 dark:text-white">Notificações</p>
+                <div class="border-b border-border px-4 py-3">
+                  <p class="font-semibold text-foreground">Notificações</p>
                 </div>
                 <div class="max-h-80 overflow-y-auto">
                   @if (loadingNotifications()) {
@@ -94,12 +94,12 @@ import { WalletService } from '../../../features/wallet/services/wallet';
                   } @else {
                     @for (notification of notifications(); track notification.createdAt) {
                       <div
-                        class="border-b border-neutral-100 px-4 py-3 last:border-0 dark:border-neutral-700"
+                        class="border-b border-border px-4 py-3 transition-colors last:border-0 hover:bg-surface-subtle"
                       >
-                        <p class="text-sm text-neutral-800 dark:text-neutral-100">
+                        <p class="text-sm text-foreground">
                           {{ notification.message }}
                         </p>
-                        <p class="mt-1 text-xs text-neutral-500">
+                        <p class="mt-1 text-xs text-muted">
                           {{ notification.createdAt | date: 'dd/MM/yyyy HH:mm' }}
                         </p>
                       </div>
@@ -108,7 +108,7 @@ import { WalletService } from '../../../features/wallet/services/wallet';
                 </div>
                 <a
                   routerLink="/admin/wallet"
-                  class="block border-t border-neutral-200 px-4 py-2.5 text-center text-sm font-medium text-violet-600 hover:bg-neutral-50 dark:border-neutral-700 dark:text-violet-400 dark:hover:bg-neutral-700"
+                  class="block border-t border-border px-4 py-2.5 text-center text-sm font-medium text-brand transition-colors hover:bg-surface-subtle"
                   (click)="notificationsOpen.set(false)"
                 >
                   Ver minha carteira
@@ -120,7 +120,7 @@ import { WalletService } from '../../../features/wallet/services/wallet';
 
         <button
           type="button"
-          class="rounded-lg p-2 text-neutral-600 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-700"
+          class="inline-flex size-10 items-center justify-center rounded-md text-white/85 transition-colors hover:bg-white/12 hover:text-white"
           (click)="appState.toggleTheme()"
           [attr.aria-label]="appState.theme() === 'dark' ? 'Tema claro' : 'Tema escuro'"
         >
@@ -128,33 +128,33 @@ import { WalletService } from '../../../features/wallet/services/wallet';
         </button>
 
         @if (appState.user(); as user) {
-          <div class="relative border-l border-neutral-200 pl-2 sm:pl-3 dark:border-neutral-700">
+          <div class="relative border-l border-white/20 pl-2 sm:pl-3">
             <button
               type="button"
-              class="flex items-center gap-2 rounded-lg px-2 py-1.5 text-left hover:bg-neutral-100 dark:hover:bg-neutral-700"
+              class="flex min-h-10 items-center gap-2 rounded-md px-2 py-1.5 text-left transition-colors hover:bg-white/12"
               (click)="toggleUserMenu($event)"
               [attr.aria-expanded]="userMenuOpen()"
               aria-label="Abrir menu do usuário"
             >
               <div class="hidden text-right sm:block">
-                <p class="max-w-44 truncate text-sm font-medium text-neutral-900 dark:text-white">
+                <p class="max-w-44 truncate text-sm font-medium text-white">
                   {{ user.name || user.email }}
                 </p>
                 @if (user.role !== 'CLIENT') {
-                  <p class="text-xs text-neutral-500">{{ user.role }}</p>
+                  <p class="text-xs text-white/65">{{ user.role }}</p>
                 }
               </div>
               <div
-                class="flex size-8 items-center justify-center rounded-full bg-violet-100 text-sm font-bold text-violet-700 dark:bg-violet-900/30 dark:text-violet-300"
+                class="flex size-9 items-center justify-center rounded-lg bg-white/16 text-sm font-semibold text-white ring-1 ring-white/15"
               >
                 {{ (user.name || user.email)[0].toUpperCase() }}
               </div>
-              <svg [lucideIcon]="LucideChevronDown" class="size-4 text-neutral-500"></svg>
+              <svg [lucideIcon]="LucideChevronDown" class="size-4 text-white/70"></svg>
             </button>
 
             @if (userMenuOpen()) {
               <div
-                class="absolute right-0 z-50 mt-2 w-56 overflow-hidden rounded-xl border border-neutral-200 bg-white py-1 shadow-xl dark:border-neutral-700 dark:bg-neutral-800"
+                class="kuber-popover absolute right-0 z-50 mt-2 w-56 py-1"
                 (click)="$event.stopPropagation()"
               >
                 <a routerLink="/admin/settings" class="menu-item" (click)="userMenuOpen.set(false)">
@@ -192,10 +192,8 @@ import { WalletService } from '../../../features/wallet/services/wallet';
       transition: background-color 150ms;
     }
     .menu-item:hover {
-      background-color: rgb(245 245 245);
-    }
-    :host-context(.dark) .menu-item:hover {
-      background-color: rgb(64 64 64);
+      background-color: var(--ui-surface-subtle);
+      color: var(--ui-primary);
     }
   `,
 })

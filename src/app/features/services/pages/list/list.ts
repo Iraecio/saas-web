@@ -19,18 +19,20 @@ import { ProfessionalRole, Service } from '../../../../core/models/service.model
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterLink, DecimalPipe],
   template: `
-    <div class="p-6 max-w-6xl mx-auto space-y-6">
-      <header class="flex items-center justify-between">
+    <main class="kuber-page max-w-6xl space-y-5">
+      <header class="kuber-page-header flex items-center justify-between">
         <div>
-          <h1 class="text-3xl font-bold text-neutral-900 dark:text-white">Catálogo de Serviços</h1>
-          <p class="mt-1 text-sm text-neutral-500">
+          <h1>Catálogo de serviços</h1>
+          <p class="mt-1 text-sm text-muted">
             {{ isReseller() ? 'Serviços da sua revenda' : 'Serviços da plataforma e das revendas' }}
           </p>
         </div>
         <a routerLink="../services/new" class="btn-primary">+ Novo serviço</a>
       </header>
 
-      <div class="flex flex-col gap-3 sm:flex-row">
+      <section
+        class="kuber-table-toolbar flex flex-col gap-3 rounded-lg border border-border sm:flex-row sm:items-center"
+      >
         <select
           class="form-input sm:w-56"
           [value]="roleFilter()"
@@ -51,7 +53,7 @@ import { ProfessionalRole, Service } from '../../../../core/models/service.model
             Incluir inativos
           </label>
         }
-      </div>
+      </section>
 
       @if (loading()) {
         <div class="flex justify-center py-12">
@@ -60,9 +62,9 @@ import { ProfessionalRole, Service } from '../../../../core/models/service.model
           ></div>
         </div>
       } @else if (services().length === 0) {
-        <p class="py-12 text-center text-sm text-neutral-500">Nenhum serviço encontrado.</p>
+        <div class="kuber-empty-state">Nenhum serviço encontrado.</div>
       } @else {
-        <div class="overflow-x-auto rounded-xl border border-neutral-200 dark:border-neutral-800">
+        <div class="kuber-table-shell overflow-x-auto">
           <table class="w-full text-sm">
             <thead class="bg-neutral-50 dark:bg-neutral-900 text-left text-neutral-500">
               <tr>
@@ -135,7 +137,7 @@ import { ProfessionalRole, Service } from '../../../../core/models/service.model
           </table>
         </div>
       }
-    </div>
+    </main>
   `,
 })
 export class ServicesListPage {

@@ -14,13 +14,15 @@ type Row = Record<string, unknown>;
   selector: 'app-table',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="overflow-x-auto rounded-lg">
+    <div
+      class="overflow-x-auto rounded-lg border border-border bg-surface shadow-[var(--ui-shadow-sm)]"
+    >
       <table class="w-full border-collapse">
-        <thead class="border-b border-neutral-200 dark:border-neutral-800">
+        <thead class="border-b border-border bg-surface-subtle">
           <tr>
             @for (col of columns(); track col.key) {
               <th
-                class="table-cell select-none text-left text-xs font-medium uppercase tracking-wide text-neutral-500 dark:text-neutral-400"
+                class="table-cell select-none text-left text-xs font-semibold tracking-wide text-muted"
                 [style.width]="col.width ?? null"
                 [class.cursor-pointer]="col.sortable"
                 (click)="col.sortable && toggleSort(col.key)"
@@ -32,9 +34,7 @@ type Row = Record<string, unknown>;
               </th>
             }
             @if (showActions()) {
-              <th
-                class="table-cell text-right text-xs font-medium uppercase tracking-wide text-neutral-500 dark:text-neutral-400"
-              >
+              <th class="table-cell text-right text-xs font-semibold tracking-wide text-muted">
                 Ações
               </th>
             }
@@ -43,7 +43,7 @@ type Row = Record<string, unknown>;
         <tbody>
           @for (row of pagedRows(); track trackKey(row); let i = $index) {
             <tr
-              class="border-b border-neutral-100 transition-colors hover:bg-neutral-50 dark:border-neutral-800 dark:hover:bg-neutral-800/50"
+              class="border-b border-border transition-colors last:border-0 hover:bg-surface-subtle"
             >
               @for (col of columns(); track col.key) {
                 <td class="table-cell">
@@ -53,13 +53,13 @@ type Row = Record<string, unknown>;
               @if (showActions()) {
                 <td class="table-cell text-right">
                   <button
-                    class="mr-4 text-sm text-neutral-600 underline-offset-2 hover:text-neutral-900 hover:underline dark:text-neutral-400 dark:hover:text-white"
+                    class="mr-4 text-sm font-medium text-brand underline-offset-2 hover:underline"
                     (click)="rowEdit.emit(row)"
                   >
                     Editar
                   </button>
                   <button
-                    class="text-sm text-neutral-600 underline-offset-2 hover:text-neutral-900 hover:underline dark:text-neutral-400 dark:hover:text-white"
+                    class="text-sm font-medium text-danger underline-offset-2 hover:underline"
                     (click)="rowDelete.emit(row)"
                   >
                     Excluir
@@ -70,7 +70,7 @@ type Row = Record<string, unknown>;
           } @empty {
             <tr>
               <td
-                class="table-cell text-center text-neutral-500"
+                class="table-cell py-10 text-center text-muted"
                 [attr.colspan]="columns().length + (showActions() ? 1 : 0)"
               >
                 Nenhum registro encontrado.
@@ -83,7 +83,7 @@ type Row = Record<string, unknown>;
 
     @if (totalPages() > 1) {
       <nav class="mt-4 flex items-center justify-between">
-        <p class="text-sm text-neutral-500">
+        <p class="text-sm text-muted">
           Página {{ page() }} de {{ totalPages() }} — {{ sortedRows().length }} itens
         </p>
         <div class="flex gap-2">

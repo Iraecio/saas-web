@@ -104,20 +104,22 @@ const DIRECT_CLIENT_MENU: MenuItem[] = [
   imports: [RouterLink, RouterLinkActive],
   template: `
     <aside
-      class="flex h-full flex-col border-r border-border bg-surface text-foreground transition-all duration-300"
+      class="relative z-30 flex h-dvh shrink-0 flex-col border-r border-border bg-surface text-foreground shadow-[var(--ui-shadow-sm)] transition-[width] duration-300"
       [class]="widthClasses()"
     >
-      <div class="flex h-16 items-center justify-center border-b border-border px-6">
-        <h2 class="text-xl font-bold text-foreground">
+      <div class="flex h-[var(--ui-header-height)] items-center border-b border-border px-5">
+        <h2 class="flex items-center gap-3 text-lg font-semibold tracking-tight text-foreground">
+          <span
+            class="grid size-9 shrink-0 place-items-center rounded-lg bg-brand text-sm font-bold text-white shadow-[0_3px_8px_rgb(0_92_187/25%)]"
+            >S</span
+          >
           @if (open()) {
-            <span>SaaS Web</span>
-          } @else {
-            <span>SW</span>
+            <span>Studio SaaS</span>
           }
         </h2>
       </div>
 
-      <nav class="flex-1 space-y-1 overflow-y-auto p-4">
+      <nav class="flex-1 space-y-1 overflow-y-auto px-4 py-5" aria-label="Navegação principal">
         @for (item of menuItems(); track item.route) {
           <a
             [routerLink]="item.route"
@@ -125,12 +127,14 @@ const DIRECT_CLIENT_MENU: MenuItem[] = [
             [routerLinkActiveOptions]="{ exact: true }"
             class="sidebar-item"
           >
-            <span class="text-xl">{{ item.icon }}</span>
+            <span class="grid size-6 shrink-0 place-items-center text-base grayscale-[.25]">{{
+              item.icon
+            }}</span>
             @if (open()) {
-              <span class="text-sm font-medium">{{ item.label }}</span>
+              <span class="truncate text-sm">{{ item.label }}</span>
               @if (item.badge) {
                 <span
-                  class="ml-auto rounded-full bg-danger px-2 py-0.5 text-xs font-bold text-white"
+                  class="ml-auto rounded-sm bg-danger px-1.5 py-0.5 text-[10px] font-semibold text-white"
                 >
                   {{ item.badge }}
                 </span>
@@ -140,33 +144,33 @@ const DIRECT_CLIENT_MENU: MenuItem[] = [
         }
       </nav>
 
-      <div class="border-t border-neutral-200 p-4 dark:border-neutral-700">
+      <div class="border-t border-border p-4">
         @if (open()) {
           <div class="flex items-center gap-2">
             <div
-              class="flex h-7 w-7 items-center justify-center rounded-full bg-violet-100 text-xs font-bold text-violet-700 dark:bg-violet-900/30 dark:text-violet-300"
+              class="flex size-9 items-center justify-center rounded-lg bg-brand/10 text-xs font-semibold text-brand"
             >
               {{ appState.userName()[0]?.toUpperCase() }}
             </div>
             <div class="min-w-0">
-              <p class="truncate text-xs font-medium text-neutral-700 dark:text-neutral-300">
+              <p class="truncate text-xs font-medium text-foreground">
                 {{ appState.userName() }}
               </p>
               @if (roleLabel(); as label) {
-                <p class="text-xs text-neutral-400">{{ label }}</p>
+                <p class="text-[11px] text-muted">{{ label }}</p>
               }
             </div>
           </div>
         } @else {
           <div class="flex justify-center">
             <div
-              class="flex h-7 w-7 items-center justify-center rounded-full bg-violet-100 text-xs font-bold text-violet-700 dark:bg-violet-900/30"
+              class="flex size-9 items-center justify-center rounded-lg bg-brand/10 text-xs font-semibold text-brand"
             >
               {{ appState.userName()[0]?.toUpperCase() }}
             </div>
           </div>
         }
-        <p class="mt-2 text-xs text-neutral-400">{{ open() ? 'v0.1.0' : '' }}</p>
+        <p class="mt-2 text-[10px] text-muted/70">{{ open() ? 'v0.1.0' : '' }}</p>
       </div>
     </aside>
   `,
@@ -176,7 +180,9 @@ export class SidebarComponent {
   protected readonly appState = inject(AppStateService);
   protected readonly inspection = inject(ImpersonationService);
 
-  readonly widthClasses = computed(() => (this.open() ? 'w-64' : 'w-20'));
+  readonly widthClasses = computed(() =>
+    this.open() ? 'w-[var(--ui-sidebar-width)]' : 'w-[var(--ui-sidebar-compact-width)]',
+  );
 
   readonly menuItems = computed((): MenuItem[] => {
     const user = this.appState.user();

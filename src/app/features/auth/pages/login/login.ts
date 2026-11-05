@@ -23,258 +23,302 @@ import { UserRole } from '../../../../core/models/user.model';
   imports: [ReactiveFormsModule, RouterLink],
   template: `
     <div
-      class="min-h-screen w-full flex items-center justify-center bg-black p-6 relative overflow-hidden"
+      class="relative flex min-h-dvh w-full items-center justify-center overflow-hidden p-4 sm:p-6"
     >
       <div
-        class="absolute inset-0 bg-[radial-gradient(ellipse_50%_70%_at_center,rgba(0,0,0,0.85)_0%,transparent_80%)] pointer-events-none"
+        class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_15%,rgb(255_255_255/70%),transparent_32%),radial-gradient(circle_at_85%_80%,rgb(0_92_187/13%),transparent_34%)]"
       ></div>
 
       <div
-        class="w-full max-w-md relative z-10 bg-neutral-950/85 backdrop-blur-2xl rounded-2xl p-8 border border-white/20 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.8)] ring-1 ring-white/5"
+        class="relative z-10 grid w-full max-w-[960px] overflow-hidden rounded-[24px] border border-white/60 bg-surface shadow-[0_24px_60px_rgb(58_74_96/20%)] lg:grid-cols-[1.04fr_.96fr]"
       >
-        <!-- Logo Mobile -->
-        <div class="lg:hidden mb-8">
-          <h1 class="text-2xl font-bold text-white">SaaS Web</h1>
-          <p class="text-neutral-400 mt-1">Painel administrativo</p>
-        </div>
+        <section class="p-6 sm:p-10 lg:p-12">
+          <div class="mx-auto w-full max-w-[360px]">
+            <div class="mb-8 flex items-center gap-3">
+              <span
+                class="grid size-11 place-items-center rounded-xl bg-brand text-base font-bold text-white shadow-[0_5px_14px_rgb(0_92_187/28%)]"
+                >S</span
+              >
+              <div>
+                <h1 class="text-lg font-semibold text-foreground">Studio SaaS</h1>
+                <p class="text-xs text-muted">Gestão de produção de áudio</p>
+              </div>
+            </div>
 
-        <!-- Cabeçalho -->
-        <div class="mb-8">
-          <h2 class="text-3xl font-bold text-white">Entrar</h2>
-          <p class="text-neutral-400 mt-2">Acesse sua conta para continuar</p>
-        </div>
+            <!-- Cabeçalho -->
+            <div class="mb-8">
+              <h2 class="text-[28px] font-semibold tracking-tight text-foreground">Entrar</h2>
+              <p class="mt-2 text-sm text-muted">Informe suas credenciais para acessar o painel.</p>
+            </div>
 
-        <!-- Formulário -->
-        <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-6">
-          <!-- Email Input -->
-          <div class="group">
-            <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
-              Email
-            </label>
-            <div class="relative">
-              <input
-                type="email"
-                formControlName="email"
-                autocomplete="email"
-                placeholder="seu@email.com"
-                class="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-600 focus:outline-none focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white focus:border-transparent transition-all"
-                required
-              />
-              @if (form.get('email')?.valid && form.get('email')?.touched) {
-                <span class="absolute right-3 top-3 text-green-500">✓</span>
+            <!-- Formulário -->
+            <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-5">
+              <!-- Email Input -->
+              <div class="group">
+                <label class="mb-2 block text-sm font-medium text-foreground"> Email </label>
+                <div class="relative">
+                  <input
+                    type="email"
+                    formControlName="email"
+                    autocomplete="email"
+                    placeholder="seu@email.com"
+                    class="form-input h-12 px-4"
+                    required
+                  />
+                  @if (form.get('email')?.valid && form.get('email')?.touched) {
+                    <span class="absolute right-3 top-3 text-green-500">✓</span>
+                  }
+                </div>
+                @if (form.get('email')?.invalid && form.get('email')?.touched) {
+                  <p class="text-xs text-red-500 mt-1">
+                    {{
+                      form.get('email')?.errors?.['required']
+                        ? 'Email é obrigatório'
+                        : 'Email inválido'
+                    }}
+                  </p>
+                }
+              </div>
+
+              <!-- Senha Input -->
+              <div class="group">
+                <div class="mb-2 flex items-center justify-between">
+                  <label class="block text-sm font-medium text-foreground"> Senha </label>
+                  <a
+                    routerLink="/auth/forgot-password"
+                    class="text-sm font-medium text-brand transition-colors hover:text-brand-hover hover:underline"
+                  >
+                    Esqueceu?
+                  </a>
+                </div>
+                <div class="relative">
+                  <input
+                    [type]="showPassword() ? 'text' : 'password'"
+                    formControlName="password"
+                    autocomplete="current-password"
+                    placeholder="••••••••"
+                    class="form-input h-12 px-4 pr-12"
+                    required
+                  />
+                  <button
+                    type="button"
+                    (click)="togglePassword()"
+                    [attr.aria-label]="showPassword() ? 'Ocultar senha' : 'Mostrar senha'"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-muted transition-colors hover:bg-surface-subtle hover:text-brand"
+                  >
+                    @if (showPassword()) {
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        class="w-5 h-5"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.244 7.244 3.228 3.228m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88"
+                        />
+                      </svg>
+                    } @else {
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        class="w-5 h-5"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
+                        />
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                        />
+                      </svg>
+                    }
+                  </button>
+                </div>
+                @if (form.get('password')?.invalid && form.get('password')?.touched) {
+                  <p class="text-xs text-red-500 mt-1">Mínimo 8 caracteres</p>
+                }
+              </div>
+
+              <!-- Mensagem de Erro -->
+              @if (error()) {
+                <div
+                  class="px-4 py-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50 rounded-lg text-sm text-red-700 dark:text-red-400 flex items-start gap-3"
+                >
+                  <span class="text-lg flex-shrink-0">⚠️</span>
+                  <span>{{ error() }}</span>
+                </div>
               }
-            </div>
-            @if (form.get('email')?.invalid && form.get('email')?.touched) {
-              <p class="text-xs text-red-500 mt-1">
-                {{
-                  form.get('email')?.errors?.['required'] ? 'Email é obrigatório' : 'Email inválido'
-                }}
-              </p>
-            }
-          </div>
 
-          <!-- Senha Input -->
-          <div class="group">
-            <div class="flex items-center justify-between mb-2">
-              <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
-                Senha
-              </label>
-              <a
-                routerLink="/auth/forgot-password"
-                class="text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors"
-              >
-                Esqueceu?
-              </a>
-            </div>
-            <div class="relative">
-              <input
-                [type]="showPassword() ? 'text' : 'password'"
-                formControlName="password"
-                autocomplete="current-password"
-                placeholder="••••••••"
-                class="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-600 focus:outline-none focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white focus:border-transparent transition-all"
-                required
-              />
+              <!-- Checkbox Lembrar -->
+              <div class="flex items-center">
+                <input
+                  type="checkbox"
+                  id="remember"
+                  class="w-4 h-4 rounded border-neutral-300 dark:border-neutral-700 text-neutral-900 dark:text-white focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white"
+                />
+                <label for="remember" class="ml-2 text-sm text-neutral-600 dark:text-neutral-400">
+                  Manter-me conectado
+                </label>
+              </div>
+
+              <!-- Botão Entrar -->
               <button
-                type="button"
-                (click)="togglePassword()"
-                [attr.aria-label]="showPassword() ? 'Ocultar senha' : 'Mostrar senha'"
-                class="absolute right-3 top-3 text-neutral-500 hover:text-neutral-300 transition-colors"
+                type="submit"
+                [disabled]="form.invalid || loading()"
+                class="btn-primary h-12 w-full text-[15px]"
               >
-                @if (showPassword()) {
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="w-5 h-5"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.244 7.244 3.228 3.228m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88"
-                    />
-                  </svg>
+                @if (loading()) {
+                  <div
+                    class="w-4 h-4 border-2 border-white dark:border-neutral-900 border-t-transparent rounded-full animate-spin"
+                  ></div>
+                  <span>Entrando...</span>
                 } @else {
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="w-5 h-5"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
-                    />
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                    />
-                  </svg>
+                  <span>Entrar</span>
+                  <span>→</span>
                 }
               </button>
-            </div>
-            @if (form.get('password')?.invalid && form.get('password')?.touched) {
-              <p class="text-xs text-red-500 mt-1">Mínimo 8 caracteres</p>
-            }
-          </div>
+            </form>
 
-          <!-- Mensagem de Erro -->
-          @if (error()) {
+            <!-- Divisor -->
+            <div class="relative my-8">
+              <div class="absolute inset-0 flex items-center">
+                <div class="w-full border-t border-neutral-200 dark:border-neutral-800"></div>
+              </div>
+              <div class="relative flex justify-center text-sm">
+                <span class="bg-surface px-2 text-muted">Ou</span>
+              </div>
+            </div>
+
+            <!-- Acesso Rápido (DEV) -->
             <div
-              class="px-4 py-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50 rounded-lg text-sm text-red-700 dark:text-red-400 flex items-start gap-3"
+              class="rounded-lg border border-dashed border-border-strong bg-surface-subtle/70 p-4"
             >
-              <span class="text-lg flex-shrink-0">⚠️</span>
-              <span>{{ error() }}</span>
-            </div>
-          }
-
-          <!-- Checkbox Lembrar -->
-          <div class="flex items-center">
-            <input
-              type="checkbox"
-              id="remember"
-              class="w-4 h-4 rounded border-neutral-300 dark:border-neutral-700 text-neutral-900 dark:text-white focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white"
-            />
-            <label for="remember" class="ml-2 text-sm text-neutral-600 dark:text-neutral-400">
-              Manter-me conectado
-            </label>
-          </div>
-
-          <!-- Botão Entrar -->
-          <button
-            type="submit"
-            [disabled]="form.invalid || loading()"
-            class="w-full px-4 py-3 bg-gradient-to-r from-neutral-900 to-neutral-800 dark:from-white dark:to-neutral-200 text-white dark:text-neutral-900 font-semibold rounded-lg hover:shadow-lg hover:shadow-neutral-900/20 dark:hover:shadow-white/10 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none flex items-center justify-center gap-2"
-          >
-            @if (loading()) {
-              <div
-                class="w-4 h-4 border-2 border-white dark:border-neutral-900 border-t-transparent rounded-full animate-spin"
-              ></div>
-              <span>Entrando...</span>
-            } @else {
-              <span>Entrar</span>
-              <span>→</span>
-            }
-          </button>
-        </form>
-
-        <!-- Divisor -->
-        <div class="relative my-8">
-          <div class="absolute inset-0 flex items-center">
-            <div class="w-full border-t border-neutral-200 dark:border-neutral-800"></div>
-          </div>
-          <div class="relative flex justify-center text-sm">
-            <span class="px-2 bg-white dark:bg-neutral-950 text-neutral-600 dark:text-neutral-400"
-              >Ou</span
-            >
-          </div>
-        </div>
-
-        <!-- Acesso Rápido (DEV) -->
-        <div class="rounded-xl border border-dashed border-neutral-700 bg-neutral-900/50 p-4">
-          <p
-            class="mb-3 text-center text-xs font-semibold uppercase tracking-widest text-neutral-500"
-          >
-            Acesso rápido · dev
-          </p>
-          @if (devUsersLoading()) {
-            <p class="py-3 text-center text-xs text-neutral-500">Carregando usuários...</p>
-          } @else if (devUsersError()) {
-            <p class="py-3 text-center text-xs text-neutral-500">{{ devUsersError() }}</p>
-          } @else {
-            <div class="space-y-4">
-              @for (group of devUserGroups(); track group.role) {
-                <section>
-                  <p
-                    class="mb-2 text-[10px] font-semibold uppercase tracking-widest"
-                    [class]="roleColor(group.role)"
-                  >
-                    {{ roleLabel(group.role) }} · {{ group.users.length }}
-                  </p>
-                  <div class="grid grid-cols-2 gap-2">
-                    @for (u of group.users; track u.email) {
-                      <button
-                        type="button"
-                        (click)="quickLogin(u.email)"
-                        [disabled]="loading()"
-                        class="flex min-w-0 flex-col items-start rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-left transition-colors hover:border-neutral-600 hover:bg-neutral-800 disabled:opacity-40"
+              <p
+                class="mb-3 text-center text-xs font-semibold uppercase tracking-widest text-neutral-500"
+              >
+                Acesso rápido · dev
+              </p>
+              @if (devUsersLoading()) {
+                <p class="py-3 text-center text-xs text-neutral-500">Carregando usuários...</p>
+              } @else if (devUsersError()) {
+                <p class="py-3 text-center text-xs text-neutral-500">{{ devUsersError() }}</p>
+              } @else {
+                <div class="space-y-4">
+                  @for (group of devUserGroups(); track group.role) {
+                    <section>
+                      <p
+                        class="mb-2 text-[10px] font-semibold uppercase tracking-widest"
+                        [class]="roleColor(group.role)"
                       >
-                        <span
-                          class="text-[10px] font-semibold uppercase tracking-wide"
-                          [class]="roleColor(u.role)"
-                          >{{ roleLabel(u.role) }}</span
-                        >
-                        <span class="mt-0.5 w-full truncate text-xs text-neutral-300">{{
-                          u.name || u.email
-                        }}</span>
-                        <span class="w-full truncate text-[10px] text-neutral-600">{{
-                          u.email
-                        }}</span>
-                      </button>
-                    }
-                  </div>
-                </section>
-              } @empty {
-                <p class="py-3 text-center text-xs text-neutral-500">Nenhum usuário disponível.</p>
+                        {{ roleLabel(group.role) }} · {{ group.users.length }}
+                      </p>
+                      <div class="grid grid-cols-2 gap-2">
+                        @for (u of group.users; track u.email) {
+                          <button
+                            type="button"
+                            (click)="quickLogin(u.email)"
+                            [disabled]="loading()"
+                            class="flex min-w-0 flex-col items-start rounded-md border border-border bg-surface px-3 py-2 text-left transition-colors hover:border-brand/40 hover:bg-brand/5 disabled:opacity-40"
+                          >
+                            <span
+                              class="text-[10px] font-semibold uppercase tracking-wide"
+                              [class]="roleColor(u.role)"
+                              >{{ roleLabel(u.role) }}</span
+                            >
+                            <span class="mt-0.5 w-full truncate text-xs text-foreground">{{
+                              u.name || u.email
+                            }}</span>
+                            <span class="w-full truncate text-[10px] text-muted">{{
+                              u.email
+                            }}</span>
+                          </button>
+                        }
+                      </div>
+                    </section>
+                  } @empty {
+                    <p class="py-3 text-center text-xs text-neutral-500">
+                      Nenhum usuário disponível.
+                    </p>
+                  }
+                </div>
               }
             </div>
-          }
-        </div>
 
-        <!-- Link Registrar -->
-        <div class="mt-6 text-center">
-          <p class="text-neutral-600 dark:text-neutral-400">
-            Não tem uma conta?
-            <a
-              routerLink="/auth/register"
-              class="font-semibold text-neutral-900 dark:text-white hover:underline transition-colors"
-            >
-              Criar agora
-            </a>
-          </p>
-        </div>
+            <!-- Link Registrar -->
+            <div class="mt-6 text-center">
+              <p class="text-neutral-600 dark:text-neutral-400">
+                Não tem uma conta?
+                <a
+                  routerLink="/auth/register"
+                  class="font-semibold text-brand transition-colors hover:text-brand-hover hover:underline"
+                >
+                  Criar agora
+                </a>
+              </p>
+            </div>
 
-        <!-- Footer -->
-        <div
-          class="mt-8 pt-8 border-t border-neutral-200 dark:border-neutral-800 text-center text-xs text-neutral-500 dark:text-neutral-600 space-y-2"
-        >
-          <p>Ao entrar, você concorda com nossos Termos de Serviço</p>
-          <div class="flex items-center justify-center gap-4">
-            <a href="#" class="hover:text-neutral-700 dark:hover:text-neutral-400 transition-colors"
-              >Privacidade</a
-            >
-            <span>•</span>
-            <a href="#" class="hover:text-neutral-700 dark:hover:text-neutral-400 transition-colors"
-              >Termos</a
-            >
+            <!-- Footer -->
+            <div class="mt-8 space-y-2 border-t border-border pt-6 text-center text-xs text-muted">
+              <p>Ao entrar, você concorda com nossos Termos de Serviço</p>
+              <div class="flex items-center justify-center gap-4">
+                <a href="#" class="transition-colors hover:text-brand">Privacidade</a>
+                <span>•</span>
+                <a href="#" class="transition-colors hover:text-brand">Termos</a>
+              </div>
+            </div>
           </div>
-        </div>
+        </section>
+
+        <aside
+          class="relative hidden min-h-[680px] overflow-hidden bg-[linear-gradient(145deg,#0068c9_0%,#0051a5_52%,#173a6b_100%)] p-10 text-white lg:flex lg:flex-col lg:justify-between"
+        >
+          <div class="absolute -right-24 -top-24 size-72 rounded-full border border-white/15"></div>
+          <div class="absolute -right-8 top-16 size-48 rounded-full border border-white/10"></div>
+          <div class="absolute -bottom-24 -left-20 size-80 rounded-full bg-white/7"></div>
+
+          <div class="relative z-10">
+            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-white/65">
+              Plataforma de produção
+            </p>
+            <h2
+              class="mt-5 max-w-sm text-3xl font-semibold leading-tight tracking-tight text-white"
+            >
+              Todo o fluxo de áudio em um só lugar.
+            </h2>
+            <p class="mt-4 max-w-sm text-sm leading-6 text-white/70">
+              Organize pedidos, profissionais, créditos e entregas com visibilidade para cada papel.
+            </p>
+          </div>
+
+          <div class="relative z-10 space-y-3">
+            <div class="rounded-xl border border-white/15 bg-white/10 p-4">
+              <p class="text-sm font-medium">Operação organizada</p>
+              <p class="mt-1 text-xs leading-5 text-white/65">
+                Pedidos, prazos e entregas acompanhados de ponta a ponta.
+              </p>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div class="rounded-xl border border-white/15 bg-white/8 p-4">
+                <p class="text-2xl font-semibold tabular-nums">5</p>
+                <p class="mt-1 text-xs text-white/60">perfis integrados</p>
+              </div>
+              <div class="rounded-xl border border-white/15 bg-white/8 p-4">
+                <p class="text-2xl font-semibold">24/7</p>
+                <p class="mt-1 text-xs text-white/60">acesso ao painel</p>
+              </div>
+            </div>
+          </div>
+        </aside>
       </div>
     </div>
   `,

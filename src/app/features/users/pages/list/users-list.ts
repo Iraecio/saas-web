@@ -48,9 +48,9 @@ const ROLE_LABELS: Record<UserRole, string> = {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [DatePipe, LucideDynamicIcon],
   template: `
-    <main class="mx-auto max-w-[1500px] space-y-5 p-4 sm:p-6 lg:p-8">
+    <main class="kuber-page space-y-5">
       <header
-        class="flex flex-col gap-4 border-b border-border pb-5 sm:flex-row sm:items-end sm:justify-between"
+        class="kuber-page-header flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"
       >
         <div class="min-w-0">
           <div
@@ -76,7 +76,7 @@ const ROLE_LABELS: Record<UserRole, string> = {
       </header>
 
       <section class="grid gap-3 sm:grid-cols-2">
-        <article class="rounded-lg border border-border bg-surface p-4 shadow-sm">
+        <article class="kuber-stat-card">
           <div class="flex items-center justify-between gap-4">
             <div>
               <p class="text-xs font-semibold uppercase tracking-wide text-muted">
@@ -89,7 +89,7 @@ const ROLE_LABELS: Record<UserRole, string> = {
             ></span>
           </div>
         </article>
-        <article class="rounded-lg border border-border bg-surface p-4 shadow-sm">
+        <article class="kuber-stat-card">
           <div class="flex items-center justify-between gap-4">
             <div>
               <p class="text-xs font-semibold uppercase tracking-wide text-muted">
@@ -106,11 +106,8 @@ const ROLE_LABELS: Record<UserRole, string> = {
         </article>
       </section>
 
-      <section
-        class="overflow-hidden rounded-xl border border-border bg-surface shadow-sm"
-        aria-labelledby="users-table-title"
-      >
-        <div class="border-b border-border p-4 sm:p-5">
+      <section class="kuber-table-shell" aria-labelledby="users-table-title">
+        <div class="kuber-table-toolbar">
           <div class="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <h2 id="users-table-title" class="font-bold text-foreground">Contas da plataforma</h2>

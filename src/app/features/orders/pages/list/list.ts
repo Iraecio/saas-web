@@ -20,18 +20,20 @@ import { Order, OrderStatus, OrderType } from '../../../../core/models/order.mod
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterLink, DatePipe],
   template: `
-    <div class="p-6 max-w-6xl mx-auto space-y-6">
-      <header class="flex items-center justify-between">
+    <main class="kuber-page max-w-6xl space-y-5">
+      <header class="kuber-page-header flex items-center justify-between">
         <div>
-          <h1 class="text-3xl font-bold text-neutral-900 dark:text-white">Pedidos</h1>
-          <p class="mt-1 text-sm text-neutral-500">Seus pedidos e seu andamento</p>
+          <h1>Pedidos</h1>
+          <p class="mt-1 text-sm text-muted">Seus pedidos e seu andamento</p>
         </div>
         @if (isClient()) {
           <a routerLink="../orders/new" class="btn-primary">+ Novo pedido</a>
         }
       </header>
 
-      <div class="flex flex-col gap-3 sm:flex-row">
+      <section
+        class="kuber-table-toolbar flex flex-col gap-3 rounded-lg border border-border sm:flex-row"
+      >
         <select
           class="form-input sm:w-56"
           [value]="statusFilter()"
@@ -51,7 +53,7 @@ import { Order, OrderStatus, OrderType } from '../../../../core/models/order.mod
           <option value="VOICE">Locução</option>
           <option value="PRODUCTION">Produção</option>
         </select>
-      </div>
+      </section>
 
       @if (loading()) {
         <div class="flex justify-center py-12">
@@ -60,9 +62,9 @@ import { Order, OrderStatus, OrderType } from '../../../../core/models/order.mod
           ></div>
         </div>
       } @else if (orders().length === 0) {
-        <p class="py-12 text-center text-sm text-neutral-500">Nenhum pedido encontrado.</p>
+        <div class="kuber-empty-state">Nenhum pedido encontrado.</div>
       } @else {
-        <div class="overflow-x-auto rounded-xl border border-neutral-200 dark:border-neutral-800">
+        <div class="kuber-table-shell overflow-x-auto">
           <table class="w-full text-sm">
             <thead class="bg-neutral-50 dark:bg-neutral-900 text-left text-neutral-500">
               <tr>
@@ -103,7 +105,7 @@ import { Order, OrderStatus, OrderType } from '../../../../core/models/order.mod
           </table>
         </div>
       }
-    </div>
+    </main>
   `,
 })
 export class OrdersListPage {

@@ -10,7 +10,7 @@ export class UiBadgeComponent {
   readonly tone = input<'neutral' | 'brand' | 'success' | 'warning' | 'danger'>('neutral');
   protected readonly classes = computed(
     () =>
-      `inline-flex items-center rounded-sm px-2 py-1 text-xs font-semibold ${this.tones[this.tone()]}`,
+      `inline-flex items-center rounded-sm border border-current/10 px-2 py-1 text-xs font-medium ${this.tones[this.tone()]}`,
   );
   private readonly tones = {
     neutral: 'bg-surface-subtle text-muted',

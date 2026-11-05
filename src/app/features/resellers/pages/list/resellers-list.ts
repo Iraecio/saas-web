@@ -9,16 +9,18 @@ import { ResellerService } from '../../services/reseller';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CardComponent, TableComponent],
   template: `
-    <div class="p-6">
-      <header class="mb-6 flex items-center justify-between">
+    <main class="kuber-page">
+      <header class="kuber-page-header mb-5 flex items-center justify-between">
         <div>
-          <h1 class="text-3xl font-bold text-neutral-900 dark:text-white">Revendedores</h1>
-          <p class="mt-1 text-sm text-neutral-500">Revendas cadastradas na plataforma.</p>
+          <h1>Revendedores</h1>
+          <p class="mt-1 text-sm text-muted">Revendas cadastradas na plataforma.</p>
         </div>
       </header>
 
       <app-card>
-        <div class="mb-4 flex flex-col gap-3 sm:flex-row">
+        <div
+          class="kuber-table-toolbar -mx-5 -mt-5 mb-5 flex flex-col gap-3 rounded-t-lg sm:flex-row"
+        >
           <input
             type="search"
             class="form-input flex-1"
@@ -47,7 +49,7 @@ import { ResellerService } from '../../services/reseller';
           (rowDelete)="onDelete($any($event))"
         />
       </app-card>
-    </div>
+    </main>
   `,
 })
 export class ResellersListComponent {

@@ -5,26 +5,24 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="card">
-      <div class="flex items-start justify-between">
+      <div class="flex items-center justify-between gap-4">
         <div>
-          <p class="text-xs uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
+          <p class="text-[13px] font-medium tracking-wide text-muted">
             {{ label() }}
           </p>
-          <p class="mt-2 text-3xl font-semibold tracking-tight text-neutral-900 dark:text-white">
+          <p class="mt-1 text-2xl font-semibold tabular-nums tracking-tight text-foreground">
             {{ value() }}
           </p>
           @if (delta() !== undefined) {
-            <p class="mt-2 flex items-center gap-1 text-xs text-neutral-600 dark:text-neutral-400">
+            <p class="mt-2 flex items-center gap-1 text-xs text-muted">
               <span>{{ deltaArrow() }}</span>
               <span>{{ deltaAbs() }}%</span>
-              <span class="text-neutral-400 dark:text-neutral-500">vs. período anterior</span>
+              <span class="text-muted/75">vs. período anterior</span>
             </p>
           }
         </div>
         @if (icon()) {
-          <div
-            class="rounded-md border border-neutral-200 bg-white p-2 text-xl dark:border-neutral-800 dark:bg-neutral-900"
-          >
+          <div class="grid size-12 place-items-center rounded-lg bg-brand/10 text-xl text-brand">
             {{ icon() }}
           </div>
         }

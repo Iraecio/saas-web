@@ -5,6 +5,7 @@ import { NotificationService } from '../../../../core/services/notification';
 import { WithdrawalService } from '../../services/withdrawal';
 import { WITHDRAWAL_STATUS_LABELS } from '../../withdrawal-status.util';
 import { WithdrawalRequest, WithdrawalStatus } from '../../../../core/models/withdrawal.model';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-admin-withdrawals',
@@ -57,12 +58,14 @@ import { WithdrawalRequest, WithdrawalStatus } from '../../../../core/models/wit
                   @if (w.status === 'PENDING') {
                     <button
                       class="rounded-md border border-neutral-300 px-3 py-1.5 text-sm hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
+                      [disabled]="busyId() === w.id"
                       (click)="process(w)"
                     >
                       Processar
                     </button>
                     <button
                       class="rounded-md border border-neutral-300 px-3 py-1.5 text-sm hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
+                      [disabled]="busyId() === w.id"
                       (click)="openReject(w)"
                     >
                       Rejeitar
@@ -71,12 +74,14 @@ import { WithdrawalRequest, WithdrawalStatus } from '../../../../core/models/wit
                   @if (w.status === 'PROCESSING') {
                     <button
                       class="rounded-md border border-neutral-300 px-3 py-1.5 text-sm hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
+                      [disabled]="busyId() === w.id"
                       (click)="openComplete(w)"
                     >
                       Confirmar pagamento
                     </button>
                     <button
                       class="rounded-md border border-neutral-300 px-3 py-1.5 text-sm hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
+                      [disabled]="busyId() === w.id"
                       (click)="openReject(w)"
                     >
                       Rejeitar
@@ -95,7 +100,7 @@ import { WithdrawalRequest, WithdrawalStatus } from '../../../../core/models/wit
                   />
                   <button
                     class="btn-primary"
-                    [disabled]="!paymentRef().trim()"
+                    [disabled]="!paymentRef().trim() || busyId() === w.id"
                     (click)="complete(w)"
                   >
                     Confirmar
@@ -112,7 +117,7 @@ import { WithdrawalRequest, WithdrawalStatus } from '../../../../core/models/wit
                   />
                   <button
                     class="btn-primary"
-                    [disabled]="!rejectReason().trim()"
+                    [disabled]="!rejectReason().trim() || busyId() === w.id"
                     (click)="reject(w)"
                   >
                     Rejeitar
@@ -134,6 +139,7 @@ export class AdminWithdrawalsPage {
   readonly statusFilter = signal<WithdrawalStatus | ''>('');
   readonly withdrawals = signal<WithdrawalRequest[]>([]);
   readonly loading = signal(true);
+  readonly busyId = signal<string | null>(null);
 
   readonly completeTarget = signal<string | null>(null);
   readonly rejectTarget = signal<string | null>(null);
@@ -171,7 +177,15 @@ export class AdminWithdrawalsPage {
   }
 
   process(w: WithdrawalRequest): void {
-    this.svc.process(w.id).subscribe({
+    if (this.busyId()) return;
+    this.busyId.set(w.id);
+    this.svc
+      .process(w.id)
+      .pipe(
+        finalize(() => this.busyId.set(null)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
       next: () => {
         this.notify.success('Saque em processamento.');
         this.load();
@@ -193,8 +207,15 @@ export class AdminWithdrawalsPage {
   }
 
   complete(w: WithdrawalRequest): void {
-    if (!this.paymentRef().trim()) return;
-    this.svc.complete(w.id, { paymentReference: this.paymentRef().trim() }).subscribe({
+    if (!this.paymentRef().trim() || this.busyId()) return;
+    this.busyId.set(w.id);
+    this.svc
+      .complete(w.id, { paymentReference: this.paymentRef().trim() })
+      .pipe(
+        finalize(() => this.busyId.set(null)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
       next: () => {
         this.completeTarget.set(null);
         this.notify.success('Pagamento confirmado.');
@@ -205,8 +226,15 @@ export class AdminWithdrawalsPage {
   }
 
   reject(w: WithdrawalRequest): void {
-    if (!this.rejectReason().trim()) return;
-    this.svc.reject(w.id, { reason: this.rejectReason().trim() }).subscribe({
+    if (!this.rejectReason().trim() || this.busyId()) return;
+    this.busyId.set(w.id);
+    this.svc
+      .reject(w.id, { reason: this.rejectReason().trim() })
+      .pipe(
+        finalize(() => this.busyId.set(null)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
       next: () => {
         this.rejectTarget.set(null);
         this.notify.success('Saque rejeitado.');

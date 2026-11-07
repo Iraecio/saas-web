@@ -30,22 +30,10 @@ import { UserRole } from '../../../../core/models/user.model';
       ></div>
 
       <div
-        class="relative z-10 grid w-full max-w-[960px] overflow-hidden rounded-[24px] border border-white/60 bg-surface shadow-[0_24px_60px_rgb(58_74_96/20%)] lg:grid-cols-[1.04fr_.96fr]"
+        class="relative z-10 w-full max-w-[540px] overflow-hidden rounded-[24px] border border-white/60 bg-surface shadow-[0_24px_60px_rgb(58_74_96/20%)]"
       >
         <section class="p-6 sm:p-10 lg:p-12">
-          <div class="mx-auto w-full max-w-[360px]">
-            <div class="mb-8 flex items-center gap-3">
-              <span
-                class="grid size-11 place-items-center rounded-xl bg-brand text-base font-bold text-white shadow-[0_5px_14px_rgb(0_92_187/28%)]"
-                >S</span
-              >
-              <div>
-                <h1 class="text-lg font-semibold text-foreground">Studio SaaS</h1>
-                <p class="text-xs text-muted">Gestão de produção de áudio</p>
-              </div>
-            </div>
-
-            <!-- Cabeçalho -->
+          <div class="mx-auto w-full max-w-[420px]">
             <div class="mb-8">
               <h2 class="text-[28px] font-semibold tracking-tight text-foreground">Entrar</h2>
               <p class="mt-2 text-sm text-muted">Informe suas credenciais para acessar o painel.</p>
@@ -278,47 +266,6 @@ import { UserRole } from '../../../../core/models/user.model';
             </div>
           </div>
         </section>
-
-        <aside
-          class="relative hidden min-h-[680px] overflow-hidden bg-[linear-gradient(145deg,#0068c9_0%,#0051a5_52%,#173a6b_100%)] p-10 text-white lg:flex lg:flex-col lg:justify-between"
-        >
-          <div class="absolute -right-24 -top-24 size-72 rounded-full border border-white/15"></div>
-          <div class="absolute -right-8 top-16 size-48 rounded-full border border-white/10"></div>
-          <div class="absolute -bottom-24 -left-20 size-80 rounded-full bg-white/7"></div>
-
-          <div class="relative z-10">
-            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-white/65">
-              Plataforma de produção
-            </p>
-            <h2
-              class="mt-5 max-w-sm text-3xl font-semibold leading-tight tracking-tight text-white"
-            >
-              Todo o fluxo de áudio em um só lugar.
-            </h2>
-            <p class="mt-4 max-w-sm text-sm leading-6 text-white/70">
-              Organize pedidos, profissionais, créditos e entregas com visibilidade para cada papel.
-            </p>
-          </div>
-
-          <div class="relative z-10 space-y-3">
-            <div class="rounded-xl border border-white/15 bg-white/10 p-4">
-              <p class="text-sm font-medium">Operação organizada</p>
-              <p class="mt-1 text-xs leading-5 text-white/65">
-                Pedidos, prazos e entregas acompanhados de ponta a ponta.
-              </p>
-            </div>
-            <div class="grid grid-cols-2 gap-3">
-              <div class="rounded-xl border border-white/15 bg-white/8 p-4">
-                <p class="text-2xl font-semibold tabular-nums">5</p>
-                <p class="mt-1 text-xs text-white/60">perfis integrados</p>
-              </div>
-              <div class="rounded-xl border border-white/15 bg-white/8 p-4">
-                <p class="text-2xl font-semibold">24/7</p>
-                <p class="mt-1 text-xs text-white/60">acesso ao painel</p>
-              </div>
-            </div>
-          </div>
-        </aside>
       </div>
     </div>
   `,

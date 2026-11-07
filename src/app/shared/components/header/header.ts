@@ -154,7 +154,7 @@ import { WalletService } from '../../../features/wallet/services/wallet';
 
             @if (userMenuOpen()) {
               <div
-                class="kuber-popover absolute right-0 z-50 mt-2 w-56 py-1"
+                class="kuber-popover absolute right-0 z-50 mt-2 w-56 py-1 text-foreground"
                 (click)="$event.stopPropagation()"
               >
                 <a routerLink="/admin/settings" class="menu-item" (click)="userMenuOpen.set(false)">
@@ -188,7 +188,7 @@ import { WalletService } from '../../../features/wallet/services/wallet';
       gap: 0.625rem;
       padding: 0.625rem 0.875rem;
       font-size: 0.875rem;
-      color: inherit;
+      color: var(--ui-foreground);
       transition: background-color 150ms;
     }
     .menu-item:hover {

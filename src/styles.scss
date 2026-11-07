@@ -216,7 +216,7 @@
     background: var(--ui-primary);
   }
   .kuber-popover {
-    @apply overflow-hidden rounded-lg border border-border bg-surface;
+    @apply overflow-hidden rounded-lg border border-border bg-surface text-foreground;
     box-shadow: var(--ui-shadow-popover);
   }
   .kuber-page {

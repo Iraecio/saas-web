@@ -2,6 +2,6 @@
 
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan
-at specs/012-kuber-design-system/plan.md
+at specs/013-security-boundaries/plan.md
 
 <!-- SPECKIT END -->

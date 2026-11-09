@@ -1,13 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, PLATFORM_ID, computed, inject, signal } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { Observable, catchError, finalize, of, switchMap, tap, throwError } from 'rxjs';
+import { Observable, catchError, finalize, of, switchMap, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { AppStateService } from './app-state';
 import { AuthResponse, AuthTokens, User } from '../models/user.model';
 
-const ACCESS_KEY = 'saas-web.accessToken';
-const REFRESH_KEY = 'saas-web.refreshToken';
 const LAST_ACTIVITY_KEY = 'saas-web.lastActivityAt';
 const IDLE_TIMEOUT_MS = 8 * 60 * 60 * 1000;
 const ACTIVITY_WRITE_INTERVAL_MS = 60 * 1000;
@@ -53,15 +51,13 @@ export class AuthService {
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   private readonly baseUrl = environment.apiUrl;
 
-  private readonly accessTokenSignal = signal<string | null>(this.readStored(ACCESS_KEY));
-  private readonly refreshTokenSignal = signal<string | null>(this.readStored(REFRESH_KEY));
+  private readonly accessTokenSignal = signal<string | null>(null);
   private readonly initializedSignal = signal(false);
   private lastActivityWrite = 0;
   private activityTrackingStarted = false;
   private idleTimer: ReturnType<typeof setTimeout> | null = null;
 
   readonly accessToken = this.accessTokenSignal.asReadonly();
-  readonly refreshToken = this.refreshTokenSignal.asReadonly();
   readonly initialized = this.initializedSignal.asReadonly();
   readonly hasToken = computed(() => this.accessTokenSignal() !== null);
 
@@ -101,12 +97,11 @@ export class AuthService {
   }
 
   refresh(): Observable<AuthTokens> {
-    const refreshToken = this.refreshTokenSignal();
-    if (!refreshToken) {
-      return throwError(() => new Error('No refresh token'));
-    }
     return this.http
-      .post<AuthTokens>(`${this.baseUrl}/auth/refresh`, { refreshToken })
+      .post<AuthTokens>(`${this.baseUrl}/auth/refresh`, null, {
+        withCredentials: true,
+        headers: { 'X-CSRF-Protection': '1' },
+      })
       .pipe(tap((tokens) => this.applyTokens(tokens)));
   }
 
@@ -163,15 +158,15 @@ export class AuthService {
   }
 
   bootstrap(): Observable<User | null> {
-    if (!this.hasRestorableSession() || this.isIdleExpired()) {
+    if (this.isIdleExpired()) {
       this.clearSession();
       this.initializedSignal.set(true);
       return of(null);
     }
 
-    const restore$ = this.shouldRefreshBeforeProfile()
-      ? this.refresh().pipe(switchMap(() => this.fetchProfile()))
-      : this.fetchProfile();
+    const restore$ = this.accessTokenSignal()
+      ? this.fetchProfile()
+      : this.refresh().pipe(switchMap(() => this.fetchProfile()));
 
     return restore$.pipe(
       tap(() => {
@@ -188,19 +183,13 @@ export class AuthService {
 
   applyTokens(tokens: AuthTokens): void {
     this.accessTokenSignal.set(tokens.accessToken);
-    this.refreshTokenSignal.set(tokens.refreshToken);
-    this.persist(ACCESS_KEY, tokens.accessToken);
-    this.persist(REFRESH_KEY, tokens.refreshToken);
     this.touchActivity(true);
     this.startActivityTracking();
   }
 
   clearSession(): void {
     this.accessTokenSignal.set(null);
-    this.refreshTokenSignal.set(null);
     this.appState.setUser(null);
-    this.persist(ACCESS_KEY, null);
-    this.persist(REFRESH_KEY, null);
     this.persist(LAST_ACTIVITY_KEY, null);
     if (this.idleTimer) {
       clearTimeout(this.idleTimer);
@@ -213,39 +202,14 @@ export class AuthService {
   }
 
   private applySession(res: AuthResponse): void {
-    this.applyTokens({ accessToken: res.accessToken, refreshToken: res.refreshToken });
+    this.applyTokens({ accessToken: res.accessToken });
     this.appState.setUser(res.user);
   }
 
   private hasRestorableSession(): boolean {
-    return this.accessTokenSignal() !== null || this.refreshTokenSignal() !== null;
+    return this.accessTokenSignal() !== null;
   }
 
-  private shouldRefreshBeforeProfile(): boolean {
-    const accessToken = this.accessTokenSignal();
-    return !accessToken || this.isJwtExpired(accessToken);
-  }
-
-  private isJwtExpired(token: string): boolean {
-    if (!this.isBrowser) return false;
-    try {
-      const payload = JSON.parse(this.decodeJwtPart(token.split('.')[1])) as { exp?: number };
-      return typeof payload.exp === 'number' && payload.exp * 1000 <= Date.now() + 30_000;
-    } catch {
-      return true;
-    }
-  }
-
-  private decodeJwtPart(value: string | undefined): string {
-    if (!value) throw new Error('Invalid token');
-    const base64 = value.replace(/-/g, '+').replace(/_/g, '/');
-    return decodeURIComponent(
-      atob(base64)
-        .split('')
-        .map((character) => `%${character.charCodeAt(0).toString(16).padStart(2, '0')}`)
-        .join(''),
-    );
-  }
 
   private isIdleExpired(): boolean {
     if (!this.isBrowser) return false;
@@ -295,11 +259,6 @@ export class AuthService {
       return;
     }
     this.logout().subscribe(() => window.location.assign('/auth/login'));
-  }
-
-  private readStored(key: string): string | null {
-    if (!this.isBrowser) return null;
-    return localStorage.getItem(key);
   }
 
   private persist(key: string, value: string | null): void {

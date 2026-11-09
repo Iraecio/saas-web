@@ -75,6 +75,13 @@ import {
           </div>
         </div>
 
+        @if (form.controls.professionalRole.value === 'VOICE_ACTOR') {
+          <div>
+            <label class="form-label">Duração máxima (segundos)</label>
+            <input type="number" min="1" class="form-input w-full" formControlName="maxDurationSeconds" />
+          </div>
+        }
+
         @if (isEdit() && criticalChanged()) {
           <div
             class="rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-700 dark:bg-amber-900/20 dark:text-amber-300"
@@ -114,6 +121,7 @@ export class ServiceFormPage {
     creditCost?: number;
     defaultPayoutCents?: number;
     maxRevisions?: number;
+    maxDurationSeconds?: number | null;
   } = {};
 
   readonly form = this.fb.group({
@@ -123,6 +131,7 @@ export class ServiceFormPage {
     creditCost: [1, [Validators.required, Validators.min(1)]],
     defaultPayoutCents: [100, [Validators.required, Validators.min(1)]],
     maxRevisions: [2, [Validators.required, Validators.min(0)]],
+    maxDurationSeconds: [40 as number | null, [Validators.min(1)]],
   });
 
   constructor() {
@@ -140,11 +149,13 @@ export class ServiceFormPage {
               creditCost: svc.creditCost,
               defaultPayoutCents: svc.defaultPayoutCents,
               maxRevisions: svc.maxRevisions,
+              maxDurationSeconds: svc.maxDurationSeconds ?? null,
             });
             this.originalCritical = {
               creditCost: svc.creditCost,
               defaultPayoutCents: svc.defaultPayoutCents,
               maxRevisions: svc.maxRevisions,
+              maxDurationSeconds: svc.maxDurationSeconds,
             };
           },
           error: (err) => this.notify.error(err.message ?? 'Erro ao carregar serviço'),
@@ -155,7 +166,8 @@ export class ServiceFormPage {
         const changed =
           v.creditCost !== this.originalCritical.creditCost ||
           v.defaultPayoutCents !== this.originalCritical.defaultPayoutCents ||
-          v.maxRevisions !== this.originalCritical.maxRevisions;
+          v.maxRevisions !== this.originalCritical.maxRevisions ||
+          v.maxDurationSeconds !== this.originalCritical.maxDurationSeconds;
         this.criticalChanged.set(changed);
       });
     }
@@ -174,6 +186,10 @@ export class ServiceFormPage {
         creditCost: raw.creditCost!,
         defaultPayoutCents: raw.defaultPayoutCents!,
         maxRevisions: raw.maxRevisions!,
+        maxDurationSeconds:
+          raw.professionalRole === 'VOICE_ACTOR'
+            ? (raw.maxDurationSeconds ?? undefined)
+            : undefined,
       };
       this.catalog.update(this.serviceId()!, dto).subscribe({
         next: () => this.onSaved('Serviço atualizado.'),
@@ -190,6 +206,10 @@ export class ServiceFormPage {
         creditCost: raw.creditCost!,
         defaultPayoutCents: raw.defaultPayoutCents!,
         maxRevisions: raw.maxRevisions!,
+        maxDurationSeconds:
+          raw.professionalRole === 'VOICE_ACTOR'
+            ? (raw.maxDurationSeconds ?? undefined)
+            : undefined,
       };
       this.catalog.create(dto).subscribe({
         next: () => this.onSaved('Serviço criado.'),

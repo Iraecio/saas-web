@@ -21,6 +21,7 @@ export interface Service {
   creditType: CreditType; // derivado do scope
   defaultPayoutCents: number;
   maxRevisions: number;
+  maxDurationSeconds?: number | null;
   isActive: boolean;
   createdById?: string;
   createdAt: string;
@@ -35,6 +36,7 @@ export interface CreateServiceDto {
   creditCost: number;
   defaultPayoutCents: number;
   maxRevisions: number;
+  maxDurationSeconds?: number;
 }
 
 // `confirmImpact` é obrigatório ao alterar creditCost/maxRevisions.

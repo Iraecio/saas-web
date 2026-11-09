@@ -570,34 +570,14 @@ export class OrderCreatePage {
     }
 
     const duration = this.estimatedDurationSeconds();
-    const servicesByPrice = [...this.compatibleServices()].sort(
-      (a, b) => a.creditCost - b.creditCost,
-    );
-    const service = servicesByPrice
-      .map((item, index) => ({
-        item,
-        // O contrato ainda não possui maxDurationSeconds. A descrição é a
-        // fonte principal; o fallback mantém as três faixas oficiais do catálogo.
-        maxSeconds:
-          this.maxDurationFromDescription(item.description) ?? [40, 80, 120][index] ?? null,
-      }))
-      .filter(({ maxSeconds }) => maxSeconds !== null && duration <= maxSeconds)
+    const service = [...this.compatibleServices()]
+      .filter((item) => item.maxDurationSeconds != null && duration <= item.maxDurationSeconds)
       .sort(
-        (a, b) => a.maxSeconds! - b.maxSeconds! || a.item.creditCost - b.item.creditCost,
-      )[0]?.item;
+        (a, b) =>
+          a.maxDurationSeconds! - b.maxDurationSeconds! || a.creditCost - b.creditCost,
+      )[0];
 
     this.selectedServiceId.set(service?.id ?? '');
-  }
-
-  private maxDurationFromDescription(description?: string): number | null {
-    if (!description) return null;
-    const durations: number[] = [];
-    const pattern =
-      /(\d+)\s*min(?:uto)?s?(?:\s*e\s*(\d+)\s*seg(?:undo)?s?)?|(\d+)\s*seg(?:undo)?s?/gi;
-    for (const match of description.matchAll(pattern)) {
-      durations.push(match[1] ? Number(match[1]) * 60 + Number(match[2] ?? 0) : Number(match[3]));
-    }
-    return durations.length ? Math.max(...durations) : null;
   }
 
   selectAttachment(event: Event): void {

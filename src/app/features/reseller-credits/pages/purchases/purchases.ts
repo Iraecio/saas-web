@@ -26,23 +26,22 @@ import { ResellerCreditService } from '../../services/reseller-credit';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [FormsModule, CurrencyPipe, DatePipe],
   template: `
-    <div
-      class="min-h-full space-y-6 bg-neutral-50 p-4 text-neutral-900 dark:bg-neutral-950 dark:text-white sm:p-6"
-    >
-      <header class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+    <div class="kuber-page space-y-8">
+      <header
+        class="flex flex-col gap-4 border-b border-border pb-5 sm:flex-row sm:items-end sm:justify-between"
+      >
         <div>
-          <p class="text-xs font-semibold uppercase tracking-wider text-primary-600">
-            Abastecimento do estoque
-          </p>
-          <h1 class="mt-1 text-2xl font-bold sm:text-3xl">Comprar créditos</h1>
-          <p class="mt-1 max-w-2xl text-sm text-neutral-500 dark:text-neutral-400">
-            Informe a quantidade, escolha como pagar e acompanhe a liberação dos créditos para sua
-            revenda.
+          <p class="text-sm font-medium text-brand">Estoque da revenda</p>
+          <h1 class="mt-1 text-2xl font-semibold tracking-tight sm:text-[28px]">
+            Comprar créditos
+          </h1>
+          <p class="mt-1 max-w-xl text-sm text-muted">
+            Escolha a quantidade e a forma de pagamento. O valor é calculado na hora.
           </p>
         </div>
         <button
           type="button"
-          class="btn-secondary inline-flex items-center justify-center gap-2 self-start lg:self-auto"
+          class="btn-ghost self-start sm:self-auto"
           [disabled]="loading() || refreshing()"
           (click)="load(false)"
         >
@@ -52,7 +51,7 @@ import { ResellerCreditService } from '../../services/reseller-credit';
             ></span>
             Atualizando…
           } @else {
-            Atualizar dados
+            Atualizar
           }
         </button>
       </header>
@@ -60,7 +59,7 @@ import { ResellerCreditService } from '../../services/reseller-credit';
       @if (error()) {
         <div
           role="alert"
-          class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300"
+          class="flex items-center justify-between gap-4 rounded-lg border border-danger/25 bg-danger/10 px-4 py-3 text-sm text-danger"
         >
           <span class="flex-1">{{ error() }}</span>
           <button type="button" class="font-semibold underline" (click)="load(false)">
@@ -78,11 +77,11 @@ import { ResellerCreditService } from '../../services/reseller-credit';
       }
       @if (transactionLoading()) {
         <div
-          class="flex items-center gap-3 rounded-xl border border-primary-200 bg-primary-50 p-4 text-sm text-primary-700 dark:border-primary-900 dark:bg-primary-950/30 dark:text-primary-300"
+          class="flex items-center gap-3 rounded-lg border border-brand/20 bg-brand/10 p-4 text-sm text-brand"
           role="status"
         >
           <span
-            class="h-5 w-5 animate-spin rounded-full border-2 border-primary-600 border-t-transparent"
+            class="h-5 w-5 animate-spin rounded-full border-2 border-brand border-t-transparent"
           ></span
           >Carregando todos os detalhes do pagamento…
         </div>
@@ -104,178 +103,179 @@ import { ResellerCreditService } from '../../services/reseller-credit';
       }
 
       @if (loading()) {
-        <section aria-live="polite" class="space-y-4">
-          <div
-            class="flex items-center gap-3 rounded-xl border border-primary-200 bg-primary-50 p-4 text-sm text-primary-700 dark:border-primary-900 dark:bg-primary-950/30 dark:text-primary-300"
-          >
-            <span
-              class="h-5 w-5 animate-spin rounded-full border-2 border-primary-600 border-t-transparent"
-            ></span>
-            Carregando preço, meios de pagamento e seu histórico…
-          </div>
-          <div class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_22rem]">
-            <div class="h-96 animate-pulse rounded-2xl bg-neutral-200 dark:bg-neutral-800"></div>
-            <div class="h-72 animate-pulse rounded-2xl bg-neutral-200 dark:bg-neutral-800"></div>
-          </div>
+        <section
+          aria-label="Carregando compra"
+          aria-live="polite"
+          class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_20rem]"
+        >
+          <div class="h-[28rem] animate-pulse rounded-lg bg-surface-subtle"></div>
+          <div class="h-72 animate-pulse rounded-lg bg-surface-subtle"></div>
+          <span class="sr-only">Carregando dados da compra…</span>
         </section>
       } @else {
-        <section class="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_22rem]">
+        <section class="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_20rem]">
           <div
-            class="space-y-7 rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm dark:border-neutral-800 dark:bg-neutral-900 sm:p-6"
+            class="rounded-lg border border-border bg-surface p-5 shadow-[var(--ui-shadow-card)] sm:p-6"
           >
-            <div class="flex gap-3">
-              <span
-                class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-100 text-sm font-bold text-primary-700 dark:bg-primary-950 dark:text-primary-300"
-                >1</span
-              >
-              <div class="min-w-0 flex-1">
-                <h2 class="font-semibold">Defina a quantidade</h2>
-                <p class="mt-0.5 text-sm text-neutral-500 dark:text-neutral-400">
-                  Os créditos aprovados serão adicionados diretamente ao estoque da revenda.
-                </p>
-              </div>
-            </div>
-            <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
-              Quantidade desejada
-              <input
-                class="form-input mt-2 w-full text-lg font-semibold"
-                type="number"
-                min="1"
-                step="1"
-                [ngModel]="amount()"
-                (ngModelChange)="amount.set($event)"
-              />
-              <span class="mt-1 block text-xs font-normal text-neutral-500"
-                >Digite um número inteiro maior que zero.</span
-              >
-            </label>
-            <div class="flex flex-wrap gap-2" aria-label="Quantidades sugeridas">
-              @for (suggestion of amountSuggestions; track suggestion) {
-                <button
-                  type="button"
-                  class="rounded-lg border border-neutral-200 px-3 py-2 text-sm font-medium transition hover:border-primary-400 hover:text-primary-600 dark:border-neutral-700 dark:hover:border-primary-600"
-                  [class]="
-                    amount() === suggestion
-                      ? 'border-primary-500 bg-primary-50 text-primary-700 dark:border-primary-600 dark:bg-primary-950/40 dark:text-primary-300'
-                      : ''
-                  "
-                  (click)="amount.set(suggestion)"
-                >
-                  {{ suggestion }} créditos
-                </button>
-              }
-            </div>
-
-            <fieldset>
-              <legend class="flex gap-3">
-                <span
-                  class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-100 text-sm font-bold text-primary-700 dark:bg-primary-950 dark:text-primary-300"
-                  >2</span
-                >
-                <span
-                  ><strong class="block">Escolha como pagar</strong
-                  ><small
-                    class="mt-0.5 block text-sm font-normal text-neutral-500 dark:text-neutral-400"
-                    >Selecione um meio para visualizar os dados e instruções.</small
-                  ></span
-                >
-              </legend>
-              <div class="mt-3 grid gap-3 sm:grid-cols-2">
-                @for (method of methods(); track method.id) {
-                  <button
-                    type="button"
-                    class="relative rounded-xl border p-4 text-left transition hover:border-primary-400 dark:hover:border-primary-600"
-                    [class]="methodCardClass(method.id)"
-                    (click)="selectedMethodId.set(method.id)"
+            <div
+              class="grid gap-6 xl:grid-cols-[minmax(16rem,0.85fr)_minmax(20rem,1.15fr)] xl:gap-8"
+            >
+              <section aria-labelledby="credit-amount-title">
+                <div class="flex items-center gap-3">
+                  <span
+                    class="grid size-8 place-items-center rounded-md bg-brand/10 text-sm font-semibold text-brand"
+                    >1</span
                   >
-                    @if (selectedMethodId() === method.id) {
+                  <div>
+                    <h2 id="credit-amount-title" class="font-semibold">Quantos créditos?</h2>
+                    <p class="text-xs text-muted">Escolha uma opção ou digite outro valor.</p>
+                  </div>
+                </div>
+
+                <label class="mt-5 block text-sm font-medium text-foreground">
+                  Quantidade
+                  <div class="relative mt-2">
+                    <input
+                      class="form-input w-full pr-20 text-xl font-semibold tabular-nums"
+                      type="number"
+                      min="1"
+                      step="1"
+                      inputmode="numeric"
+                      [ngModel]="amount()"
+                      (ngModelChange)="amount.set($event)"
+                    />
+                    <span
+                      class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-xs text-muted"
+                      >créditos</span
+                    >
+                  </div>
+                </label>
+
+                <div class="mt-3 grid grid-cols-2 gap-2" aria-label="Quantidades sugeridas">
+                  @for (suggestion of amountSuggestions; track suggestion) {
+                    <button
+                      type="button"
+                      class="min-h-10 rounded-md border px-3 text-sm font-medium tabular-nums transition active:translate-y-px"
+                      [class]="
+                        amount() === suggestion
+                          ? 'border-brand bg-brand/10 text-brand'
+                          : 'border-border-strong bg-surface text-foreground hover:border-brand/50 hover:text-brand'
+                      "
+                      (click)="amount.set(suggestion)"
+                    >
+                      {{ suggestion }}
+                    </button>
+                  }
+                </div>
+              </section>
+
+              <fieldset>
+                <legend class="flex items-center gap-3">
+                  <span
+                    class="grid size-8 place-items-center rounded-md bg-brand/10 text-sm font-semibold text-brand"
+                    >2</span
+                  >
+                  <span>
+                    <strong class="block font-semibold">Como você quer pagar?</strong>
+                    <small class="block text-xs font-normal text-muted"
+                      >Selecione uma opção disponível.</small
+                    >
+                  </span>
+                </legend>
+
+                <div class="mt-5 space-y-2">
+                  @for (method of methods(); track method.id) {
+                    <button
+                      type="button"
+                      class="flex w-full items-center gap-3 rounded-md border p-3 text-left transition active:translate-y-px"
+                      [class]="methodCardClass(method.id)"
+                      (click)="selectedMethodId.set(method.id)"
+                    >
                       <span
-                        class="absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full bg-primary-600 text-xs text-white"
+                        class="grid size-9 shrink-0 place-items-center rounded-md bg-surface-subtle text-base"
+                        aria-hidden="true"
+                      >
+                        {{ paymentMethodIcon(method) }}
+                      </span>
+                      <span class="min-w-0 flex-1">
+                        <span class="block font-medium text-foreground">{{
+                          method.policy.displayName
+                        }}</span>
+                        <span class="block truncate text-xs text-muted">{{
+                          methodDescription(method)
+                        }}</span>
+                      </span>
+                      <span
+                        class="grid size-5 shrink-0 place-items-center rounded-full border text-[11px]"
+                        [class]="
+                          selectedMethodId() === method.id
+                            ? 'border-brand bg-brand text-white'
+                            : 'border-border-strong text-transparent'
+                        "
+                        aria-hidden="true"
                         >✓</span
                       >
-                    }
-                    <span class="block font-semibold text-neutral-900 dark:text-white">
-                      {{ method.policy.displayName }}
-                    </span>
-                    <span class="mt-1 block text-xs text-neutral-500">
-                      {{ methodDescription(method) }}
-                    </span>
-                  </button>
-                } @empty {
-                  <div
-                    class="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800 sm:col-span-2 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-300"
-                  >
-                    Nenhuma forma de pagamento está disponível no momento. Tente novamente mais
-                    tarde ou fale com o administrador.
-                  </div>
-                }
-              </div>
-            </fieldset>
-
-            @if (selectedMethod(); as method) {
-              <section
-                class="rounded-xl border border-violet-200 bg-violet-50/60 p-4 dark:border-violet-900 dark:bg-violet-950/20"
-              >
-                <h2 class="text-sm font-semibold text-neutral-900 dark:text-white">
-                  Instruções para {{ method.policy.displayName }}
-                </h2>
-                <dl class="mt-3 grid gap-3 text-sm sm:grid-cols-2">
-                  @for (item of publicPaymentInstructions(method); track item.key) {
-                    <div
-                      class="rounded-lg bg-white/70 p-3 dark:bg-neutral-900/70"
-                      [class.sm:col-span-2]="item.wide"
-                    >
-                      <dt class="text-neutral-500">{{ item.label }}</dt>
-                      <dd
-                        class="mt-1 flex items-start justify-between gap-3 break-all font-medium text-neutral-900 dark:text-white"
-                      >
-                        <span>{{ item.value }}</span
-                        ><button
-                          type="button"
-                          class="shrink-0 text-xs font-semibold text-primary-600 hover:underline"
-                          (click)="copyInstruction(item.value)"
-                        >
-                          Copiar
-                        </button>
-                      </dd>
-                    </div>
+                    </button>
                   } @empty {
-                    <p class="text-neutral-500 sm:col-span-2">
-                      Os dados finais deste meio serão apresentados após iniciar o pagamento.
-                    </p>
+                    <div
+                      class="rounded-md border border-warning/30 bg-warning/10 p-4 text-sm text-foreground"
+                    >
+                      Nenhuma forma de pagamento disponível. Atualize a página ou fale com o
+                      suporte.
+                    </div>
                   }
-                </dl>
-              </section>
-            }
+                </div>
+
+                @if (selectedMethod(); as method) {
+                  @if (publicPaymentInstructions(method).length) {
+                    <details class="mt-3 rounded-md bg-surface-subtle px-4 py-3 text-sm">
+                      <summary class="cursor-pointer font-medium text-foreground">
+                        Ver dados de pagamento
+                      </summary>
+                      <dl class="mt-3 space-y-3 border-t border-border pt-3">
+                        @for (item of publicPaymentInstructions(method); track item.key) {
+                          <div>
+                            <dt class="text-xs text-muted">{{ item.label }}</dt>
+                            <dd
+                              class="mt-0.5 flex items-start justify-between gap-3 break-all font-medium text-foreground"
+                            >
+                              <span>{{ item.value }}</span>
+                              <button
+                                type="button"
+                                class="shrink-0 text-xs font-semibold text-brand hover:underline"
+                                (click)="copyInstruction(item.value)"
+                              >
+                                Copiar
+                              </button>
+                            </dd>
+                          </div>
+                        }
+                      </dl>
+                    </details>
+                  }
+                }
+              </fieldset>
+            </div>
           </div>
 
-          <aside
-            class="sticky top-4 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-900"
-          >
-            <p class="text-xs font-semibold uppercase tracking-wider text-primary-600">
-              Resumo da compra
+          <aside class="sticky top-5 rounded-lg bg-surface-subtle p-5 ring-1 ring-border">
+            <p class="text-xs font-medium text-muted">Resumo</p>
+            <p class="mt-2 text-3xl font-semibold tracking-tight text-foreground tabular-nums">
+              {{ totalCents() / 100 | currency: 'BRL' }}
             </p>
-            <h2 class="mt-1 font-semibold">Confira antes de continuar</h2>
-            <dl class="mt-4 space-y-3 text-sm">
+            <p class="mt-1 text-sm text-muted">valor total da compra</p>
+            <dl class="mt-5 space-y-3 border-t border-border pt-4 text-sm">
               <div class="flex justify-between gap-4">
-                <dt class="text-neutral-500">Quantidade</dt>
-                <dd class="font-semibold">{{ validAmount() }} créditos</dd>
+                <dt class="text-muted">Créditos</dt>
+                <dd class="font-medium tabular-nums">{{ validAmount() }}</dd>
               </div>
               <div class="flex justify-between gap-4">
-                <dt class="text-neutral-500">Preço unitário</dt>
-                <dd class="font-medium">{{ unitPrice() / 100 | currency: 'BRL' }}</dd>
-              </div>
-              <div class="flex justify-between gap-4 border-t border-neutral-200 pt-3">
-                <dt class="font-semibold">Total</dt>
-                <dd class="text-xl font-bold text-primary-700 dark:text-primary-300">
-                  {{ totalCents() / 100 | currency: 'BRL' }}
-                </dd>
+                <dt class="text-muted">Por crédito</dt>
+                <dd class="font-medium tabular-nums">{{ unitPrice() / 100 | currency: 'BRL' }}</dd>
               </div>
             </dl>
             @if (!price()) {
-              <p
-                class="mt-4 rounded-lg bg-amber-50 p-3 text-xs text-amber-800 dark:bg-amber-950/30 dark:text-amber-300"
-              >
+              <p class="mt-4 rounded-md bg-warning/10 p-3 text-xs text-foreground">
                 O preço do crédito ainda não foi configurado. Não é possível iniciar uma compra.
               </p>
             }
@@ -294,8 +294,8 @@ import { ResellerCreditService } from '../../services/reseller-credit';
                 Continuar para pagamento
               }
             </button>
-            <p class="mt-3 text-center text-xs text-neutral-500">
-              Você poderá acompanhar o pedido e enviar o comprovante logo após continuar.
+            <p class="mt-3 text-center text-xs leading-5 text-muted">
+              Os créditos entram no estoque após a confirmação do pagamento.
             </p>
           </aside>
         </section>
@@ -580,35 +580,28 @@ import { ResellerCreditService } from '../../services/reseller-credit';
         </div>
       }
 
-      <section class="space-y-3">
-        <div class="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+      <section class="space-y-4" aria-labelledby="purchase-history-title">
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p class="text-xs font-semibold uppercase tracking-wider text-primary-600">
-              Seus pedidos
-            </p>
-            <h2 class="mt-1 text-lg font-bold">Histórico de compras</h2>
-            <p class="text-sm text-neutral-500 dark:text-neutral-400">
-              Consulte pagamentos anteriores, envie comprovantes e acompanhe cada análise.
+            <h2 id="purchase-history-title" class="text-lg font-semibold">Compras recentes</h2>
+            <p class="mt-1 text-sm text-muted">
+              Acompanhe pagamentos e envie comprovantes pendentes.
             </p>
           </div>
-          <span class="text-sm text-neutral-500">{{ purchases().length }} pedido(s)</span>
+          <span class="text-xs font-medium text-muted">{{ purchases().length }} compras</span>
         </div>
         @if (refreshing()) {
-          <div
-            class="flex items-center gap-3 rounded-xl border border-neutral-200 bg-white p-4 text-sm text-neutral-500 dark:border-neutral-800 dark:bg-neutral-900"
-          >
+          <div class="flex items-center gap-3 rounded-lg bg-surface-subtle p-4 text-sm text-muted">
             <span
-              class="h-4 w-4 animate-spin rounded-full border-2 border-primary-600 border-t-transparent"
+              class="h-4 w-4 animate-spin rounded-full border-2 border-brand border-t-transparent"
             ></span
             >Atualizando histórico…
           </div>
         }
         @if (purchases().length) {
-          <div
-            class="hidden overflow-auto rounded-xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-900 md:block"
-          >
+          <div class="kuber-table-shell hidden overflow-auto md:block">
             <table class="w-full min-w-[48rem] text-sm">
-              <thead class="bg-neutral-50 text-left text-neutral-500 dark:bg-neutral-800/60">
+              <thead class="bg-surface-subtle text-left text-xs font-medium text-muted">
                 <tr>
                   <th class="p-3">Créditos</th>
                   <th class="p-3">Total</th>
@@ -620,12 +613,10 @@ import { ResellerCreditService } from '../../services/reseller-credit';
               </thead>
               <tbody>
                 @for (purchase of purchases(); track purchase.id) {
-                  <tr
-                    class="border-t border-neutral-100 transition hover:bg-neutral-50 dark:border-neutral-800 dark:hover:bg-neutral-800/40"
-                  >
+                  <tr class="border-t border-border transition hover:bg-surface-subtle">
                     <td class="p-4">
                       <strong>{{ purchase.creditAmount }}</strong
-                      ><span class="ml-1 text-xs text-neutral-500">créditos</span>
+                      ><span class="ml-1 text-xs text-muted">créditos</span>
                     </td>
                     <td class="p-4 font-medium">
                       {{ purchase.totalCents / 100 | currency: 'BRL' }}
@@ -640,7 +631,7 @@ import { ResellerCreditService } from '../../services/reseller-credit';
                           {{ paymentStatusLabel(payment.status) }}
                         </span>
                       } @else {
-                        <span class="text-neutral-500">—</span>
+                        <span class="text-muted">—</span>
                       }
                     </td>
                     <td class="p-4 whitespace-nowrap">
@@ -672,15 +663,15 @@ import { ResellerCreditService } from '../../services/reseller-credit';
           <div class="grid gap-3 md:hidden">
             @for (purchase of purchases(); track purchase.id) {
               <article
-                class="rounded-xl border border-neutral-200 bg-white p-4 shadow-sm dark:border-neutral-800 dark:bg-neutral-900"
+                class="rounded-lg border border-border bg-surface p-4 shadow-[var(--ui-shadow-card)]"
               >
                 <div class="flex items-start justify-between gap-3">
                   <div>
-                    <p class="text-xs text-neutral-500">
+                    <p class="text-xs text-muted">
                       {{ purchase.createdAt | date: 'dd/MM/yyyy HH:mm' }}
                     </p>
                     <strong class="mt-1 block text-lg">{{ purchase.creditAmount }} créditos</strong>
-                    <p class="text-sm text-neutral-500">
+                    <p class="text-sm text-muted">
                       {{ purchase.totalCents / 100 | currency: 'BRL' }}
                     </p>
                   </div>
@@ -693,11 +684,9 @@ import { ResellerCreditService } from '../../services/reseller-credit';
                   }
                 </div>
                 <div
-                  class="mt-4 flex items-center justify-between gap-3 border-t border-neutral-100 pt-3 dark:border-neutral-800"
+                  class="mt-4 flex items-center justify-between gap-3 border-t border-border pt-3"
                 >
-                  <span class="text-xs text-neutral-500">{{
-                    purchaseStatus(purchase.status)
-                  }}</span>
+                  <span class="text-xs text-muted">{{ purchaseStatus(purchase.status) }}</span>
                   @if (transactionForPurchase(purchase.id); as payment) {
                     <button
                       type="button"
@@ -720,12 +709,12 @@ import { ResellerCreditService } from '../../services/reseller-credit';
           </div>
         } @else if (!loading()) {
           <div
-            class="rounded-xl border border-dashed border-neutral-300 bg-white p-10 text-center dark:border-neutral-700 dark:bg-neutral-900"
+            class="rounded-lg border border-dashed border-border-strong bg-surface p-10 text-center"
           >
             <div class="text-3xl" aria-hidden="true">🪙</div>
             <p class="mt-3 font-semibold">Nenhuma compra realizada</p>
-            <p class="mt-1 text-sm text-neutral-500">
-              Sua primeira compra aparecerá aqui para acompanhamento.
+            <p class="mt-1 text-sm text-muted">
+              Escolha uma quantidade acima para fazer sua primeira compra.
             </p>
           </div>
         }
@@ -967,10 +956,16 @@ export class CreditPurchasesPage {
     return method.name;
   }
 
+  paymentMethodIcon(method: PlatformPaymentMethod): string {
+    if (method.policy.methodType === 'PIX') return '⌁';
+    if (method.policy.providerCode === 'BANK_TRANSFER_MANUAL') return '↔';
+    return '↗';
+  }
+
   methodCardClass(methodId: string): string {
     return this.selectedMethodId() === methodId
-      ? 'border-primary-500 bg-primary-50 ring-1 ring-primary-500 dark:border-primary-600 dark:bg-primary-950/30'
-      : 'border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-900';
+      ? 'border-brand bg-brand/5 ring-1 ring-brand'
+      : 'border-border bg-surface hover:border-brand/50 hover:bg-surface-subtle';
   }
 
   copyInstruction(value: string): void {

@@ -12,6 +12,7 @@ npm-debug.log
 yarn-error.log
 *.log
 .env*
+.mp-integrate-progress.md
 
 # IDEs and editors
 .idea/

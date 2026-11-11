@@ -11,6 +11,16 @@ Install the locked dependency tree with `npm ci`.
 
 ## Development server
 
+### Configurações por ambiente
+
+O card **Acesso rápido · dev** da tela de login é controlado por
+`ENABLE_DEV_QUICK_ACCESS`. O padrão é desabilitado. Use `true`, `1`, `yes` ou `on`
+para habilitá-lo.
+
+Na Vercel, cadastre a variável como **Config** em Project Settings → Environment
+Variables e selecione apenas os ambientes em que o acesso rápido deve aparecer.
+Uma alteração na variável entra em vigor em um novo deployment.
+
 To start a local development server, run:
 
 ```bash

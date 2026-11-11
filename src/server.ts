@@ -6,6 +6,7 @@ import {
 } from '@angular/ssr/node';
 import express from 'express';
 import { join } from 'node:path';
+import { isEnabled, type RuntimeConfig } from './app/core/config/runtime-config';
 
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
@@ -18,6 +19,17 @@ const angularApp = new AngularNodeAppEngine({
   allowedHosts,
   // TODO: This is a security-sensitive option. Remove if not needed. For more information, see https://angular.dev/best-practices/security#configuring-trusted-proxy-headers
   trustProxyHeaders: ['x-forwarded-host', 'x-forwarded-proto'],
+});
+
+app.get('/runtime-config', (_req, res) => {
+  const config: RuntimeConfig = {
+    features: {
+      devQuickAccess: isEnabled(process.env['ENABLE_DEV_QUICK_ACCESS']),
+    },
+  };
+
+  res.set('Cache-Control', 'no-store');
+  res.json(config);
 });
 
 /**

@@ -16,6 +16,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService, DevLoginUser } from '../../../../core/services/auth';
 import { AppStateService } from '../../../../core/services/app-state';
 import { UserRole } from '../../../../core/models/user.model';
+import { RuntimeConfigService } from '../../../../core/services/runtime-config';
 
 @Component({
   selector: 'app-login',
@@ -177,70 +178,72 @@ import { UserRole } from '../../../../core/models/user.model';
               </button>
             </form>
 
-            <!-- Divisor -->
-            <div class="relative my-8">
-              <div class="absolute inset-0 flex items-center">
-                <div class="w-full border-t border-neutral-200 dark:border-neutral-800"></div>
-              </div>
-              <div class="relative flex justify-center text-sm">
-                <span class="bg-surface px-2 text-muted">Ou</span>
-              </div>
-            </div>
-
-            <!-- Acesso Rápido (DEV) -->
-            <div
-              class="rounded-lg border border-dashed border-border-strong bg-surface-subtle/70 p-4"
-            >
-              <p
-                class="mb-3 text-center text-xs font-semibold uppercase tracking-widest text-neutral-500"
-              >
-                Acesso rápido · dev
-              </p>
-              @if (devUsersLoading()) {
-                <p class="py-3 text-center text-xs text-neutral-500">Carregando usuários...</p>
-              } @else if (devUsersError()) {
-                <p class="py-3 text-center text-xs text-neutral-500">{{ devUsersError() }}</p>
-              } @else {
-                <div class="space-y-4">
-                  @for (group of devUserGroups(); track group.role) {
-                    <section>
-                      <p
-                        class="mb-2 text-[10px] font-semibold uppercase tracking-widest"
-                        [class]="roleColor(group.role)"
-                      >
-                        {{ roleLabel(group.role) }} · {{ group.users.length }}
-                      </p>
-                      <div class="grid grid-cols-2 gap-2">
-                        @for (u of group.users; track u.email) {
-                          <button
-                            type="button"
-                            (click)="quickLogin(u.email)"
-                            [disabled]="loading()"
-                            class="flex min-w-0 flex-col items-start rounded-md border border-border bg-surface px-3 py-2 text-left transition-colors hover:border-brand/40 hover:bg-brand/5 disabled:opacity-40"
-                          >
-                            <span
-                              class="text-[10px] font-semibold uppercase tracking-wide"
-                              [class]="roleColor(u.role)"
-                              >{{ roleLabel(u.role) }}</span
-                            >
-                            <span class="mt-0.5 w-full truncate text-xs text-foreground">{{
-                              u.name || u.email
-                            }}</span>
-                            <span class="w-full truncate text-[10px] text-muted">{{
-                              u.email
-                            }}</span>
-                          </button>
-                        }
-                      </div>
-                    </section>
-                  } @empty {
-                    <p class="py-3 text-center text-xs text-neutral-500">
-                      Nenhum usuário disponível.
-                    </p>
-                  }
+            @if (devQuickAccessEnabled()) {
+              <!-- Divisor -->
+              <div class="relative my-8">
+                <div class="absolute inset-0 flex items-center">
+                  <div class="w-full border-t border-neutral-200 dark:border-neutral-800"></div>
                 </div>
-              }
-            </div>
+                <div class="relative flex justify-center text-sm">
+                  <span class="bg-surface px-2 text-muted">Ou</span>
+                </div>
+              </div>
+
+              <!-- Acesso Rápido (DEV) -->
+              <div
+                class="rounded-lg border border-dashed border-border-strong bg-surface-subtle/70 p-4"
+              >
+                <p
+                  class="mb-3 text-center text-xs font-semibold uppercase tracking-widest text-neutral-500"
+                >
+                  Acesso rápido · dev
+                </p>
+                @if (devUsersLoading()) {
+                  <p class="py-3 text-center text-xs text-neutral-500">Carregando usuários...</p>
+                } @else if (devUsersError()) {
+                  <p class="py-3 text-center text-xs text-neutral-500">{{ devUsersError() }}</p>
+                } @else {
+                  <div class="space-y-4">
+                    @for (group of devUserGroups(); track group.role) {
+                      <section>
+                        <p
+                          class="mb-2 text-[10px] font-semibold uppercase tracking-widest"
+                          [class]="roleColor(group.role)"
+                        >
+                          {{ roleLabel(group.role) }} · {{ group.users.length }}
+                        </p>
+                        <div class="grid grid-cols-2 gap-2">
+                          @for (u of group.users; track u.email) {
+                            <button
+                              type="button"
+                              (click)="quickLogin(u.email)"
+                              [disabled]="loading()"
+                              class="flex min-w-0 flex-col items-start rounded-md border border-border bg-surface px-3 py-2 text-left transition-colors hover:border-brand/40 hover:bg-brand/5 disabled:opacity-40"
+                            >
+                              <span
+                                class="text-[10px] font-semibold uppercase tracking-wide"
+                                [class]="roleColor(u.role)"
+                                >{{ roleLabel(u.role) }}</span
+                              >
+                              <span class="mt-0.5 w-full truncate text-xs text-foreground">{{
+                                u.name || u.email
+                              }}</span>
+                              <span class="w-full truncate text-[10px] text-muted">{{
+                                u.email
+                              }}</span>
+                            </button>
+                          }
+                        </div>
+                      </section>
+                    } @empty {
+                      <p class="py-3 text-center text-xs text-neutral-500">
+                        Nenhum usuário disponível.
+                      </p>
+                    }
+                  </div>
+                }
+              </div>
+            }
 
             <!-- Link Registrar -->
             <div class="mt-6 text-center">
@@ -277,10 +280,12 @@ export class LoginComponent implements OnInit {
   private readonly appState = inject(AppStateService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly platformId = inject(PLATFORM_ID);
+  private readonly runtimeConfig = inject(RuntimeConfigService);
 
   readonly loading = signal(false);
   readonly error = signal<string | undefined>(undefined);
   readonly showPassword = signal(false);
+  readonly devQuickAccessEnabled = signal(false);
   readonly devUsers = signal<DevLoginUser[]>([]);
   readonly devUsersLoading = signal(false);
   readonly devUsersError = signal<string | undefined>(undefined);
@@ -316,7 +321,13 @@ export class LoginComponent implements OnInit {
 
   ngOnInit(): void {
     if (!isPlatformBrowser(this.platformId)) return;
-    this.loadDevUsers();
+    this.runtimeConfig
+      .load()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((config) => {
+        this.devQuickAccessEnabled.set(config.features.devQuickAccess);
+        if (config.features.devQuickAccess) this.loadDevUsers();
+      });
     // Supabase redireciona para a URL base com o token no hash fragment
     // ex: /auth/login#access_token=...&type=recovery
     const hash = window.location.hash.slice(1);

@@ -10,14 +10,14 @@ import { ImpersonationBannerComponent } from '../../shared/components/impersonat
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterOutlet, SidebarComponent, HeaderComponent, ImpersonationBannerComponent],
   template: `
-    <div class="flex min-h-dvh overflow-hidden bg-canvas text-foreground">
+    <div class="flex h-dvh overflow-hidden bg-canvas text-foreground">
       <app-sidebar [open]="appState.sidebarOpen()" />
 
-      <div class="flex min-w-0 flex-1 flex-col overflow-hidden">
+      <div class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
         <app-header (toggleSidebar)="appState.toggleSidebar()" />
         <app-impersonation-banner />
 
-        <main class="flex-1 overflow-y-auto overscroll-contain">
+        <main class="min-h-0 flex-1 overflow-y-auto overscroll-contain">
           <router-outlet />
         </main>
       </div>

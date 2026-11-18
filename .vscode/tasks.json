@@ -3,9 +3,19 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "ng serve (dev quick access)",
       "type": "npm",
       "script": "start",
       "isBackground": true,
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "options": {
+        "env": {
+          "ENABLE_DEV_QUICK_ACCESS": "true"
+        }
+      },
       "problemMatcher": {
         "owner": "typescript",
         "pattern": "$tsc",

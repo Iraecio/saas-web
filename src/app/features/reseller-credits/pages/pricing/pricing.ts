@@ -3,6 +3,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
+  HostListener,
   computed,
   inject,
   signal,
@@ -29,6 +30,14 @@ import {
   parseMoneyToCents,
 } from '../../services/reseller-pricing.presentation';
 
+interface PendingConfirmation {
+  title: string;
+  description: string;
+  confirmLabel: string;
+  tone: 'default' | 'danger';
+  action: () => void;
+}
+
 @Component({
   selector: 'app-reseller-pricing',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -37,43 +46,201 @@ import {
     `
       :host {
         display: block;
+        color: rgb(23 23 23);
+        --surface: rgb(255 255 255);
+        --surface-subtle: rgb(250 250 250);
+        --border: rgb(229 229 229);
+        --muted: rgb(82 82 82);
+        --accent: rgb(23 23 23);
       }
       .panel {
-        border: 1px solid rgb(226 232 240);
-        border-radius: 1rem;
-        background: rgb(255 255 255);
+        border: 1px solid var(--border);
+        border-radius: 1.25rem;
+        background: var(--surface);
+        box-shadow:
+          0 1px 2px rgb(23 23 23 / 0.03),
+          0 12px 32px rgb(23 23 23 / 0.035);
+      }
+      .metric-card {
+        position: relative;
+        min-height: 9.5rem;
+        overflow: visible;
+        padding: 1.15rem;
+      }
+      .metric-card::after {
+        position: absolute;
+        right: 0.75rem;
+        bottom: 0.75rem;
+        width: 3.5rem;
+        height: 3.5rem;
+        border-radius: 999px;
+        background: rgb(163 163 163 / 0.1);
+        content: '';
+        pointer-events: none;
+      }
+      .metric-value {
+        font-variant-numeric: tabular-nums;
+        letter-spacing: -0.04em;
       }
       .field {
         width: 100%;
-        border: 1px solid rgb(203 213 225);
-        border-radius: 0.7rem;
+        min-height: 2.875rem;
+        border: 1px solid var(--border);
+        border-radius: 0.75rem;
         padding: 0.7rem 0.85rem;
-        background: transparent;
+        background: var(--surface);
+        transition:
+          border-color 180ms ease,
+          box-shadow 180ms ease,
+          background 180ms ease;
       }
       .field:focus {
-        outline: 2px solid rgb(14 116 144);
-        outline-offset: 2px;
+        border-color: var(--accent);
+        outline: none;
+        box-shadow: 0 0 0 3px rgb(115 115 115 / 0.18);
       }
       .button {
         min-height: 44px;
-        border-radius: 0.7rem;
+        border-radius: 0.75rem;
         padding: 0.65rem 1rem;
-        font-weight: 700;
+        font-weight: 650;
+        transition:
+          transform 180ms ease,
+          background 180ms ease,
+          border-color 180ms ease,
+          opacity 180ms ease;
+      }
+      .button:hover:not(:disabled) {
+        transform: translateY(-1px);
+      }
+      .button:active:not(:disabled) {
+        transform: translateY(0) scale(0.98);
+      }
+      .button:focus-visible,
+      .icon-button:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 3px;
+      }
+      .button:disabled {
+        cursor: not-allowed;
+        opacity: 0.45;
       }
       .primary {
-        background: rgb(8 145 178);
+        background: var(--accent);
         color: white;
       }
+      .primary:hover:not(:disabled) {
+        background: rgb(38 38 38);
+      }
       .secondary {
-        border: 1px solid rgb(203 213 225);
+        border: 1px solid var(--border);
+        background: var(--surface);
+      }
+      .secondary:hover:not(:disabled) {
+        background: var(--surface-subtle);
+        border-color: rgb(163 163 163);
+      }
+      .icon-button {
+        display: inline-grid;
+        width: 1.35rem;
+        height: 1.35rem;
+        place-items: center;
+        border-radius: 999px;
+        background: rgb(229 229 229);
+        color: rgb(82 82 82);
+        font-size: 0.75rem;
+        font-weight: 800;
+      }
+      .tooltip {
+        position: relative;
+      }
+      .tooltip::after {
+        position: absolute;
+        z-index: 20;
+        bottom: calc(100% + 0.5rem);
+        left: 50%;
+        width: max-content;
+        max-width: 15rem;
+        padding: 0.5rem 0.65rem;
+        transform: translate(-50%, 0.25rem);
+        border-radius: 0.5rem;
+        background: rgb(23 23 23);
+        color: white;
+        content: attr(data-tooltip);
+        font-size: 0.75rem;
+        font-weight: 500;
+        line-height: 1.35;
+        opacity: 0;
+        pointer-events: none;
+        transition:
+          opacity 160ms ease,
+          transform 160ms ease;
+      }
+      .tooltip:hover::after,
+      .tooltip:focus-visible::after {
+        transform: translate(-50%, 0);
+        opacity: 1;
+      }
+      .status-dot {
+        width: 0.45rem;
+        height: 0.45rem;
+        border-radius: 999px;
+        background: currentColor;
+      }
+      .notice {
+        border: 1px solid var(--border);
+        border-left-width: 3px;
+        border-radius: 0.85rem;
+        background: var(--surface);
+      }
+      .dialog-backdrop {
+        animation: fade-in 160ms ease-out;
+        backdrop-filter: blur(4px);
+      }
+      .dialog-panel {
+        animation: dialog-in 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+      @keyframes fade-in {
+        from {
+          opacity: 0;
+        }
+      }
+      @keyframes dialog-in {
+        from {
+          opacity: 0;
+          transform: translateY(10px) scale(0.985);
+        }
       }
       @media (prefers-color-scheme: dark) {
-        .panel {
-          border-color: rgb(51 65 85);
-          background: rgb(15 23 42);
+        :host:not-context(.light) {
         }
-        .field {
-          border-color: rgb(71 85 105);
+      }
+      :host-context(.dark) {
+        color: rgb(245 245 245);
+        --surface: rgb(23 23 23);
+        --surface-subtle: rgb(38 38 38);
+        --border: rgb(64 64 64);
+        --muted: rgb(163 163 163);
+        --accent: rgb(250 250 250);
+      }
+      :host-context(.dark) .primary {
+        color: rgb(23 23 23);
+      }
+      :host-context(.dark) .primary:hover:not(:disabled) {
+        background: rgb(229 229 229);
+      }
+      :host-context(.dark) .icon-button {
+        background: rgb(64 64 64);
+        color: rgb(212 212 212);
+      }
+      :host-context(.dark) .tooltip::after {
+        background: rgb(245 245 245);
+        color: rgb(23 23 23);
+      }
+      @media (max-width: 639px) {
+        .metric-card {
+          min-height: 8.5rem;
+          padding: 1rem;
         }
       }
       @media (prefers-reduced-motion: reduce) {
@@ -85,39 +252,59 @@ import {
     `,
   ],
   template: `
-    <main class="mx-auto max-w-7xl space-y-6 p-4 sm:p-6" aria-busy="{{ loading() }}">
-      <header class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+    <main
+      class="mx-auto max-w-[90rem] space-y-6 px-4 py-5 sm:px-6 sm:py-8"
+      [attr.aria-busy]="loading()"
+    >
+      <header
+        class="flex flex-col gap-5 border-b border-neutral-200 pb-6 dark:border-neutral-800 sm:flex-row sm:items-end sm:justify-between"
+      >
         <div>
-          <p
-            class="text-sm font-semibold uppercase tracking-widest text-cyan-700 dark:text-cyan-300"
-          >
-            Operação comercial
+          <p class="text-sm font-medium text-neutral-500 dark:text-neutral-400">
+            Créditos de revenda
           </p>
-          <h1 class="text-3xl font-black tracking-tight">Preços e pacotes</h1>
-          <p class="mt-1 text-slate-600 dark:text-slate-300">
-            Defina sua margem e organize ofertas para vendas futuras.
+          <h1 class="mt-1 text-3xl font-black tracking-[-0.045em] text-balance sm:text-4xl">
+            Preços e pacotes
+          </h1>
+          <p
+            class="mt-2 max-w-2xl text-sm leading-6 text-neutral-600 dark:text-neutral-300 sm:text-base"
+          >
+            Controle seu preço por crédito, margem e ofertas disponíveis para novas vendas.
           </p>
         </div>
-        <button class="button secondary" type="button" (click)="reload()" [disabled]="loading()">
-          {{ loading() ? 'Atualizando…' : 'Atualizar dados' }}
+        <button
+          class="button secondary inline-flex items-center justify-center gap-2"
+          type="button"
+          (click)="reload()"
+          [disabled]="loading()"
+        >
+          <span aria-hidden="true" [class.animate-spin]="loading()">↻</span>
+          {{ loading() ? 'Atualizando dados…' : 'Atualizar dados' }}
         </button>
       </header>
 
       @if (!online()) {
-        <div role="alert" class="rounded-xl border border-amber-400 bg-amber-50 p-4 text-amber-900">
-          Você está sem conexão. Seu rascunho foi preservado; alterações estão bloqueadas.
+        <div
+          role="alert"
+          class="notice border-l-amber-500 p-4 text-sm text-neutral-800 dark:text-neutral-200"
+        >
+          <b>Você está offline.</b> O rascunho continua nesta página, mas as alterações ficam
+          bloqueadas até a conexão voltar.
         </div>
       }
       @if (message()) {
         <div
           aria-live="polite"
-          class="rounded-xl border border-emerald-300 bg-emerald-50 p-4 text-emerald-900"
+          class="notice border-l-emerald-600 p-4 text-sm text-neutral-800 dark:border-l-emerald-400 dark:text-neutral-200"
         >
           {{ message() }}
         </div>
       }
       @if (error()) {
-        <div role="alert" class="rounded-xl border border-red-300 bg-red-50 p-4 text-red-900">
+        <div
+          role="alert"
+          class="notice border-l-red-600 p-4 text-sm text-neutral-800 dark:border-l-red-400 dark:text-neutral-200"
+        >
           <b>Não foi possível concluir.</b> {{ error() }}
           <button class="ml-2 underline" (click)="reload()">Tentar novamente</button>
         </div>
@@ -131,43 +318,87 @@ import {
         </section>
       } @else if (overview(); as data) {
         <section class="grid grid-cols-2 gap-3 lg:grid-cols-4" aria-label="Resumo financeiro">
-          <article class="panel p-4">
-            <p class="text-sm text-slate-500">Custo por crédito</p>
-            <strong class="mt-2 block text-xl">{{
+          <article class="panel metric-card">
+            <div class="flex items-center gap-2">
+              <p class="text-xs font-semibold text-neutral-500 dark:text-neutral-400 sm:text-sm">
+                Custo por crédito
+              </p>
+              <button
+                type="button"
+                class="icon-button tooltip"
+                data-tooltip="Valor cobrado pela plataforma por cada crédito."
+                aria-label="Sobre o custo por crédito"
+              >
+                ?
+              </button>
+            </div>
+            <strong class="metric-value mt-5 block text-xl sm:text-2xl">{{
               data.platformCost.unitPriceCents / 100 | currency: 'BRL'
             }}</strong
-            ><small>Plataforma</small>
+            ><small class="text-neutral-500 dark:text-neutral-400">Definido pela plataforma</small>
           </article>
-          <article class="panel p-4">
-            <p class="text-sm text-slate-500">Preço ao cliente</p>
-            <strong class="mt-2 block text-xl">{{
+          <article class="panel metric-card">
+            <p class="text-xs font-semibold text-neutral-500 dark:text-neutral-400 sm:text-sm">
+              Preço ao cliente
+            </p>
+            <strong class="metric-value mt-5 block text-xl sm:text-2xl">{{
               (data.config?.unitPriceCents ?? 0) / 100 | currency: 'BRL'
             }}</strong
-            ><small>Vendas futuras</small>
+            ><small class="text-neutral-500 dark:text-neutral-400"
+              >Aplicado às próximas vendas</small
+            >
           </article>
-          <article class="panel p-4">
-            <p class="text-sm text-slate-500">Margem unitária</p>
+          <article class="panel metric-card">
+            <div class="flex items-center gap-2">
+              <p class="text-xs font-semibold text-neutral-500 dark:text-neutral-400 sm:text-sm">
+                Margem unitária
+              </p>
+              <button
+                type="button"
+                class="icon-button tooltip"
+                data-tooltip="Diferença entre seu preço de venda e o custo da plataforma."
+                aria-label="Como a margem é calculada"
+              >
+                ?
+              </button>
+            </div>
             <strong
-              class="mt-2 block text-xl"
+              class="metric-value mt-5 block text-xl sm:text-2xl"
               [class.text-red-600]="(data.margin?.unitCents ?? 0) < 0"
               >{{ (data.margin?.unitCents ?? 0) / 100 | currency: 'BRL' }}</strong
-            ><small>{{ data.margin?.percent ?? 0 | number: '1.0-2' }}% sobre o custo</small>
+            ><small class="text-neutral-500 dark:text-neutral-400"
+              >{{ data.margin?.percent ?? 0 | number: '1.0-2' }}% sobre o custo</small
+            >
           </article>
-          <article class="panel p-4">
-            <p class="text-sm text-slate-500">Canal e pacotes</p>
-            <strong class="mt-2 block text-xl">{{
-              data.config?.allowDirectPurchase ? 'Ativo' : 'Suspenso'
-            }}</strong
-            ><small>{{ data.activePackageCount }} pacotes ativos</small>
+          <article class="panel metric-card">
+            <p class="text-xs font-semibold text-neutral-500 dark:text-neutral-400 sm:text-sm">
+              Canal de venda
+            </p>
+            <strong class="mt-5 flex items-center gap-2 text-xl"
+              ><span
+                class="status-dot"
+                [class.text-emerald-600]="data.config?.allowDirectPurchase"
+                [class.text-neutral-400]="!data.config?.allowDirectPurchase"
+              ></span
+              >{{ data.config?.allowDirectPurchase ? 'Ativo' : 'Suspenso' }}</strong
+            ><small class="text-neutral-500 dark:text-neutral-400"
+              >{{ data.activePackageCount }} pacotes ativos</small
+            >
           </article>
         </section>
       }
 
-      <section class="grid gap-6 lg:grid-cols-[1.15fr_.85fr]">
-        <form class="panel space-y-5 p-5" [formGroup]="pricingForm" (ngSubmit)="requestPreview()">
+      <section class="grid items-start gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(18rem,.75fr)]">
+        <form
+          class="panel space-y-5 p-5 sm:p-6"
+          [formGroup]="pricingForm"
+          (ngSubmit)="requestPreview()"
+        >
           <div>
             <h2 class="text-xl font-bold">Preço unitário</h2>
-            <p class="text-sm text-slate-500">O novo valor não altera vendas já realizadas.</p>
+            <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+              O novo valor não altera vendas já realizadas.
+            </p>
           </div>
           <label class="block"
             ><span class="mb-1 block font-semibold">Preço ao cliente (R$)</span
@@ -177,7 +408,10 @@ import {
               inputmode="decimal"
               placeholder="0,00"
               aria-describedby="price-help price-error"
-            /><small id="price-help">Mínimo: custo vigente da plataforma.</small></label
+            /><small id="price-help" class="mt-1.5 block text-neutral-500 dark:text-neutral-400"
+              >Mínimo recomendado: custo vigente de
+              {{ (overview()?.platformCost?.unitPriceCents ?? 0) / 100 | currency: 'BRL' }}.</small
+            ></label
           >
           @if (pricingForm.controls.price.touched && pricingForm.controls.price.invalid) {
             <p id="price-error" class="text-sm text-red-600">
@@ -192,14 +426,24 @@ import {
               formControlName="allowDirectPurchase"
             /><span
               ><b>Permitir compra direta</b
-              ><small class="block text-slate-500"
+              ><small class="block text-neutral-500 dark:text-neutral-400"
                 >Quando suspenso, novas compras diretas ficam indisponíveis.</small
               ></span
             ></label
           >
-          <div class="rounded-xl bg-slate-50 p-4 dark:bg-slate-800">
-            <p class="text-sm">Prévia local</p>
-            <p class="mt-1 font-bold">
+          <div class="rounded-xl bg-neutral-100 p-4 dark:bg-neutral-800">
+            <div class="flex items-center gap-2">
+              <p class="text-sm font-medium">Estimativa imediata</p>
+              <button
+                type="button"
+                class="icon-button tooltip"
+                data-tooltip="A confirmação usa uma nova validação do servidor com o custo mais recente."
+                aria-label="Sobre esta estimativa"
+              >
+                ?
+              </button>
+            </div>
+            <p class="metric-value mt-2 text-lg font-bold">
               Margem: {{ draftMargin().cents / 100 | currency: 'BRL' }} ·
               {{ draftMargin().percent ?? 0 | number: '1.0-2' }}%
             </p>
@@ -212,42 +456,69 @@ import {
           </button>
         </form>
 
-        <section class="panel p-5">
-          <h2 class="text-xl font-bold">Como funciona</h2>
-          <ol class="mt-4 space-y-4 text-sm">
-            <li>
-              <b>1. Confira o custo.</b><br />Ele é definido pela plataforma e serve como limite
-              mínimo.
+        <aside class="panel p-5 sm:p-6 lg:sticky lg:top-6">
+          <p class="text-sm font-medium text-neutral-500 dark:text-neutral-400">
+            Antes de publicar
+          </p>
+          <h2 class="mt-1 text-xl font-bold tracking-tight">Uma mudança segura em 3 passos</h2>
+          <ol class="mt-5 space-y-5 text-sm">
+            <li class="grid grid-cols-[2rem_1fr] gap-3">
+              <span
+                class="grid size-8 place-items-center rounded-lg bg-neutral-900 text-xs font-bold text-white dark:bg-white dark:text-neutral-900"
+                >1</span
+              ><span
+                ><b>Confira o custo</b><br /><span class="text-neutral-500 dark:text-neutral-400"
+                  >Ele define o limite para proteger sua margem.</span
+                ></span
+              >
             </li>
-            <li>
-              <b>2. Revise a margem.</b><br />A prévia do servidor recalcula tudo com o custo
-              vigente.
+            <li class="grid grid-cols-[2rem_1fr] gap-3">
+              <span
+                class="grid size-8 place-items-center rounded-lg bg-neutral-200 text-xs font-bold dark:bg-neutral-700"
+                >2</span
+              ><span
+                ><b>Revise a prévia</b><br /><span class="text-neutral-500 dark:text-neutral-400"
+                  >O servidor recalcula tudo com os dados mais recentes.</span
+                ></span
+              >
             </li>
-            <li>
-              <b>3. Confirme conscientemente.</b><br />A mudança vale apenas para novas vendas.
+            <li class="grid grid-cols-[2rem_1fr] gap-3">
+              <span
+                class="grid size-8 place-items-center rounded-lg bg-neutral-200 text-xs font-bold dark:bg-neutral-700"
+                >3</span
+              ><span
+                ><b>Confirme a publicação</b><br /><span
+                  class="text-neutral-500 dark:text-neutral-400"
+                  >Somente novas vendas recebem o novo preço.</span
+                ></span
+              >
             </li>
           </ol>
-        </section>
+        </aside>
       </section>
 
       <section class="panel overflow-hidden">
-        <div class="border-b border-slate-200 p-5 dark:border-slate-700">
+        <div class="border-b border-neutral-200 p-5 dark:border-neutral-700 sm:p-6">
           <div class="flex flex-wrap items-center justify-between gap-3">
             <div>
               <h2 class="text-xl font-bold">Pacotes de créditos</h2>
-              <p class="text-sm text-slate-500">Ofertas com preço total próprio.</p>
+              <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+                Ofertas com preço total próprio.
+              </p>
             </div>
             <button
-              class="button primary"
+              class="button primary inline-flex items-center gap-2"
               type="button"
               (click)="packageEditor.set(!packageEditor())"
+              [attr.aria-expanded]="packageEditor()"
             >
-              {{ packageEditor() ? 'Fechar' : 'Novo pacote' }}
+              <span aria-hidden="true">{{ packageEditor() ? '×' : '+' }}</span
+              >{{ packageEditor() ? 'Fechar criação' : 'Novo pacote' }}
             </button>
           </div>
           @if (packageEditor()) {
             <form
-              class="mt-5 grid gap-3 sm:grid-cols-4"
+              class="mt-5 grid gap-4 rounded-xl bg-neutral-100 p-4 dark:bg-neutral-800 sm:grid-cols-2 lg:grid-cols-4"
               [formGroup]="packageForm"
               (ngSubmit)="createPackage()"
             >
@@ -298,12 +569,14 @@ import {
         @if (!packages().length && !loading()) {
           <div class="p-10 text-center">
             <h3 class="font-bold">Nenhum pacote encontrado</h3>
-            <p class="text-slate-500">Crie o primeiro pacote ou limpe os filtros.</p>
+            <p class="mt-1 text-neutral-500 dark:text-neutral-400">
+              Crie o primeiro pacote ou ajuste os filtros.
+            </p>
           </div>
         }
         @if (selected().length) {
           <div
-            class="flex flex-wrap items-center gap-3 border-b border-slate-200 bg-cyan-50 p-4 text-cyan-950 dark:border-slate-700 dark:bg-cyan-950 dark:text-cyan-50"
+            class="flex flex-wrap items-center gap-3 border-b border-neutral-200 bg-neutral-100 p-4 text-neutral-900 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100"
           >
             <b>{{ selected().length }} selecionado(s)</b
             ><button class="button secondary" (click)="bulkAction('ACTIVATE')">
@@ -329,7 +602,9 @@ import {
             </thead>
             <tbody>
               @for (p of packages(); track p.id) {
-                <tr class="border-t border-slate-200 dark:border-slate-700">
+                <tr
+                  class="border-t border-neutral-200 transition-colors hover:bg-neutral-50 dark:border-neutral-700 dark:hover:bg-neutral-800/60"
+                >
                   <td class="p-4">
                     <input
                       type="checkbox"
@@ -343,7 +618,16 @@ import {
                   <td class="p-4">{{ p.priceCents / 100 | currency: 'BRL' }}</td>
                   <td class="p-4">{{ p.priceCents / p.creditAmount / 100 | currency: 'BRL' }}</td>
                   <td class="p-4">{{ packageMargin(p) / 100 | currency: 'BRL' }}</td>
-                  <td class="p-4">{{ p.isActive ? 'Ativo' : 'Inativo' }}</td>
+                  <td class="p-4">
+                    <span class="inline-flex items-center gap-2 text-sm font-medium"
+                      ><span
+                        class="status-dot"
+                        [class.text-emerald-600]="p.isActive"
+                        [class.text-neutral-400]="!p.isActive"
+                      ></span
+                      >{{ p.isActive ? 'Ativo' : 'Inativo' }}</span
+                    >
+                  </td>
                   <td class="p-4">
                     <button class="button secondary" (click)="togglePackage(p)">
                       {{ p.isActive ? 'Desativar' : 'Ativar' }}
@@ -356,13 +640,22 @@ import {
         </div>
         <div class="grid gap-3 p-4 md:hidden">
           @for (p of packages(); track p.id) {
-            <article class="rounded-xl border border-slate-200 p-4 dark:border-slate-700">
+            <article
+              class="rounded-xl border border-neutral-200 bg-neutral-50 p-4 dark:border-neutral-700 dark:bg-neutral-800/50"
+            >
               <div class="flex justify-between gap-3">
                 <div>
                   <h3 class="font-bold">{{ p.name || 'Pacote ' + p.creditAmount }}</h3>
                   <p class="text-sm">{{ p.creditAmount }} créditos</p>
                 </div>
-                <span>{{ p.isActive ? 'Ativo' : 'Inativo' }}</span>
+                <span class="inline-flex items-center gap-2 text-sm font-medium"
+                  ><span
+                    class="status-dot"
+                    [class.text-emerald-600]="p.isActive"
+                    [class.text-neutral-400]="!p.isActive"
+                  ></span
+                  >{{ p.isActive ? 'Ativo' : 'Inativo' }}</span
+                >
               </div>
               <p class="mt-4 text-xl font-black">{{ p.priceCents / 100 | currency: 'BRL' }}</p>
               <p class="text-sm text-slate-500">
@@ -416,7 +709,7 @@ import {
 
     @if (preview(); as item) {
       <div
-        class="fixed inset-0 z-50 grid place-items-center bg-slate-950/60 p-4"
+        class="dialog-backdrop fixed inset-0 z-50 grid place-items-center bg-neutral-950/60 p-4"
         role="presentation"
         (click)="preview.set(null)"
       >
@@ -424,7 +717,7 @@ import {
           role="dialog"
           aria-modal="true"
           aria-labelledby="confirm-title"
-          class="panel w-full max-w-lg p-6 shadow-2xl"
+          class="panel dialog-panel w-full max-w-lg p-6 shadow-2xl"
           (click)="$event.stopPropagation()"
         >
           <h2 id="confirm-title" class="text-2xl font-black">Confirmar novo preço?</h2>
@@ -458,6 +751,65 @@ import {
         </section>
       </div>
     }
+
+    @if (pendingConfirmation(); as confirmation) {
+      <div
+        class="dialog-backdrop fixed inset-0 z-50 grid place-items-center bg-neutral-950/60 p-4"
+        role="presentation"
+        (click)="closeConfirmation()"
+      >
+        <section
+          role="alertdialog"
+          aria-modal="true"
+          aria-labelledby="action-dialog-title"
+          aria-describedby="action-dialog-description"
+          class="panel dialog-panel w-full max-w-md p-6 shadow-2xl"
+          (click)="$event.stopPropagation()"
+        >
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <p class="text-sm font-medium text-neutral-500 dark:text-neutral-400">
+                Confirme a ação
+              </p>
+              <h2 id="action-dialog-title" class="mt-1 text-2xl font-black tracking-tight">
+                {{ confirmation.title }}
+              </h2>
+            </div>
+            <button
+              type="button"
+              class="icon-button"
+              aria-label="Fechar confirmação"
+              (click)="closeConfirmation()"
+            >
+              ×
+            </button>
+          </div>
+          <p
+            id="action-dialog-description"
+            class="mt-4 text-sm leading-6 text-neutral-600 dark:text-neutral-300"
+          >
+            {{ confirmation.description }}
+          </p>
+          <div class="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <button type="button" class="button secondary" (click)="closeConfirmation()">
+              Cancelar
+            </button>
+            <button
+              type="button"
+              class="button"
+              [class.primary]="confirmation.tone === 'default'"
+              [class.bg-red-600]="confirmation.tone === 'danger'"
+              [class.text-white]="confirmation.tone === 'danger'"
+              (click)="confirmPendingAction()"
+              [disabled]="saving()"
+              autofocus
+            >
+              {{ saving() ? 'Processando…' : confirmation.confirmLabel }}
+            </button>
+          </div>
+        </section>
+      </div>
+    }
   `,
 })
 export class ResellerPricingPage {
@@ -475,6 +827,7 @@ export class ResellerPricingPage {
   readonly packages = signal<CreditPackage[]>([]);
   readonly history = signal<PricingHistoryEvent[]>([]);
   readonly preview = signal<PricingPreview | null>(null);
+  readonly pendingConfirmation = signal<PendingConfirmation | null>(null);
   readonly packageEditor = signal(false);
   readonly selected = signal<string[]>([]);
   readonly query = signal<PackageQuery>(DEFAULT_PACKAGE_QUERY);
@@ -509,11 +862,15 @@ export class ResellerPricingPage {
     this.pricingForm.controls.price.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((value) => this.priceDraft.set(value));
-    if (typeof window !== 'undefined') {
-      window.addEventListener('online', () => this.online.set(true));
-      window.addEventListener('offline', () => this.online.set(false));
-    }
     this.reload();
+  }
+  @HostListener('window:online')
+  handleOnline() {
+    this.online.set(true);
+  }
+  @HostListener('window:offline')
+  handleOffline() {
+    this.online.set(false);
   }
   reload() {
     this.loading.set(true);
@@ -605,8 +962,18 @@ export class ResellerPricingPage {
       });
   }
   togglePackage(pkg: CreditPackage) {
-    if (!confirm(`${pkg.isActive ? 'Desativar' : 'Ativar'} este pacote para vendas futuras?`))
-      return;
+    const packageName = pkg.name || `Pacote ${pkg.creditAmount}`;
+    this.pendingConfirmation.set({
+      title: `${pkg.isActive ? 'Desativar' : 'Ativar'} ${packageName}?`,
+      description: pkg.isActive
+        ? 'O pacote deixará de aparecer para novas compras. Vendas já concluídas não serão alteradas.'
+        : 'O pacote ficará disponível imediatamente para novas compras com o preço configurado.',
+      confirmLabel: pkg.isActive ? 'Desativar pacote' : 'Ativar pacote',
+      tone: pkg.isActive ? 'danger' : 'default',
+      action: () => this.executePackageToggle(pkg),
+    });
+  }
+  private executePackageToggle(pkg: CreditPackage) {
     this.saving.set(true);
     this.service
       .togglePackage(pkg.id, !pkg.isActive, pkg.version)
@@ -633,32 +1000,58 @@ export class ResellerPricingPage {
     this.saving.set(true);
     this.service.previewPackageBulk(action, ids).subscribe({
       next: (preview) => {
-        if (
-          !preview.eligible.length ||
-          !confirm(`${preview.eligible.length} pacote(s) elegível(is). Confirmar ação?`)
-        ) {
+        if (!preview.eligible.length) {
           this.saving.set(false);
+          this.error.set('Nenhum dos pacotes selecionados pode receber esta alteração.');
           return;
         }
-        this.service
-          .executePackageBulk(preview.previewId)
-          .pipe(finalize(() => this.saving.set(false)))
-          .subscribe({
-            next: (result) => {
-              this.selected.set([]);
-              this.message.set(
-                `${result.results.filter((item) => item.success).length} pacote(s) atualizado(s).`,
-              );
-              this.reload();
-            },
-            error: (error) => this.error.set(error.message),
-          });
+        this.saving.set(false);
+        this.pendingConfirmation.set({
+          title:
+            action === 'ACTIVATE'
+              ? 'Ativar pacotes selecionados?'
+              : 'Desativar pacotes selecionados?',
+          description: `${preview.eligible.length} pacote(s) estão elegíveis. ${preview.ineligible.length ? `${preview.ineligible.length} não serão alterados.` : 'Todos os itens selecionados serão alterados.'}`,
+          confirmLabel: action === 'ACTIVATE' ? 'Ativar pacotes' : 'Desativar pacotes',
+          tone: action === 'ACTIVATE' ? 'default' : 'danger',
+          action: () => this.executeBulkPreview(preview.previewId),
+        });
       },
       error: (error) => {
         this.saving.set(false);
         this.error.set(error.message);
       },
     });
+  }
+  private executeBulkPreview(previewId: string) {
+    this.saving.set(true);
+    this.service
+      .executePackageBulk(previewId)
+      .pipe(finalize(() => this.saving.set(false)))
+      .subscribe({
+        next: (result) => {
+          this.selected.set([]);
+          this.message.set(
+            `${result.results.filter((item) => item.success).length} pacote(s) atualizado(s).`,
+          );
+          this.reload();
+        },
+        error: (error) => this.error.set(error.message),
+      });
+  }
+  confirmPendingAction() {
+    const confirmation = this.pendingConfirmation();
+    if (!confirmation || this.saving()) return;
+    this.pendingConfirmation.set(null);
+    confirmation.action();
+  }
+  closeConfirmation() {
+    if (!this.saving()) this.pendingConfirmation.set(null);
+  }
+  @HostListener('document:keydown.escape')
+  closeDialogs() {
+    this.preview.set(null);
+    this.closeConfirmation();
   }
   applyFilters() {
     this.query.update((query) => ({ ...query, ...this.filterForm.getRawValue(), page: 1 }));

@@ -73,4 +73,38 @@ describe('ProfessionalService pricing flow', () => {
       {},
     );
   });
+
+  it('creates a private professional without sending a reseller id', () => {
+    api.post.mockReturnValue(of({ id: 'voice-2' }));
+    const input = {
+      name: 'Marina Costa',
+      email: 'marina@example.com',
+      password: 'safe-password',
+      role: 'VOICE_ACTOR' as const,
+    };
+
+    service.createPrivateProfessional(input).subscribe();
+
+    expect(api.post).toHaveBeenCalledWith('/professionals', input);
+  });
+
+  it('loads and updates client catalog visibility', () => {
+    const visibility = { hiddenProfessionalIds: ['voice-1'] };
+    api.get.mockReturnValue(of(visibility));
+    api.patch.mockReturnValue(of(visibility));
+
+    service.getCatalogVisibility().subscribe();
+    service.updateProfessionalVisibility('voice-1', false).subscribe();
+    service.updateBulkVisibility('VOICE_ACTOR', true, 'GLOBAL').subscribe();
+
+    expect(api.get).toHaveBeenCalledWith('/professionals/catalog-visibility');
+    expect(api.patch).toHaveBeenNthCalledWith(1, '/professionals/catalog-visibility/voice-1', {
+      isVisible: false,
+    });
+    expect(api.patch).toHaveBeenNthCalledWith(2, '/professionals/catalog-visibility', {
+      role: 'VOICE_ACTOR',
+      isVisible: true,
+      scope: 'GLOBAL',
+    });
+  });
 });

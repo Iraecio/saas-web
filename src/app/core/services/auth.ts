@@ -164,6 +164,11 @@ export class AuthService {
       return of(null);
     }
 
+    if (!this.hasRestorableSession()) {
+      this.initializedSignal.set(true);
+      return of(null);
+    }
+
     const restore$ = this.accessTokenSignal()
       ? this.fetchProfile()
       : this.refresh().pipe(switchMap(() => this.fetchProfile()));
@@ -207,9 +212,11 @@ export class AuthService {
   }
 
   private hasRestorableSession(): boolean {
-    return this.accessTokenSignal() !== null;
+    if (this.accessTokenSignal() !== null) return true;
+    if (!this.isBrowser) return false;
+    const lastActivity = Number(localStorage.getItem(LAST_ACTIVITY_KEY));
+    return Number.isFinite(lastActivity) && lastActivity > 0;
   }
-
 
   private isIdleExpired(): boolean {
     if (!this.isBrowser) return false;

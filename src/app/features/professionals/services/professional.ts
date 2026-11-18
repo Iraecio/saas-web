@@ -7,6 +7,9 @@ import {
   ProfessionalListResponse,
   ProfessionalOffering,
   ProposeServicePriceDto,
+  CreatePrivateProfessional,
+  ProfessionalCatalogVisibility,
+  ProfessionalRole,
   ServicePriceNegotiation,
   SetScopeDto,
 } from '../../../core/models/professional.model';
@@ -45,6 +48,36 @@ export class ProfessionalService {
     return this.api
       .get<ProfessionalApiResponse>('/professionals/producers', this.toParams(filters))
       .pipe(map((response) => this.normalizeResponse(response, filters)));
+  }
+
+  createPrivateProfessional(input: CreatePrivateProfessional): Observable<{ id: string }> {
+    return this.api.post<{ id: string }>('/professionals', input);
+  }
+
+  getCatalogVisibility(): Observable<ProfessionalCatalogVisibility> {
+    return this.api.get<ProfessionalCatalogVisibility>('/professionals/catalog-visibility');
+  }
+
+  updateProfessionalVisibility(
+    professionalId: string,
+    isVisible: boolean,
+  ): Observable<ProfessionalCatalogVisibility> {
+    return this.api.patch<ProfessionalCatalogVisibility>(
+      `/professionals/catalog-visibility/${professionalId}`,
+      { isVisible },
+    );
+  }
+
+  updateBulkVisibility(
+    role: ProfessionalRole,
+    isVisible: boolean,
+    scope?: ProfessionalListFilters['scope'],
+  ): Observable<ProfessionalCatalogVisibility> {
+    return this.api.patch<ProfessionalCatalogVisibility>('/professionals/catalog-visibility', {
+      role,
+      isVisible,
+      scope,
+    });
   }
 
   setScope(type: ProfessionalType, id: string, dto: SetScopeDto): Observable<Professional> {

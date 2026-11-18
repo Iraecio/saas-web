@@ -34,6 +34,18 @@ export interface SetScopeDto {
 }
 
 export type ProfessionalRole = 'VOICE_ACTOR' | 'PRODUCER';
+
+export interface CreatePrivateProfessional {
+  name: string;
+  email: string;
+  password: string;
+  role: ProfessionalRole;
+  summary?: string;
+}
+
+export interface ProfessionalCatalogVisibility {
+  hiddenProfessionalIds: string[];
+}
 export type NegotiationInitiator = 'PROFESSIONAL' | 'MANAGER';
 export type NegotiationStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'COUNTERED' | 'APPLIED';
 

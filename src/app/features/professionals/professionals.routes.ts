@@ -8,6 +8,11 @@ export const PROFESSIONALS_ROUTES: Routes = [
     loadComponent: () => import('./pages/my-services/my-services').then((m) => m.MyServicesPage),
   },
   {
+    path: 'network',
+    canActivate: [roleGuard(['RESELLER', 'RESELLER_MANAGER'])],
+    loadComponent: () => import('./pages/list/list').then((m) => m.ProfessionalsListPage),
+  },
+  {
     path: '',
     canActivate: [roleGuard(['SUPER_ADMIN'])],
     loadComponent: () =>

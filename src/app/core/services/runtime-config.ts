@@ -15,7 +15,7 @@ export class RuntimeConfigService {
 
   load(): Observable<RuntimeConfig> {
     return this.http
-      .get<RuntimeConfig>('/runtime-config', {
+      .get<RuntimeConfig>('/api/runtime-config', {
         headers: { Accept: 'application/json' },
       })
       .pipe(catchError(() => of(DEFAULT_CONFIG)));

@@ -1,10 +1,15 @@
 /// <reference types="node" />
 
 import type { IncomingMessage, ServerResponse } from 'node:http';
-import { isEnabled, type RuntimeConfig } from '../src/app/core/config/runtime-config';
+
+const ENABLED_VALUES = new Set(['1', 'true', 'yes', 'on']);
+
+function isEnabled(value: string | undefined): boolean {
+  return value !== undefined && ENABLED_VALUES.has(value.trim().toLowerCase());
+}
 
 export default function runtimeConfigHandler(_req: IncomingMessage, res: ServerResponse): void {
-  const config: RuntimeConfig = {
+  const config = {
     features: {
       devQuickAccess: isEnabled(process.env['ENABLE_DEV_QUICK_ACCESS']),
     },

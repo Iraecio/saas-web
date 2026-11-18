@@ -13,8 +13,8 @@ Install the locked dependency tree with `npm ci`.
 
 ### Configurações por ambiente
 
-O card **Acesso rápido · dev** da tela de login é controlado pela função Vercel
-`/api/runtime-config`, que lê
+O card **Acesso rápido · dev** da tela de login é controlado pelo arquivo
+`/runtime-config.json`, gerado ao final do build a partir de
 `ENABLE_DEV_QUICK_ACCESS`. O padrão é desabilitado. Use `true`, `1`, `yes` ou `on`
 para habilitá-lo.
 

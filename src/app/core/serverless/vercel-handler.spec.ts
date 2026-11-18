@@ -26,29 +26,4 @@ describe('Vercel SSR handler', () => {
     await expect(handleVercelRequest(request, response, loadHandler)).rejects.toBe(handlerError);
   });
 
-  it('serves runtime config without loading the SSR bundle', async () => {
-    const previous = process.env['ENABLE_DEV_QUICK_ACCESS'];
-    process.env['ENABLE_DEV_QUICK_ACCESS'] = 'true';
-    const loadHandler: SsrHandlerLoader = vi.fn();
-    const response = {
-      statusCode: 0,
-      setHeader: vi.fn(),
-      end: vi.fn(),
-    } as unknown as Parameters<typeof handleVercelRequest>[1];
-
-    await handleVercelRequest(
-      { url: '/api/runtime-config' } as Parameters<typeof handleVercelRequest>[0],
-      response,
-      loadHandler,
-    );
-
-    expect(loadHandler).not.toHaveBeenCalled();
-    expect(response.statusCode).toBe(200);
-    expect(response.end).toHaveBeenCalledWith(
-      JSON.stringify({ features: { devQuickAccess: true } }),
-    );
-
-    if (previous === undefined) delete process.env['ENABLE_DEV_QUICK_ACCESS'];
-    else process.env['ENABLE_DEV_QUICK_ACCESS'] = previous;
-  });
 });

@@ -3,7 +3,8 @@
   "outputDirectory": "dist/saas-web/browser",
   "functions": {
     "api/handler.ts": {
-      "maxDuration": 60
+      "maxDuration": 60,
+      "includeFiles": "dist/saas-web/server/**"
     }
   },
   "rewrites": [
